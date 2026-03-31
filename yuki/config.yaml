@@ -27,30 +27,28 @@ wakeword:
   chunk_duration: 2.0  # seconds
   check_interval: 0.5  # seconds
 
-# Text-to-Speech
+# Text-to-Speech (LuxTTS)
 tts:
-  engine: pyttsx3
-  voice_name: "Microsoft Zira Desktop"  # Windows default female voice
-  rate: 165  # words per minute
-  volume: 0.9  # 0.0 to 1.0
+  engine: luxtts
+  device: cuda  # Options: "cuda", "cpu", "mps" (Mac)
+  reference_audio: data/yuki_voice.wav
+  num_steps: 4  # Quality/speed tradeoff (3-6 recommended)
+  t_shift: 0.9  # Sampling parameter (0.7-0.95)
+  speed: 1.0  # Speech speed multiplier
+  rms: 0.01  # Volume normalization
+  ref_duration: 5  # seconds of reference audio to use
+  return_smooth: false  # Smoother but less clear audio
+  fallback_mode: text_only  # If LuxTTS fails, continue without voice
 
-# 3D Avatar
-avatar:
-  vrm_path: data/Yuki.vrm
-  max_texture_size: 512  # pixels (VRAM optimization)
-  fps: 30
-  enable_placeholder: true  # Show placeholder if VRM missing
-  auto_blink_interval_min: 3.0  # seconds
-  auto_blink_interval_max: 5.0  # seconds
-
-# User Interface
+# User Interface (Minimal Status Window)
 ui:
-  width: 380
-  height: 640
+  width: 400
+  height: 300
   position: bottom_right  # Options: "bottom_right", "bottom_left", "top_right", "top_left", "center"
   start_hidden: true
+  always_on_top: false  # Toggle in system tray menu
   conversation_timeout_seconds: 10
-  max_chat_history_visible: 5  # number of exchanges shown
+  max_chat_history_visible: 10  # number of exchanges shown
 
 # Memory
 memory:
@@ -64,6 +62,12 @@ audio:
   channels: 1
   vad_aggressiveness: 2  # 0-3, higher = more aggressive
   silence_duration: 1.5  # seconds of silence before stopping recording
+  
+  # Audio cues (sound effects for state changes)
+  enable_audio_cues: true
+  wakeword_chime: true  # Play sound when wakeword detected
+  thinking_beep: false  # Beep when processing (can be annoying)
+  error_sound: true  # Play sound on errors
 
 # Actions
 actions:
