@@ -1,21 +1,22 @@
 """
-Text-to-Speech engine using pyttsx3 with streaming support.
+Text-to-Speech engine using LuxTTS for high-quality voice synthesis.
 
-Provides threaded TTS execution with sentence-based streaming for
-responsive LLM output. Emits Qt signals for lip sync integration.
+Provides GPU-accelerated voice cloning with streaming support for
+responsive LLM output. Supports fallback to text-only mode if TTS fails.
 """
 
 import re
 import threading
 import logging
 import queue
+import os
 from typing import Optional, Callable
 from enum import Enum
+from pathlib import Path
 
-try:
-    import pyttsx3
-except ImportError:
-    pyttsx3 = None
+import torch
+import soundfile as sf
+import numpy as np
 
 try:
     from PyQt6.QtCore import QObject, pyqtSignal
@@ -25,6 +26,12 @@ except ImportError:
     def pyqtSignal(*args, **kwargs):
         return None
 
+try:
+    import pygame
+    PYGAME_AVAILABLE = True
+except ImportError:
+    PYGAME_AVAILABLE = False
+    
 logger = logging.getLogger(__name__)
 
 
@@ -35,170 +42,286 @@ class TTSState(Enum):
     STOPPING = "stopping"
 
 
-class TTSEngine(QObject):
+class LuxTTSEngine(QObject):
     """
-    Text-to-Speech engine with streaming and threading support.
+    Text-to-Speech engine using LuxTTS voice cloning.
     
     Features:
-    - pyttsx3 backend (zero VRAM, instant)
-    - Microsoft Zira voice on Windows
+    - High-quality 48kHz voice synthesis
+    - GPU acceleration (150x realtime) with CPU fallback
+    - Voice cloning from reference audio
     - Threaded execution (non-blocking)
     - Sentence-based streaming for LLM responses
-    - Qt signals for UI integration
+    - Graceful degradation to text-only mode
     
     Signals:
         speaking_started: Emitted when TTS begins speaking
-        speaking_word: Emitted for each word (for lip sync)
-        speaking_finished: Emitted when TTS finishes
+        speaking_stopped: Emitted when TTS finishes or is stopped
+        sentence_complete: Emitted after each sentence (for UI updates)
+        tts_error: Emitted if TTS fails (str: error message)
     """
     
-    # Qt signals
+    # Qt Signals
     speaking_started = pyqtSignal()
-    speaking_word = pyqtSignal(str)  # Current word being spoken
-    speaking_finished = pyqtSignal()
+    speaking_stopped = pyqtSignal()
+    sentence_complete = pyqtSignal(str)  # sentence text
+    tts_error = pyqtSignal(str)  # error message
     
-    def __init__(self, config: dict):
+    def __init__(
+        self,
+        device: str = "cuda",
+        reference_audio: str = "data/yuki_voice.wav",
+        num_steps: int = 4,
+        t_shift: float = 0.9,
+        speed: float = 1.0,
+        rms: float = 0.01,
+        ref_duration: int = 5,
+        return_smooth: bool = False,
+        fallback_mode: str = "text_only"
+    ):
         """
-        Initialize TTS engine.
+        Initialize LuxTTS engine.
         
         Args:
-            config: TTS configuration dict with keys:
-                - voice_name: Voice name (e.g., "Microsoft Zira Desktop")
-                - rate: Speech rate in words per minute (default: 165)
-                - volume: Volume level 0.0-1.0 (default: 0.9)
+            device: "cuda", "cpu", or "mps" (Mac)
+            reference_audio: Path to reference voice file (WAV, 48kHz recommended)
+            num_steps: Quality/speed tradeoff (3-6, higher = better quality)
+            t_shift: Sampling parameter (0.7-0.95, higher = better quality but more errors)
+            speed: Speech speed multiplier (0.5-2.0)
+            rms: Volume normalization (0.01 recommended)
+            ref_duration: Seconds of reference audio to use
+            return_smooth: Enable smoother audio (may reduce clarity)
+            fallback_mode: "text_only" if TTS initialization fails
         """
         super().__init__()
         
-        if pyttsx3 is None:
-            raise ImportError("pyttsx3 is not installed")
+        self._device = device
+        self._reference_audio = reference_audio
+        self._num_steps = num_steps
+        self._t_shift = t_shift
+        self._speed = speed
+        self._rms = rms
+        self._ref_duration = ref_duration
+        self._return_smooth = return_smooth
+        self._fallback_mode = fallback_mode
         
-        self._config = config
         self._state = TTSState.IDLE
         self._state_lock = threading.Lock()
+        self._speech_queue = queue.Queue()
+        self._worker_thread: Optional[threading.Thread] = None
+        self._stop_flag = threading.Event()
         
-        # Speech queue for streaming
-        self._speech_queue: queue.Queue = queue.Queue()
-        self._stop_event = threading.Event()
+        self._lux_tts = None
+        self._encoded_prompt = None
+        self._tts_available = False
         
-        # Initialize pyttsx3 engine
-        self._engine: Optional[pyttsx3.Engine] = None
-        self._init_engine()
+        # Initialize pygame for audio playback
+        if PYGAME_AVAILABLE:
+            try:
+                pygame.mixer.init(frequency=48000, channels=1)
+                logger.info("Pygame mixer initialized for audio playback")
+            except Exception as e:
+                logger.warning(f"Failed to initialize pygame mixer: {e}")
         
-        # Start worker thread
-        self._worker_thread = threading.Thread(
-            target=self._speech_worker,
-            daemon=True,
-            name="TTS-Worker"
-        )
-        self._worker_thread.start()
-        
-        logger.info("TTS engine initialized")
+        # Try to initialize LuxTTS
+        self._initialize_luxtts()
     
-    def _init_engine(self) -> None:
-        """Initialize pyttsx3 engine with configured settings."""
+    def _initialize_luxtts(self):
+        """Initialize LuxTTS model and encode reference audio."""
         try:
-            self._engine = pyttsx3.init()
+            # Import LuxTTS (installed from GitHub)
+            from zipvoice.luxvoice import LuxTTS
             
-            # Set voice
-            voice_name = self._config.get("voice_name", "Microsoft Zira Desktop")
-            voices = self._engine.getProperty('voices')
+            # Check if reference audio exists
+            if not os.path.exists(self._reference_audio):
+                logger.warning(
+                    f"Reference audio not found: {self._reference_audio}. "
+                    f"Running in {self._fallback_mode} mode."
+                )
+                return
             
-            # Try to find requested voice
-            selected_voice = None
-            for voice in voices:
-                if voice_name.lower() in voice.name.lower():
-                    selected_voice = voice.id
-                    logger.info(f"Selected voice: {voice.name}")
-                    break
+            # Check device availability
+            if self._device == "cuda" and not torch.cuda.is_available():
+                logger.warning("CUDA not available, falling back to CPU")
+                self._device = "cpu"
             
-            if selected_voice:
-                self._engine.setProperty('voice', selected_voice)
+            # Load model
+            logger.info(f"Loading LuxTTS model on {self._device}...")
+            if self._device == "cpu":
+                self._lux_tts = LuxTTS('YatharthS/LuxTTS', device='cpu', threads=2)
             else:
-                # Fallback to first available female voice
-                for voice in voices:
-                    if 'female' in voice.name.lower() or 'zira' in voice.name.lower():
-                        self._engine.setProperty('voice', voice.id)
-                        logger.info(f"Fallback voice: {voice.name}")
-                        break
-                else:
-                    logger.warning(f"Voice '{voice_name}' not found, using default")
+                self._lux_tts = LuxTTS('YatharthS/LuxTTS', device=self._device)
             
-            # Set rate (words per minute)
-            rate = self._config.get("rate", 165)
-            self._engine.setProperty('rate', rate)
+            # Encode reference audio
+            logger.info(f"Encoding reference audio: {self._reference_audio}")
+            self._encoded_prompt = self._lux_tts.encode_prompt(
+                self._reference_audio,
+                duration=self._ref_duration,
+                rms=self._rms
+            )
             
-            # Set volume (0.0 to 1.0)
-            volume = self._config.get("volume", 0.9)
-            self._engine.setProperty('volume', volume)
+            self._tts_available = True
+            logger.info("✓ LuxTTS initialized successfully")
             
-            logger.debug(f"TTS configured: rate={rate}, volume={volume}")
-            
+        except ImportError as e:
+            logger.error(
+                f"LuxTTS not installed: {e}. "
+                f"Install from: git clone https://github.com/ysharma3501/LuxTTS.git"
+            )
+            logger.info(f"Running in {self._fallback_mode} mode")
         except Exception as e:
-            logger.error(f"Failed to initialize pyttsx3 engine: {e}", exc_info=True)
-            raise
+            logger.error(f"Failed to initialize LuxTTS: {e}")
+            logger.info(f"Running in {self._fallback_mode} mode")
     
-    def speak(self, text: str, blocking: bool = False) -> None:
+    def is_available(self) -> bool:
+        """Check if TTS is available."""
+        return self._tts_available
+    
+    def speak(self, text: str, streaming: bool = True):
         """
-        Speak the given text.
+        Speak the given text using LuxTTS.
         
         Args:
             text: Text to speak
-            blocking: If True, wait until speech finishes
+            streaming: If True, split into sentences and speak each as it arrives
         """
         if not text or not text.strip():
             return
         
-        text = text.strip()
-        logger.debug(f"Queuing speech: {text[:50]}...")
+        if not self._tts_available:
+            logger.warning(f"TTS not available. Text: {text}")
+            self.tts_error.emit("TTS engine not initialized")
+            return
         
+        # Add to speech queue
+        self._speech_queue.put((text, streaming))
+        
+        # Start worker thread if not running
         with self._state_lock:
-            if self._state == TTSState.STOPPING:
-                logger.debug("TTS is stopping, ignoring new speech request")
-                return
-        
-        self._speech_queue.put(text)
-        
-        if blocking:
-            # Wait until queue is empty and engine is idle
-            self._speech_queue.join()
+            if self._state == TTSState.IDLE:
+                self._state = TTSState.SPEAKING
+                self._stop_flag.clear()
+                self._worker_thread = threading.Thread(
+                    target=self._speech_worker,
+                    daemon=True,
+                    name="LuxTTS-Worker"
+                )
+                self._worker_thread.start()
     
-    def speak_stream(self, text_generator) -> None:
-        """
-        Speak text from a generator/stream, breaking on sentences.
+    def _speech_worker(self):
+        """Worker thread for processing speech queue."""
+        self.speaking_started.emit()
         
-        This is designed for LLM streaming - speak each complete
-        sentence as it arrives instead of waiting for full response.
+        try:
+            while True:
+                # Check stop flag
+                if self._stop_flag.is_set():
+                    break
+                
+                # Get next item from queue
+                try:
+                    text, streaming = self._speech_queue.get(timeout=0.1)
+                except queue.Empty:
+                    # No more items, finish
+                    break
+                
+                # Split into sentences if streaming
+                if streaming:
+                    sentences = self._split_sentences(text)
+                else:
+                    sentences = [text]
+                
+                # Speak each sentence
+                for sentence in sentences:
+                    if self._stop_flag.is_set():
+                        break
+                    
+                    if sentence.strip():
+                        self._synthesize_and_play(sentence)
+                        self.sentence_complete.emit(sentence)
+                
+                self._speech_queue.task_done()
+        
+        except Exception as e:
+            logger.error(f"Error in speech worker: {e}")
+            self.tts_error.emit(str(e))
+        
+        finally:
+            with self._state_lock:
+                self._state = TTSState.IDLE
+            self.speaking_stopped.emit()
+    
+    def _synthesize_and_play(self, text: str):
+        """Synthesize and play a single sentence."""
+        try:
+            # Generate speech
+            final_wav = self._lux_tts.generate_speech(
+                text,
+                self._encoded_prompt,
+                num_steps=self._num_steps,
+                t_shift=self._t_shift,
+                speed=self._speed,
+                return_smooth=self._return_smooth
+            )
+            
+            # Convert to numpy
+            audio_data = final_wav.numpy().squeeze()
+            
+            # Play audio
+            if PYGAME_AVAILABLE:
+                self._play_with_pygame(audio_data)
+            else:
+                logger.warning("Pygame not available, cannot play audio")
+        
+        except Exception as e:
+            logger.error(f"Failed to synthesize speech: {e}")
+            self.tts_error.emit(f"Synthesis error: {e}")
+    
+    def _play_with_pygame(self, audio_data: np.ndarray):
+        """Play audio using pygame mixer."""
+        try:
+            # Ensure audio is in correct format
+            if audio_data.dtype != np.int16:
+                audio_data = (audio_data * 32767).astype(np.int16)
+            
+            # Create pygame Sound from array
+            sound = pygame.sndarray.make_sound(audio_data)
+            
+            # Play and wait for completion
+            channel = sound.play()
+            while channel.get_busy() and not self._stop_flag.is_set():
+                pygame.time.wait(100)
+        
+        except Exception as e:
+            logger.error(f"Failed to play audio: {e}")
+    
+    def _split_sentences(self, text: str) -> list[str]:
+        """
+        Split text into sentences for streaming.
         
         Args:
-            text_generator: Generator yielding text chunks
+            text: Input text
+        
+        Returns:
+            List of sentences
         """
-        buffer = ""
-        sentence_endings = re.compile(r'[.!?]\s+')
+        # Split on sentence-ending punctuation
+        pattern = r'(?<=[.!?])\s+'
+        sentences = re.split(pattern, text)
         
-        for chunk in text_generator:
-            buffer += chunk
-            
-            # Check if we have complete sentences
-            sentences = sentence_endings.split(buffer)
-            
-            # Keep the last incomplete sentence in buffer
-            if len(sentences) > 1:
-                for sentence in sentences[:-1]:
-                    sentence = sentence.strip()
-                    if sentence:
-                        self.speak(sentence)
-                buffer = sentences[-1]
+        # Filter empty sentences
+        sentences = [s.strip() for s in sentences if s.strip()]
         
-        # Speak remaining text
-        if buffer.strip():
-            self.speak(buffer.strip())
+        return sentences
     
-    def stop(self) -> None:
-        """Stop current speech and clear queue."""
-        logger.debug("Stopping TTS")
+    def stop(self):
+        """Stop current speech immediately."""
+        logger.info("Stopping TTS")
         
         with self._state_lock:
-            self._state = TTSState.STOPPING
+            if self._state == TTSState.SPEAKING:
+                self._state = TTSState.STOPPING
+                self._stop_flag.set()
         
         # Clear queue
         while not self._speech_queue.empty():
@@ -208,139 +331,84 @@ class TTSEngine(QObject):
             except queue.Empty:
                 break
         
-        # Stop engine
-        if self._engine:
-            try:
-                self._engine.stop()
-            except Exception as e:
-                logger.warning(f"Error stopping engine: {e}")
+        # Stop pygame playback
+        if PYGAME_AVAILABLE:
+            pygame.mixer.stop()
         
-        with self._state_lock:
-            self._state = TTSState.IDLE
-        
-        logger.debug("TTS stopped")
+        # Wait for worker thread
+        if self._worker_thread and self._worker_thread.is_alive():
+            self._worker_thread.join(timeout=2.0)
     
     def is_speaking(self) -> bool:
-        """Check if TTS is currently speaking."""
+        """Check if currently speaking."""
         with self._state_lock:
             return self._state == TTSState.SPEAKING
     
-    def _speech_worker(self) -> None:
-        """Worker thread that processes speech queue."""
-        logger.debug("TTS worker thread started")
-        
-        while not self._stop_event.is_set():
-            try:
-                # Wait for text to speak (with timeout for clean shutdown)
-                text = self._speech_queue.get(timeout=0.5)
-                
-                with self._state_lock:
-                    if self._state == TTSState.STOPPING:
-                        self._speech_queue.task_done()
-                        continue
-                    self._state = TTSState.SPEAKING
-                
-                # Emit speaking started signal
-                try:
-                    self.speaking_started.emit()
-                except:
-                    pass  # Qt signals may not be available in tests
-                
-                # Speak the text
-                self._speak_text(text)
-                
-                # Mark task as done
-                self._speech_queue.task_done()
-                
-                with self._state_lock:
-                    # Only set to idle if we're not already stopping
-                    if self._state == TTSState.SPEAKING:
-                        self._state = TTSState.IDLE
-                
-                # Emit speaking finished signal
-                try:
-                    self.speaking_finished.emit()
-                except:
-                    pass
-                
-            except queue.Empty:
-                continue
-            except Exception as e:
-                logger.error(f"Error in speech worker: {e}", exc_info=True)
-                with self._state_lock:
-                    self._state = TTSState.IDLE
-        
-        logger.debug("TTS worker thread stopped")
-    
-    def _speak_text(self, text: str) -> None:
+    def set_params(
+        self,
+        num_steps: Optional[int] = None,
+        t_shift: Optional[float] = None,
+        speed: Optional[float] = None,
+        rms: Optional[float] = None
+    ):
         """
-        Speak text using pyttsx3 engine.
+        Update TTS parameters dynamically.
         
         Args:
-            text: Text to speak
+            num_steps: Quality/speed tradeoff (3-6)
+            t_shift: Sampling parameter (0.7-0.95)
+            speed: Speech speed multiplier (0.5-2.0)
+            rms: Volume normalization
         """
-        if not self._engine:
-            logger.error("TTS engine not initialized")
-            return
+        if num_steps is not None:
+            self._num_steps = num_steps
+        if t_shift is not None:
+            self._t_shift = t_shift
+        if speed is not None:
+            self._speed = speed
+        if rms is not None:
+            self._rms = rms
         
-        try:
-            # Split into words for word-level callbacks
-            words = text.split()
-            
-            # Set up word callback for lip sync
-            def on_word(name, location, length):
-                word_index = location // 10  # Rough estimate
-                if 0 <= word_index < len(words):
-                    try:
-                        self.speaking_word.emit(words[word_index])
-                    except:
-                        pass
-            
-            # Register callback
-            try:
-                self._engine.connect('started-word', on_word)
-            except:
-                pass  # Callback may not be supported on all platforms
-            
-            # Speak
-            self._engine.say(text)
-            self._engine.runAndWait()
-            
-        except Exception as e:
-            logger.error(f"Error speaking text: {e}", exc_info=True)
+        logger.info(
+            f"Updated TTS params: num_steps={self._num_steps}, "
+            f"t_shift={self._t_shift}, speed={self._speed}, rms={self._rms}"
+        )
     
-    def shutdown(self) -> None:
-        """Clean shutdown of TTS engine."""
-        logger.info("Shutting down TTS engine")
-        
-        # Stop worker thread
-        self._stop_event.set()
-        
-        # Stop any ongoing speech
+    def get_device(self) -> str:
+        """Get current device (cuda/cpu/mps)."""
+        return self._device
+    
+    def cleanup(self):
+        """Clean up resources."""
+        logger.info("Cleaning up LuxTTS engine")
         self.stop()
         
-        # Wait for worker thread
-        if self._worker_thread.is_alive():
-            self._worker_thread.join(timeout=2.0)
-        
-        # Clean up engine
-        if self._engine:
-            try:
-                del self._engine
-            except:
-                pass
-        
-        logger.info("TTS engine shut down")
+        if PYGAME_AVAILABLE:
+            pygame.mixer.quit()
 
 
-def create_tts_engine(config: dict) -> TTSEngine:
+def create_tts_engine(config: dict) -> LuxTTSEngine:
     """
-    Factory function to create TTS engine.
+    Factory function to create TTS engine from config.
     
     Args:
-        config: TTS configuration dict
+        config: Configuration dictionary with TTS settings
     
     Returns:
-        Initialized TTSEngine instance
+        Initialized LuxTTSEngine instance
     """
-    return TTSEngine(config)
+    tts_config = config.get('tts', {})
+    
+    engine = LuxTTSEngine(
+        device=tts_config.get('device', 'cuda'),
+        reference_audio=tts_config.get('reference_audio', 'data/yuki_voice.wav'),
+        num_steps=tts_config.get('num_steps', 4),
+        t_shift=tts_config.get('t_shift', 0.9),
+        speed=tts_config.get('speed', 1.0),
+        rms=tts_config.get('rms', 0.01),
+        ref_duration=tts_config.get('ref_duration', 5),
+        return_smooth=tts_config.get('return_smooth', False),
+        fallback_mode=tts_config.get('fallback_mode', 'text_only')
+    )
+    
+    return engine
