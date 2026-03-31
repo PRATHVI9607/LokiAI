@@ -54,38 +54,38 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Yuki AI Assistant                         │
+│                        Yuki AI Assistant                        │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────┐     ┌───────────────┐     ┌────────────┐    │
-│  │   Wakeword   │────▶│   Listener    │────▶│   Brain    │    │
-│  │  Detection   │     │  (Whisper)    │     │ (OpenRouter│    │
-│  │  (Whisper)   │     │   + VAD       │     │    LLM)    │    │
-│  └──────────────┘     └───────────────┘     └──────┬─────┘    │
+│                                                                 │
+│  ┌──────────────┐      ┌───────────────┐      ┌────────────┐    │
+│  │   Wakeword   │────> │   Listener    │────> │   Brain    │    │
+│  │  Detection   │      │   (Whisper)   │      │ (OpenRouter│    │
+│  │  (Whisper)   │      │   + VAD       │      │    LLM)    │    │
+│  └──────────────┘      └───────────────┘      └──────┬─────┘    │
 │         │                                           │           │
 │         │                                           ▼           │
-│  ┌──────▼──────┐     ┌───────────────┐     ┌────────────┐    │
-│  │   System    │     │     TTS       │◀────│   Action   │    │
-│  │    Tray     │     │  (LuxTTS)     │     │   Router   │    │
-│  │   + Menu    │     │  Voice Clone  │     └──────┬─────┘    │
-│  └──────┬──────┘     └───────────────┘            │           │
-│         │                                          ▼           │
-│         ▼                                 ┌─────────────────┐ │
-│  ┌─────────────┐                         │     Actions     │ │
-│  │   Status    │                         ├─────────────────┤ │
-│  │   Window    │                         │ • File Ops      │ │
-│  │ (Text UI)   │                         │ • Shell Exec    │ │
-│  └─────────────┘                         │ • System Ctrl   │ │
-│                                          │ • App Control   │ │
-│                                          │ • Browser       │ │
-│                                          └─────────────────┘ │
-│                                                                  │
+│  ┌──────▼──────┐     ┌───────────────┐       ┌────────────┐     │
+│  │   System    │     │     TTS       │ <──── │   Action   │     │
+│  │    Tray     │     │  (LuxTTS)     │       │   Router   │     │
+│  │   + Menu    │     │  Voice Clone  │       └──────┬─────┘     │
+│  └──────┬──────┘     └───────────────┘              │           │
+│         │                                           ▼           │
+│         ▼                                  ┌─────────────────┐  │
+│  ┌─────────────┐                           │     Actions     │  │
+│  │   Status    │                           ├─────────────────┤  │
+│  │   Window    │                           │ • File Ops      │  │
+│  │ (Text UI)   │                           │ • Shell Exec    │  │
+│  └─────────────┘                           │ • System Ctrl   │  │
+│                                            │ • App Control   │  │
+│                                            │ • Browser       │  │
+│                                            └─────────────────┘  │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 
        Local Processing                      Cloud Processing
     ┌────────────────────────┐          ┌────────────────────┐
     │ • Whisper (CPU/GPU)    │          │  OpenRouter API    │
-    │ • LuxTTS (GPU/CPU)     │─────────▶│  Free LLM Models   │
+    │ • LuxTTS (GPU/CPU)     │─────────>│  Free LLM Models   │
     │ • WebRTC VAD           │  HTTPS   │  Streaming Tokens  │
     │ • All Actions Local    │          │  No Data Stored    │
     └────────────────────────┘          └────────────────────┘
@@ -148,13 +148,13 @@
                            │                        │                      ▼
                       [Is Speech?]            [Accumulate              [Text Output]
                            │                   Frames]                     │
-                           ├─ NO ──▶ [Ignore]      │                      │
-                           │                        │                      ▼
-                           └─ YES ─▶ [Buffer] ─────┤              [Send to Brain]
-                                                    │
-                                         [Silence > 1.5s?]
-                                                    │
-                                                    └─ YES ─▶ [Stop Recording]
+                           ├─ NO ──> [Ignore]      │                       │
+                           │                       │                       ▼
+                           └─ YES ─> [Buffer] ─────┤                 [Send to Brain]
+                                                   │
+                                            [Silence > 1.5s?]
+                                                   │
+                                                   └─ YES ─▶ [Stop Recording]
 ```
 
 **Speech recognition details:**
@@ -193,7 +193,7 @@
                          │                                            │
                          │                                            └─ Text? ─▶ [TTS]
                          │                                                         │
-                         └────────────────────────────────────────────────────────┤
+                         └─────────────────────────────────────────────────────────┤
                                                                                    ▼
                                                                         [Save to Memory]
 ```
@@ -373,17 +373,17 @@ The system prompt defines Yukino's character traits:
                                     [Snapshot Type]        [Max Depth: 20]
                                           │                      │
                                           ▼                      │
-                                 ┌─────────────────┐            │
-                                 │ • file_create   │            │
-                                 │ • file_delete   │            ▼
-                                 │ • file_move     │    [Circular Buffer]
-                                 │ • folder_create │            │
-                                 │ • folder_delete │            │
-                                 │ • volume_change │            │
-                                 │ • brightness    │            │
-                                 │ • shell (log)   │            │
-                                 └─────────────────┘            │
-                                                                │
+                                 ┌─────────────────┐             │
+                                 │ • file_create   │             │
+                                 │ • file_delete   │             ▼
+                                 │ • file_move     │      [Circular Buffer]
+                                 │ • folder_create │             │
+                                 │ • folder_delete │             │
+                                 │ • volume_change │             │
+                                 │ • brightness    │             │
+                                 │ • shell (log)   │             │
+                                 └─────────────────┘             │
+                                                                 │
 [User Says "Undo"] ─────▶ [Pop from Stack] ─────▶ [Execute Rollback] ─────▶ [Restore State]
                                  │
                                  ▼
