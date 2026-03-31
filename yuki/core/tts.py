@@ -14,8 +14,21 @@ from typing import Optional, Callable
 from enum import Enum
 from pathlib import Path
 
-import torch
-import soundfile as sf
+# Make heavy dependencies optional
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
+
+try:
+    import soundfile as sf
+    SOUNDFILE_AVAILABLE = True
+except ImportError:
+    SOUNDFILE_AVAILABLE = False
+    sf = None
+
 import numpy as np
 
 try:
@@ -128,6 +141,12 @@ class LuxTTSEngine(QObject):
     
     def _initialize_luxtts(self):
         """Initialize LuxTTS model and encode reference audio."""
+        # Check if torch is available
+        if not TORCH_AVAILABLE:
+            logger.warning("PyTorch not installed. Running in text-only mode.")
+            self._fallback_mode = True
+            return
+            
         try:
             # Import LuxTTS (installed from GitHub)
             from zipvoice.luxvoice import LuxTTS
@@ -136,8 +155,9 @@ class LuxTTSEngine(QObject):
             if not os.path.exists(self._reference_audio):
                 logger.warning(
                     f"Reference audio not found: {self._reference_audio}. "
-                    f"Running in {self._fallback_mode} mode."
+                    f"Running in fallback mode."
                 )
+                self._fallback_mode = True
                 return
             
             # Check device availability

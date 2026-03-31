@@ -358,6 +358,11 @@ class StatusWindow(QMainWindow):
         self.activateWindow()
         logger.info("Window shown")
     
+    def hide_window(self):
+        """Hide window."""
+        self.hide()
+        logger.info("Window hidden")
+    
     # Event handlers
     
     def _on_mute_clicked(self):

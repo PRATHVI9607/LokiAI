@@ -391,6 +391,11 @@ class YukiApplication:
 def main():
     """Entry point"""
     try:
+        # Load environment variables first
+        env_path = project_root / 'yuki' / '.env'
+        if env_path.exists():
+            load_dotenv(env_path)
+        
         # Check for required environment variables
         if not os.getenv('OPENROUTER_API_KEY'):
             logger.error("OPENROUTER_API_KEY not found in environment!")
