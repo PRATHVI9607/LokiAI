@@ -120,7 +120,7 @@ class ConversationManager(QObject):
             
             if not full_response:
                 logger.error("Empty response from brain")
-                self._speak("...I have nothing to say to that.")
+                self._speak("Sorry, I didn't catch that. Could you try again?")
                 return
             
             # Add to UI
@@ -304,6 +304,16 @@ class YukiApplication:
         # Wakeword detection → Start listening
         self.wakeword_detector.wakeword_detected.connect(
             self.voice_listener.start_listening
+        )
+        
+        # Wakeword transcript → UI display
+        self.wakeword_detector.transcript_available.connect(
+            self.status_window.update_transcript
+        )
+        
+        # Clear transcript when wakeword detected
+        self.wakeword_detector.wakeword_detected.connect(
+            self.status_window.clear_transcript
         )
         
         # Voice listener → Process speech

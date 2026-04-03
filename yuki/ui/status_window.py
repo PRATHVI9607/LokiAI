@@ -5,6 +5,7 @@ Simple text-based window showing conversation history and current status.
 Replaces the complex overlay UI for voice-only architecture.
 """
 
+import re
 import logging
 from typing import Optional
 from datetime import datetime
@@ -30,17 +31,20 @@ class StatusWindow(QMainWindow):
     - System tray integration
     - Auto-hide on conversation timeout
     - Draggable window
+    - Live transcription display
     
     Signals:
         mute_toggled: Emitted when mute button is clicked (bool: is_muted)
         undo_requested: Emitted when undo button is clicked
         window_closing: Emitted when window is being closed (not just hidden)
+        transcript_updated: Emitted when live transcript changes (str: text)
     """
     
     # Qt Signals
     mute_toggled = pyqtSignal(bool)  # is_muted
     undo_requested = pyqtSignal()
     window_closing = pyqtSignal()
+    transcript_updated = pyqtSignal(str)  # live transcript text
     
     def __init__(
         self,
@@ -103,79 +107,79 @@ class StatusWindow(QMainWindow):
         self.setMouseTracking(True)
     
     def _setup_ui(self):
-        """Create UI components."""
-        # Central widget with rounded corners
+        """Create UI components - glassy white/sky blue design."""
+        # Central widget with glassmorphism effect
         central_widget = QWidget()
         central_widget.setObjectName("centralWidget")
         central_widget.setStyleSheet("""
             #centralWidget {
                 background: qlineargradient(
                     x1: 0, y1: 0, x2: 1, y2: 1,
-                    stop: 0 #ffffff,
-                    stop: 0.5 #f8f9fa,
-                    stop: 1 #f0f2f5
+                    stop: 0 rgba(255, 255, 255, 0.95),
+                    stop: 0.5 rgba(240, 248, 255, 0.9),
+                    stop: 1 rgba(224, 242, 254, 0.95)
                 );
-                border-radius: 20px;
-                border: 1px solid #e5e7eb;
+                border-radius: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.6);
             }
         """)
         self.setCentralWidget(central_widget)
         
         # Main layout
         layout = QVBoxLayout()
-        layout.setContentsMargins(16, 16, 16, 16)
-        layout.setSpacing(12)
+        layout.setContentsMargins(20, 16, 20, 20)
+        layout.setSpacing(14)
         central_widget.setLayout(layout)
         
-        # Title bar with drag handle and close button
+        # Title bar - glassy
         title_bar = QHBoxLayout()
-        title_bar.setSpacing(8)
+        title_bar.setSpacing(12)
         
         # App title
-        title_label = QLabel("✨ Yuki AI")
+        title_label = QLabel("Yuki AI")
         title_label.setStyleSheet("""
-            color: #6366f1;
-            font-size: 14pt;
-            font-weight: 700;
-            padding: 4px;
+            color: #0369a1;
+            font-size: 15pt;
+            font-weight: 600;
+            letter-spacing: 1px;
         """)
         title_bar.addWidget(title_label)
         
         title_bar.addStretch()
         
-        # Minimize button
-        minimize_btn = QPushButton("─")
+        # Minimize button - glassy
+        minimize_btn = QPushButton("—")
         minimize_btn.setFixedSize(28, 28)
         minimize_btn.setStyleSheet("""
             QPushButton {
-                background: #f3f4f6;
-                border: none;
+                background: rgba(255, 255, 255, 0.5);
+                border: 1px solid rgba(148, 163, 184, 0.3);
                 border-radius: 14px;
-                color: #6b7280;
-                font-size: 12pt;
-                font-weight: bold;
+                color: #64748b;
+                font-size: 10pt;
             }
             QPushButton:hover {
-                background: #e5e7eb;
+                background: rgba(241, 245, 249, 0.8);
+                border-color: rgba(148, 163, 184, 0.5);
             }
         """)
         minimize_btn.clicked.connect(self.showMinimized)
         title_bar.addWidget(minimize_btn)
         
-        # Close button
+        # Close button - glassy red
         close_btn = QPushButton("×")
         close_btn.setFixedSize(28, 28)
         close_btn.setStyleSheet("""
             QPushButton {
-                background: #fee2e2;
-                border: none;
+                background: rgba(254, 226, 226, 0.6);
+                border: 1px solid rgba(252, 165, 165, 0.4);
                 border-radius: 14px;
                 color: #dc2626;
-                font-size: 16pt;
-                font-weight: bold;
+                font-size: 14pt;
             }
             QPushButton:hover {
-                background: #fecaca;
+                background: rgba(254, 202, 202, 0.8);
+                border-color: rgba(248, 113, 113, 0.5);
             }
         """)
         close_btn.clicked.connect(self.hide)
@@ -183,43 +187,164 @@ class StatusWindow(QMainWindow):
         
         layout.addLayout(title_bar)
         
-        # Status indicator
-        self._status_label = QLabel("● Idle")
+        # Divider - subtle gradient
+        divider = QWidget()
+        divider.setFixedHeight(1)
+        divider.setStyleSheet("""
+            background: qlineargradient(
+                x1: 0, y1: 0, x2: 1, y2: 0,
+                stop: 0 rgba(186, 230, 253, 0.2),
+                stop: 0.5 rgba(125, 211, 252, 0.5),
+                stop: 1 rgba(186, 230, 253, 0.2)
+            );
+        """)
+        layout.addWidget(divider)
+        
+        # Status indicator - glassy pill
+        self._status_label = QLabel("Idle")
         self._status_label.setObjectName("statusLabel")
         self._status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        font = QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        self._status_label.setFont(font)
+        self._status_label.setStyleSheet("""
+            color: #475569;
+            background: qlineargradient(
+                x1: 0, y1: 0, x2: 1, y2: 0,
+                stop: 0 rgba(241, 245, 249, 0.7),
+                stop: 1 rgba(226, 232, 240, 0.7)
+            );
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            border-radius: 16px;
+            padding: 10px 20px;
+            font-size: 10pt;
+            font-weight: 600;
+        """)
         layout.addWidget(self._status_label)
         
-        # Conversation history
+        # Live transcription display - glassy subtle
+        self._transcript_label = QLabel("")
+        self._transcript_label.setObjectName("transcriptLabel")
+        self._transcript_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._transcript_label.setWordWrap(True)
+        self._transcript_label.setStyleSheet("""
+            color: #64748b;
+            font-size: 9pt;
+            font-style: italic;
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 8px;
+            padding: 8px 12px;
+        """)
+        self._transcript_label.hide()
+        layout.addWidget(self._transcript_label)
+        
+        # Conversation history - glassy card
         self._history_text = QTextEdit()
         self._history_text.setObjectName("historyText")
         self._history_text.setReadOnly(True)
-        self._history_text.setPlaceholderText("Conversation history will appear here...")
+        self._history_text.setPlaceholderText("Conversation will appear here...")
+        self._history_text.setStyleSheet("""
+            QTextEdit {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 rgba(255, 255, 255, 0.8),
+                    stop: 1 rgba(248, 250, 252, 0.7)
+                );
+                border: 1px solid rgba(203, 213, 225, 0.4);
+                border-radius: 12px;
+                padding: 12px;
+                font-size: 10pt;
+                color: #334155;
+            }
+            QTextEdit::placeholder {
+                color: #94a3b8;
+            }
+            QScrollBar:vertical {
+                background: rgba(241, 245, 249, 0.5);
+                width: 8px;
+                border-radius: 4px;
+                margin: 4px 2px;
+            }
+            QScrollBar::handle:vertical {
+                background: rgba(148, 163, 184, 0.5);
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: rgba(100, 116, 139, 0.6);
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+        """)
         layout.addWidget(self._history_text, stretch=1)
         
         # Buttons layout
         button_layout = QHBoxLayout()
-        button_layout.setSpacing(8)
+        button_layout.setSpacing(12)
         
-        # Mute button
-        self._mute_button = QPushButton("🔊 Mute")
+        # Mute button - glassy
+        self._mute_button = QPushButton("Mute")
         self._mute_button.setObjectName("muteButton")
+        self._mute_button.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 rgba(255, 255, 255, 0.8),
+                    stop: 1 rgba(241, 245, 249, 0.7)
+                );
+                border: 1px solid rgba(203, 213, 225, 0.5);
+                border-radius: 10px;
+                color: #475569;
+                padding: 10px 24px;
+                font-size: 10pt;
+                font-weight: 500;
+            }
+            QPushButton:hover {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 rgba(240, 249, 255, 0.9),
+                    stop: 1 rgba(224, 242, 254, 0.8)
+                );
+                border-color: rgba(125, 211, 252, 0.5);
+            }
+            QPushButton:pressed {
+                background: rgba(224, 242, 254, 0.9);
+            }
+        """)
         self._mute_button.clicked.connect(self._on_mute_clicked)
         button_layout.addWidget(self._mute_button)
         
-        # Undo button
-        self._undo_button = QPushButton("↶ Undo")
+        # Undo button - glassy sky blue
+        self._undo_button = QPushButton("Undo")
         self._undo_button.setObjectName("undoButton")
+        self._undo_button.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 rgba(224, 242, 254, 0.8),
+                    stop: 1 rgba(186, 230, 253, 0.7)
+                );
+                border: 1px solid rgba(125, 211, 252, 0.4);
+                border-radius: 10px;
+                color: #0369a1;
+                padding: 10px 24px;
+                font-size: 10pt;
+                font-weight: 500;
+            }
+            QPushButton:hover {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0 rgba(186, 230, 253, 0.9),
+                    stop: 1 rgba(125, 211, 252, 0.7)
+                );
+                border-color: rgba(56, 189, 248, 0.5);
+            }
+            QPushButton:pressed {
+                background: rgba(125, 211, 252, 0.8);
+            }
+        """)
         self._undo_button.clicked.connect(self._on_undo_clicked)
         button_layout.addWidget(self._undo_button)
         
         layout.addLayout(button_layout)
-        
-        # Apply stylesheet
-        self._apply_styles()
     
     def _setup_system_tray(self):
         """Setup system tray icon and menu."""
@@ -286,254 +411,152 @@ class StatusWindow(QMainWindow):
         self.move(x, y)
     
     def _apply_styles(self):
-        """Apply professional white gradient theme."""
-        self.setStyleSheet("""
-            QMainWindow {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 1, y2: 1,
-                    stop: 0 #ffffff,
-                    stop: 0.5 #f8f9fa,
-                    stop: 1 #f0f2f5
-                );
-                border-radius: 16px;
-            }
-            QWidget {
-                background: transparent;
-                font-family: 'Segoe UI', 'SF Pro Display', sans-serif;
-            }
-            QLabel#statusLabel {
-                color: #1a1a2e;
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: 0 #e8f4f8,
-                    stop: 1 #f0f4ff
-                );
-                border: 1px solid #d1d5db;
-                border-radius: 20px;
-                padding: 12px 20px;
-                min-height: 36px;
-                font-size: 12pt;
-                font-weight: 600;
-            }
-            QTextEdit#historyText {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #ffffff,
-                    stop: 1 #fafbfc
-                );
-                color: #1f2937;
-                border: 1px solid #e5e7eb;
-                border-radius: 12px;
-                padding: 12px;
-                font-size: 11pt;
-                line-height: 1.5;
-                selection-background-color: #bfdbfe;
-            }
-            QTextEdit#historyText:focus {
-                border: 1px solid #93c5fd;
-            }
-            QScrollBar:vertical {
-                background: #f3f4f6;
-                width: 8px;
-                border-radius: 4px;
-                margin: 4px 2px;
-            }
-            QScrollBar::handle:vertical {
-                background: #d1d5db;
-                border-radius: 4px;
-                min-height: 30px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #9ca3af;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-            QPushButton {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #ffffff,
-                    stop: 1 #f3f4f6
-                );
-                color: #374151;
-                border: 1px solid #d1d5db;
-                border-radius: 10px;
-                padding: 10px 20px;
-                font-size: 10pt;
-                font-weight: 500;
-                min-height: 36px;
-            }
-            QPushButton:hover {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #f9fafb,
-                    stop: 1 #e5e7eb
-                );
-                border: 1px solid #9ca3af;
-            }
-            QPushButton:pressed {
-                background: #e5e7eb;
-            }
-            QPushButton#muteButton {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #ecfdf5,
-                    stop: 1 #d1fae5
-                );
-                color: #065f46;
-                border: 1px solid #a7f3d0;
-            }
-            QPushButton#muteButton:hover {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #d1fae5,
-                    stop: 1 #a7f3d0
-                );
-            }
-            QPushButton#undoButton {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #eff6ff,
-                    stop: 1 #dbeafe
-                );
-                color: #1e40af;
-                border: 1px solid #93c5fd;
-            }
-            QPushButton#undoButton:hover {
-                background: qlineargradient(
-                    x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #dbeafe,
-                    stop: 1 #bfdbfe
-                );
-            }
-        """)
+        """Apply glassy white/sky blue theme."""
+        pass  # All styles inline in _setup_ui
     
     # Public API
     
     def set_status(self, status: str):
-        """
-        Update status indicator.
-        
-        Args:
-            status: "idle", "listening", "thinking", or "speaking"
-        """
+        """Update status indicator with glassy style."""
         status_lower = status.lower()
         
         if status_lower == "idle":
-            self._status_label.setText("● Idle")
+            self._status_label.setText("Idle")
             self._status_label.setStyleSheet("""
-                color: #6b7280;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f3f4f6, stop:1 #e5e7eb);
-                border: 1px solid #d1d5db; border-radius: 20px; padding: 12px 20px;
-                font-size: 12pt; font-weight: 600;
+                color: #475569;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 rgba(241, 245, 249, 0.7),
+                    stop:1 rgba(226, 232, 240, 0.7));
+                border: 1px solid rgba(203, 213, 225, 0.5);
+                border-radius: 16px; padding: 10px 20px;
+                font-size: 10pt; font-weight: 600;
             """)
         elif status_lower == "listening":
-            self._status_label.setText("● Listening...")
+            self._status_label.setText("Listening...")
             self._status_label.setStyleSheet("""
-                color: #059669;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #d1fae5, stop:1 #a7f3d0);
-                border: 1px solid #6ee7b7; border-radius: 20px; padding: 12px 20px;
-                font-size: 12pt; font-weight: 600;
+                color: #047857;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 rgba(209, 250, 229, 0.8),
+                    stop:1 rgba(167, 243, 208, 0.7));
+                border: 1px solid rgba(110, 231, 183, 0.5);
+                border-radius: 16px; padding: 10px 20px;
+                font-size: 10pt; font-weight: 600;
             """)
         elif status_lower == "thinking":
-            self._status_label.setText("● Thinking...")
+            self._status_label.setText("Thinking...")
             self._status_label.setStyleSheet("""
-                color: #d97706;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #fef3c7, stop:1 #fde68a);
-                border: 1px solid #fcd34d; border-radius: 20px; padding: 12px 20px;
-                font-size: 12pt; font-weight: 600;
+                color: #b45309;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 rgba(254, 243, 199, 0.8),
+                    stop:1 rgba(253, 230, 138, 0.7));
+                border: 1px solid rgba(252, 211, 77, 0.5);
+                border-radius: 16px; padding: 10px 20px;
+                font-size: 10pt; font-weight: 600;
             """)
         elif status_lower == "speaking":
-            self._status_label.setText("● Speaking...")
+            self._status_label.setText("Speaking...")
             self._status_label.setStyleSheet("""
-                color: #2563eb;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #dbeafe, stop:1 #bfdbfe);
-                border: 1px solid #93c5fd; border-radius: 20px; padding: 12px 20px;
-                font-size: 12pt; font-weight: 600;
+                color: #0369a1;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 rgba(224, 242, 254, 0.8),
+                    stop:1 rgba(186, 230, 253, 0.7));
+                border: 1px solid rgba(125, 211, 252, 0.5);
+                border-radius: 16px; padding: 10px 20px;
+                font-size: 10pt; font-weight: 600;
             """)
         elif status_lower == "muted":
-            self._status_label.setText("● Muted")
+            self._status_label.setText("Muted")
             self._status_label.setStyleSheet("""
-                color: #dc2626;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #fee2e2, stop:1 #fecaca);
-                border: 1px solid #fca5a5; border-radius: 20px; padding: 12px 20px;
-                font-size: 12pt; font-weight: 600;
+                color: #b91c1c;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 rgba(254, 226, 226, 0.8),
+                    stop:1 rgba(254, 202, 202, 0.7));
+                border: 1px solid rgba(252, 165, 165, 0.5);
+                border-radius: 16px; padding: 10px 20px;
+                font-size: 10pt; font-weight: 600;
             """)
         else:
-            self._status_label.setText(f"● {status}")
+            self._status_label.setText(status)
             self._status_label.setStyleSheet("""
-                color: #374151;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f9fafb, stop:1 #f3f4f6);
-                border: 1px solid #d1d5db; border-radius: 20px; padding: 12px 20px;
-                font-size: 12pt; font-weight: 600;
+                color: #475569;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 rgba(248, 250, 252, 0.7),
+                    stop:1 rgba(241, 245, 249, 0.7));
+                border: 1px solid rgba(226, 232, 240, 0.5);
+                border-radius: 16px; padding: 10px 20px;
+                font-size: 10pt; font-weight: 600;
             """)
         
         logger.debug(f"Status updated: {status}")
     
-    def add_user_message(self, message: str):
-        """
-        Add user message to conversation history.
+    def update_transcript(self, text: str, highlight_keywords: bool = True):
+        """Update the live transcription display."""
+        if not text or not text.strip():
+            self._transcript_label.hide()
+            return
         
-        Args:
-            message: User's message text
-        """
+        display_text = text.strip()
+        
+        if highlight_keywords:
+            keywords = ['yuki', 'hey yuki', 'ok yuki', 'okay yuki']
+            for keyword in keywords:
+                pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+                display_text = pattern.sub(
+                    f'<b style="color: #0284c7;">{keyword.title()}</b>',
+                    display_text
+                )
+        
+        self._transcript_label.setText(f'"{display_text}"')
+        self._transcript_label.show()
+        self.transcript_updated.emit(text)
+        logger.debug(f"Transcript: {text}")
+    
+    def clear_transcript(self):
+        """Clear the live transcription display."""
+        self._transcript_label.setText("")
+        self._transcript_label.hide()
+    
+    def add_user_message(self, message: str):
+        """Add user message to conversation history."""
         timestamp = datetime.now().strftime("%H:%M")
-        html = f'''<div style="text-align: right; margin: 10px 0;">
-            <span style="background: linear-gradient(135deg, #6366f1, #8b5cf6); 
-                         color: white; 
-                         padding: 10px 16px; 
-                         border-radius: 18px 18px 4px 18px; 
+        html = f'''<div style="text-align: right; margin: 8px 0;">
+            <span style="background: linear-gradient(135deg, #0ea5e9, #0284c7); 
+                         color: #fff; 
+                         padding: 10px 14px; 
+                         border-radius: 14px 14px 4px 14px; 
                          display: inline-block; 
-                         max-width: 85%;
-                         font-size: 11pt;
-                         box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);">
-                <b style="font-size: 9pt; opacity: 0.9;">[{timestamp}] You</b><br>{message}
+                         max-width: 80%;
+                         font-size: 10pt;">
+                <span style="font-size: 8pt; opacity: 0.8;">{timestamp}</span><br>{message}
             </span>
         </div>'''
         self._history_text.append(html)
         self._scroll_to_bottom()
     
     def add_yuki_message(self, message: str):
-        """
-        Add Yuki's message to conversation history.
-        
-        Args:
-            message: Yuki's response text
-        """
+        """Add Yuki's message to conversation history."""
         timestamp = datetime.now().strftime("%H:%M")
-        html = f'''<div style="text-align: left; margin: 10px 0;">
-            <span style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); 
-                         color: #1e293b; 
-                         padding: 10px 16px; 
-                         border-radius: 18px 18px 18px 4px; 
+        html = f'''<div style="text-align: left; margin: 8px 0;">
+            <span style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); 
+                         color: #334155; 
+                         padding: 10px 14px; 
+                         border-radius: 14px 14px 14px 4px; 
                          display: inline-block; 
-                         max-width: 85%;
-                         font-size: 11pt;
-                         border: 1px solid #e2e8f0;
-                         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                <b style="font-size: 9pt; color: #6366f1;">[{timestamp}] Yuki</b><br>{message}
+                         max-width: 80%;
+                         font-size: 10pt;
+                         border: 1px solid rgba(203, 213, 225, 0.5);">
+                <span style="font-size: 8pt; color: #0369a1;">{timestamp} · Yuki</span><br>{message}
             </span>
         </div>'''
         self._history_text.append(html)
         self._scroll_to_bottom()
     
     def add_system_message(self, message: str):
-        """
-        Add system message to conversation history.
-        
-        Args:
-            message: System message text
-        """
+        """Add system message to conversation history."""
         timestamp = datetime.now().strftime("%H:%M")
-        html = f'''<div style="text-align: center; margin: 12px 0;">
-            <span style="background: #f1f5f9; 
-                         color: #64748b; 
-                         padding: 6px 14px; 
-                         border-radius: 12px; 
-                         display: inline-block; 
-                         font-size: 9pt;
-                         font-style: italic;">
-                {timestamp} • {message}
+        html = f'''<div style="text-align: center; margin: 10px 0;">
+            <span style="color: #64748b; font-size: 8pt;">
+                {timestamp} · {message}
             </span>
         </div>'''
         self._history_text.append(html)
@@ -545,33 +568,47 @@ class StatusWindow(QMainWindow):
         logger.info("Conversation history cleared")
     
     def set_mute_state(self, is_muted: bool):
-        """
-        Set mute button state.
-        
-        Args:
-            is_muted: True if microphone is muted
-        """
+        """Set mute button state."""
         self._is_muted = is_muted
         if is_muted:
-            self._mute_button.setText("🔇 Unmute")
+            self._mute_button.setText("Unmute")
             self._mute_button.setStyleSheet("""
-                QPushButton#muteButton {
-                    background-color: #3a1a1a;
-                    color: #ef4444;
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 rgba(254, 226, 226, 0.8),
+                        stop:1 rgba(254, 202, 202, 0.7));
+                    border: 1px solid rgba(252, 165, 165, 0.5);
+                    border-radius: 10px;
+                    color: #b91c1c;
+                    padding: 10px 24px;
+                    font-size: 10pt;
+                    font-weight: 500;
                 }
-                QPushButton#muteButton:hover {
-                    background-color: #4a2020;
+                QPushButton:hover {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 rgba(254, 202, 202, 0.9),
+                        stop:1 rgba(252, 165, 165, 0.8));
                 }
             """)
         else:
-            self._mute_button.setText("🔊 Mute")
+            self._mute_button.setText("Mute")
             self._mute_button.setStyleSheet("""
-                QPushButton#muteButton {
-                    background-color: #1e1e30;
-                    color: #4ade80;
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 rgba(255, 255, 255, 0.8),
+                        stop:1 rgba(241, 245, 249, 0.7));
+                    border: 1px solid rgba(203, 213, 225, 0.5);
+                    border-radius: 10px;
+                    color: #475569;
+                    padding: 10px 24px;
+                    font-size: 10pt;
+                    font-weight: 500;
                 }
-                QPushButton#muteButton:hover {
-                    background-color: #2d2050;
+                QPushButton:hover {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 rgba(240, 249, 255, 0.9),
+                        stop:1 rgba(224, 242, 254, 0.8));
+                    border-color: rgba(125, 211, 252, 0.5);
                 }
             """)
     

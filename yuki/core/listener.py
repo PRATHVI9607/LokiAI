@@ -269,7 +269,9 @@ class SpeechListener(QObject):
                         continue
                 
                 if is_speech:
-                    # Speech detected - add to buffer
+                    # Speech detected - add to buffer (flatten if 2D)
+                    if audio_chunk.ndim > 1:
+                        audio_chunk = audio_chunk.flatten()
                     self._speech_frames.append(audio_chunk)
                     self._silence_start = None
                 else:
@@ -310,8 +312,20 @@ class SpeechListener(QObject):
             # Concatenate all speech frames
             audio_data = np.concatenate(self._speech_frames)
             
+            # Flatten if 2D (frames, channels) -> 1D
+            if audio_data.ndim > 1:
+                audio_data = audio_data.flatten()
+            
+            # Limit audio length to prevent memory issues (max 30 seconds)
+            max_samples = 16000 * 30  # 30 seconds at 16kHz
+            if len(audio_data) > max_samples:
+                audio_data = audio_data[:max_samples]
+                logger.warning(f"Audio truncated to 30 seconds")
+            
             # Convert to float32 and normalize for Whisper
             audio_float = audio_data.astype(np.float32) / 32768.0
+            
+            logger.debug(f"Audio shape: {audio_float.shape}, duration: {len(audio_float)/16000:.1f}s")
             
             # Transcribe with Whisper
             result = self._whisper_model.transcribe(
@@ -323,7 +337,7 @@ class SpeechListener(QObject):
             transcript = result["text"].strip()
             
             if transcript:
-                logger.info(f"Transcript: {transcript}")
+                logger.info(f"You said: {transcript}")
                 
                 # Emit transcript signal
                 try:

@@ -54,10 +54,12 @@ class WakewordDetector(QObject):
     
     Signals:
         wakeword_detected: Emitted when wakeword is detected
+        transcript_available: Emitted with live transcript text
     """
     
     # Qt signals
     wakeword_detected = pyqtSignal()
+    transcript_available = pyqtSignal(str)  # live transcript for UI
     
     def __init__(self, config: dict):
         """
@@ -328,9 +330,23 @@ class WakewordDetector(QObject):
                         
                         transcript = result["text"].strip().lower()
                         
-                        # Check if keyword is in transcript
-                        if self._keyword in transcript:
-                            logger.info(f"Wakeword detected by Whisper: '{transcript}'")
+                        # Debug: log what we're hearing
+                        if transcript and len(transcript) > 2:
+                            logger.info(f"Heard: '{transcript}'")
+                        
+                        # Emit transcript for UI display (if not empty/noise)
+                        if transcript and len(transcript) > 2:
+                            try:
+                                self.transcript_available.emit(transcript)
+                            except:
+                                pass
+                        
+                        # Check if keyword is in transcript - flexible matching
+                        # Match: "yuki", "hey yuki", "yukki", "yuuki", "youki", etc.
+                        import re
+                        keyword_pattern = re.compile(r'\b(hey\s+)?(yuki|yukki|yuuki|youki|yu ki)\b', re.IGNORECASE)
+                        if keyword_pattern.search(transcript) or 'yuki' in transcript:
+                            logger.info(f"Wakeword detected! Transcript: '{transcript}'")
                             
                             # Emit signal
                             try:

@@ -1,14 +1,15 @@
 # Yuki AI Configuration
 
 # LLM Settings - Using verified free OpenRouter models
+# These models have better availability and less rate limiting
 llm:
   provider: openrouter
-  primary_model: google/gemma-3-27b-it:free
-  fallback_model: qwen/qwen3-coder:free
-  second_fallback_model: nvidia/nemotron-3-nano-30b-a3b:free
+  primary_model: meta-llama/llama-3.2-3b-instruct:free
+  fallback_model: huggingfaceh4/zephyr-7b-beta:free
+  second_fallback_model: mistralai/mistral-7b-instruct:free
   max_tokens: 300
   temperature: 0.85
-  stream: true
+  stream: false  # Disable streaming for more reliable responses
 
 # Speech Recognition (Whisper)
 whisper:

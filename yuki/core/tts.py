@@ -148,22 +148,26 @@ class LuxTTSEngine(QObject):
         if PYTTSX3_AVAILABLE:
             try:
                 self._pyttsx3_engine = pyttsx3.init()
-                # Set male voice
+                # Set female voice
                 voices = self._pyttsx3_engine.getProperty('voices')
-                male_voice = None
+                female_voice = None
                 for voice in voices:
-                    # Look for male voice (usually David on Windows)
-                    if 'male' in voice.name.lower() or 'david' in voice.name.lower():
-                        male_voice = voice.id
+                    # Look for female voice (Zira on Windows)
+                    if 'female' in voice.name.lower() or 'zira' in voice.name.lower():
+                        female_voice = voice.id
                         break
-                if male_voice:
-                    self._pyttsx3_engine.setProperty('voice', male_voice)
-                    logger.info(f"pyttsx3 using male voice: {male_voice}")
+                if female_voice:
+                    self._pyttsx3_engine.setProperty('voice', female_voice)
+                    logger.info(f"pyttsx3 using female voice: {female_voice}")
                 else:
-                    # Just use first available voice
-                    logger.info("Using default pyttsx3 voice")
+                    # Fallback to second voice if available (often female)
+                    if len(voices) > 1:
+                        self._pyttsx3_engine.setProperty('voice', voices[1].id)
+                        logger.info(f"Using voice: {voices[1].name}")
+                    else:
+                        logger.info("Using default pyttsx3 voice")
                 # Set rate
-                self._pyttsx3_engine.setProperty('rate', 175)  # Normal speaking rate
+                self._pyttsx3_engine.setProperty('rate', 175)
                 logger.info("pyttsx3 TTS initialized as fallback")
             except Exception as e:
                 logger.warning(f"Failed to initialize pyttsx3: {e}")
