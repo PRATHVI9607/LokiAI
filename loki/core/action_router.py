@@ -112,12 +112,21 @@ class ActionRouter:
         return self._missing("file_ops")
 
     def _handle_file_read(self, p):
+        import os
         from pathlib import Path
-        path = Path(p.get("path", ""))
-        if not path.exists():
-            return {"success": False, "message": f"File not found: {path}"}
+        raw = p.get("path", "")
         try:
-            content = path.read_text(encoding="utf-8", errors="replace")
+            resolved = Path(raw).expanduser().resolve()
+            home = Path(os.path.expanduser("~")).resolve()
+            if not resolved.is_relative_to(home):
+                logger.warning(f"Blocked file_read outside home: {raw}")
+                return {"success": False, "message": "Access denied. Path must be within your home directory."}
+        except Exception:
+            return {"success": False, "message": "Invalid path."}
+        if not resolved.exists():
+            return {"success": False, "message": f"File not found: {resolved.name}"}
+        try:
+            content = resolved.read_text(encoding="utf-8", errors="replace")
             return {"success": True, "message": content[:2000], "data": content}
         except Exception as e:
             return {"success": False, "message": str(e)}

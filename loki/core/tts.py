@@ -6,8 +6,9 @@ import asyncio
 import logging
 import tempfile
 import threading
+import time
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from PyQt6.QtCore import QObject, pyqtSignal
 
@@ -129,27 +130,41 @@ class LokiTTS(QObject):
             self._pyttsx3_engine.runAndWait()
 
     def _play_audio(self, path: str) -> None:
-        if PYGAME_AVAILABLE:
-            try:
+        played = False
+        try:
+            if PYGAME_AVAILABLE:
                 pygame.mixer.music.load(path)
                 pygame.mixer.music.play()
                 while pygame.mixer.music.get_busy():
-                    import time
                     time.sleep(0.05)
-            except Exception as e:
-                logger.error(f"Audio playback error: {e}")
-            finally:
-                try:
-                    Path(path).unlink(missing_ok=True)
-                except Exception:
-                    pass
-        else:
+                played = True
+        except Exception as e:
+            logger.error(f"pygame playback error: {e}")
+
+        if not played:
             try:
                 import subprocess
-                subprocess.run(["powershell", "-c", f"(New-Object Media.SoundPlayer '{path}').PlaySync()"],
-                               capture_output=True, timeout=30)
+                # WMPlayer.OCX.7 supports MP3 natively; 8s ceiling covers any TTS clip
+                safe = path.replace("'", "''")
+                ps = (
+                    f"$w=New-Object -ComObject WMPlayer.OCX.7;"
+                    f"$w.URL='{safe}';"
+                    f"$w.controls.play();"
+                    f"$end=[DateTime]::Now.AddSeconds(8);"
+                    f"while($w.playState-eq 3 -and [DateTime]::Now-lt$end){{Start-Sleep -ms 100}};"
+                    f"$w.controls.stop();$w.close()"
+                )
+                subprocess.run(
+                    ["powershell", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", ps],
+                    capture_output=True, timeout=12,
+                )
             except Exception as e:
-                logger.error(f"Playback fallback error: {e}")
+                logger.warning(f"Audio playback fallback failed: {e}")
+
+        try:
+            Path(path).unlink(missing_ok=True)
+        except Exception:
+            pass
 
     def stop(self) -> None:
         if PYGAME_AVAILABLE:
