@@ -252,7 +252,8 @@ class LokiApplication:
         self.clipboard = ClipboardManager()
         self.clipboard.start_monitoring()
         self.vault = Vault(memory_dir / "vault.enc")
-        self.security_scanner = SecurityScanner(self.config.get("features", {}).get("security_scanner", {}).get("patterns"))
+        scanner_cfg = (self.config.get("features") or {}).get("security_scanner") or {}
+        self.security_scanner = SecurityScanner(scanner_cfg.get("patterns"))
         self.file_organizer = FileOrganizer(feat_cfg.get("file_organizer", {}))
 
         # Router

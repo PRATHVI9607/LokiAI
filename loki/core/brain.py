@@ -135,13 +135,15 @@ class LokiBrain:
         try:
             self._ollama_client = OpenAI(
                 base_url="http://localhost:11434/v1",
-                api_key="ollama"
+                api_key="ollama",
+                timeout=3.0,      # fail fast — no Ollama = no point waiting
+                max_retries=0,    # skip automatic retries
             )
             self._ollama_client.models.list()
             self._ollama_available = True
             logger.info(f"Ollama connected: {self._ollama_model}")
-        except Exception as e:
-            logger.warning(f"Ollama unavailable: {e}. Using OpenRouter.")
+        except Exception:
+            logger.info("Ollama not running — using OpenRouter.")
 
         self._openrouter_client: Optional[Any] = None
         api_key = os.getenv("OPENROUTER_API_KEY", "")

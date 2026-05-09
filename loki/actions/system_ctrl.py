@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 try:
     from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+    from ctypes import cast, POINTER
     from comtypes import CLSCTX_ALL
     PYCAW_AVAILABLE = True
 except ImportError:
@@ -33,9 +34,9 @@ class SystemCtrl:
             try:
                 devices = AudioUtilities.GetSpeakers()
                 interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-                self._vol_iface = interface.QueryInterface(IAudioEndpointVolume)
+                self._vol_iface = cast(interface, POINTER(IAudioEndpointVolume))
             except Exception as e:
-                logger.error(f"Volume init failed: {e}")
+                logger.warning(f"Volume control unavailable: {e}")
 
     def set_volume(self, percent: int) -> Dict[str, Any]:
         if not 0 <= percent <= 100:
