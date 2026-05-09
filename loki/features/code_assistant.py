@@ -101,10 +101,11 @@ class CodeAssistant:
                     pass
 
         context = "\n".join(f"{k}:\n{v[:500]}" for k, v in context_files.items())
+        structure_text = "\n".join(structure[:30])
         prompt = (
             f"Generate a professional README.md for this project. "
             f"Include: title, description, features, installation, usage, and license sections.\n\n"
-            f"Project structure:\n{'chr(10).join(structure[:30])}\n\nKey files:\n{context}"
+            f"Project structure:\n{structure_text}\n\nKey files:\n{context}"
         )
         result = self._ask(prompt)
         return {"success": True, "message": result}

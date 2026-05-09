@@ -34,7 +34,7 @@ class TaskManager:
         tasks = self._memory.list_tasks(filter_done=show_done)
 
         if not tasks:
-            return {"success": True, "message": "No tasks. A clean slate — how suspicious."}
+            return {"success": True, "message": "No tasks. A clean slate — how suspicious.", "data": []}
 
         # Sort by priority weight
         tasks.sort(key=lambda t: PRIORITY_WEIGHTS.get(t.get("priority", "medium"), 2), reverse=True)
