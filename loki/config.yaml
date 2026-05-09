@@ -103,21 +103,8 @@ features:
     algorithm: AES-256-GCM
     pbkdf2_iterations: 310000
   security_scanner:
-    patterns:
-      - name: API Key
-        regex: '(?i)(api[_-]?key|apikey)\s*[=:]\s*["\']?[A-Za-z0-9_\-]{20,}["\']?'
-      - name: AWS Key
-        regex: 'AKIA[0-9A-Z]{16}'
-      - name: Private Key
-        regex: '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'
-      - name: Password in code
-        regex: '(?i)(password|passwd|pwd)\s*[=:]\s*["\'][^"\']{6,}["\']'
-      - name: Bearer Token
-        regex: 'Bearer\s+[A-Za-z0-9\-._~+/]+=*'
-      - name: GitHub Token
-        regex: 'ghp_[A-Za-z0-9]{36}'
-      - name: OpenAI Key
-        regex: 'sk-[A-Za-z0-9]{48}'
+    # Patterns are defined in loki/features/security_scanner.py (DEFAULT_PATTERNS)
+    # Override here only if needed — regex strings with quotes are tricky in YAML
 
 logging:
   level: INFO
