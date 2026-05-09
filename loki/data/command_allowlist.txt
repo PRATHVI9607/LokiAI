@@ -1,0 +1,68 @@
+# Loki Command Allowlist
+# Each line is a command prefix that Loki is allowed to execute.
+# Add more as needed. "git" allows all git subcommands.
+
+# Development
+git
+python
+pip
+npm
+node
+npx
+cargo
+go
+dotnet
+make
+cmake
+pytest
+jest
+
+# File system (safe)
+dir
+ls
+pwd
+cd
+type
+cat
+echo
+copy
+xcopy
+robocopy
+mkdir
+md
+
+# System info (read-only)
+ipconfig
+netstat
+tasklist
+systeminfo
+ver
+whoami
+hostname
+ping
+tracert
+nslookup
+curl
+wget
+
+# Text processing
+findstr
+grep
+sort
+find
+
+# Package managers
+winget
+choco
+scoop
+
+# PowerShell (read-only)
+powershell -Command Get-
+powershell -Command Write-
+
+# Editors (launch only)
+code
+notepad
+notepad++
+nano
+vim

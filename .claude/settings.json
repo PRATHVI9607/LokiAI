@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python *)",
+      "Bash(pip *)",
+      "Bash(pip3 *)",
+      "Bash(git *)",
+      "Bash(pytest *)",
+      "Bash(python -m pytest *)",
+      "Bash(python -m pip *)",
+      "Bash(edge-tts *)",
+      "Bash(dir *)",
+      "Bash(ls *)",
+      "Bash(type *)",
+      "Bash(cat *)",
+      "Bash(mkdir *)",
+      "Bash(echo *)",
+      "Read",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(del /s *)",
+      "Bash(rd /s *)",
+      "Bash(format *)",
+      "Bash(shutdown *)",
+      "Bash(reboot *)"
+    ],
+    "defaultMode": "default",
+    "additionalDirectories": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo Hook: file saved",
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "PYTHONPATH": "c:\\Workspace\\YukiAI"
+  }
+}

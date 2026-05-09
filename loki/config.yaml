@@ -1,0 +1,125 @@
+# Loki AI Desktop Assistant — Configuration
+
+assistant:
+  name: Loki
+  wakeword: "Hey Loki"
+  personality: norse_trickster  # witty, sharp, helpful
+
+llm:
+  ollama_model: phi3:mini
+  fallback_model: meta-llama/llama-3.1-8b-instruct:free
+  second_fallback_model: microsoft/phi-3-mini-128k-instruct:free
+  max_tokens: 400
+  temperature: 0.75
+
+whisper:
+  model: base.en
+  device: cpu
+  language: en
+
+wakeword:
+  method: whisper      # "porcupine" | "whisper"
+  keyword: "hey loki"
+  chunk_duration: 2.0
+  check_interval: 0.5
+  porcupine_sensitivity: 0.5
+
+tts:
+  engine: edge         # "edge" | "pyttsx3" | "luxtts"
+  voice: en-GB-RyanNeural   # edge-tts voice (sounds like Loki)
+  rate: +0%
+  volume: +0%
+  fallback_engine: pyttsx3
+
+ui:
+  width: 480
+  height: 620
+  position: bottom_right
+  start_hidden: false
+  always_on_top: true
+  conversation_timeout_seconds: 30
+  theme: dark_norse    # dark theme with purple/gold accents
+  show_avatar: true
+  opacity: 0.97
+
+memory:
+  max_turns: 30
+  conversation_file: memory/conversation.json
+  profile_file: memory/user_profile.json
+  tasks_file: memory/tasks.json
+  vault_file: memory/vault.enc
+
+audio:
+  sample_rate: 16000
+  channels: 1
+  vad_aggressiveness: 2
+  silence_duration: 1.5
+  enable_audio_cues: true
+  wakeword_chime: true
+  error_sound: true
+
+actions:
+  allowlist_file: data/command_allowlist.txt
+  home_dir_only: true
+  shell_timeout: 30
+  confirm_destructive: true   # always confirm deletes/kills
+
+undo:
+  max_depth: 25
+
+features:
+  file_search:
+    max_results: 20
+    search_content: true
+    max_file_size_mb: 10
+  system_monitor:
+    update_interval: 2.0
+    alert_cpu_percent: 90
+    alert_ram_percent: 85
+  focus_mode:
+    block_sites:
+      - youtube.com
+      - reddit.com
+      - twitter.com
+      - facebook.com
+      - instagram.com
+      - tiktok.com
+      - twitch.tv
+      - netflix.com
+    hosts_file: "C:/Windows/System32/drivers/etc/hosts"
+  file_organizer:
+    watch_dirs:
+      - ~/Downloads
+      - ~/Desktop
+    rules:
+      images: [.jpg, .jpeg, .png, .gif, .bmp, .webp, .svg, .ico]
+      documents: [.pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt, .md]
+      videos: [.mp4, .avi, .mkv, .mov, .wmv, .flv, .webm]
+      audio: [.mp3, .wav, .flac, .aac, .ogg, .m4a]
+      code: [.py, .js, .ts, .html, .css, .java, .cpp, .c, .h, .go, .rs, .rb]
+      archives: [.zip, .rar, .7z, .tar, .gz, .bz2]
+      executables: [.exe, .msi, .bat, .cmd, .ps1]
+  vault:
+    algorithm: AES-256-GCM
+    pbkdf2_iterations: 310000
+  security_scanner:
+    patterns:
+      - name: API Key
+        regex: '(?i)(api[_-]?key|apikey)\s*[=:]\s*["\']?[A-Za-z0-9_\-]{20,}["\']?'
+      - name: AWS Key
+        regex: 'AKIA[0-9A-Z]{16}'
+      - name: Private Key
+        regex: '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'
+      - name: Password in code
+        regex: '(?i)(password|passwd|pwd)\s*[=:]\s*["\'][^"\']{6,}["\']'
+      - name: Bearer Token
+        regex: 'Bearer\s+[A-Za-z0-9\-._~+/]+=*'
+      - name: GitHub Token
+        regex: 'ghp_[A-Za-z0-9]{36}'
+      - name: OpenAI Key
+        regex: 'sk-[A-Za-z0-9]{48}'
+
+logging:
+  level: INFO
+  file: loki.log
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"

@@ -1,0 +1,234 @@
+/* Loki Dark Norse Theme — Purple/Gold accents */
+
+QMainWindow, QWidget {
+    background: transparent;
+}
+
+#loki_panel {
+    background: qlineargradient(
+        x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 #0d0d1a,
+        stop: 0.4 #111128,
+        stop: 1 #0a0a18
+    );
+    border: 1px solid #2a2a5a;
+    border-radius: 18px;
+}
+
+#title_bar {
+    background: transparent;
+}
+
+#loki_title {
+    color: #c4a45a;
+    font-size: 16pt;
+    font-weight: 700;
+    letter-spacing: 3px;
+    font-family: "Segoe UI", "Arial";
+}
+
+#loki_subtitle {
+    color: #6b6ba8;
+    font-size: 8pt;
+    letter-spacing: 2px;
+}
+
+#status_label {
+    color: #8888cc;
+    font-size: 9pt;
+    font-weight: 500;
+    letter-spacing: 1px;
+    background: rgba(20, 20, 50, 0.8);
+    border: 1px solid #2a2a5a;
+    border-radius: 14px;
+    padding: 6px 16px;
+}
+
+#status_label[status="listening"] {
+    color: #50fa7b;
+    border-color: #50fa7b;
+    background: rgba(80, 250, 123, 0.08);
+}
+
+#status_label[status="thinking"] {
+    color: #c4a45a;
+    border-color: #c4a45a;
+    background: rgba(196, 164, 90, 0.08);
+}
+
+#status_label[status="speaking"] {
+    color: #8be9fd;
+    border-color: #8be9fd;
+    background: rgba(139, 233, 253, 0.08);
+}
+
+#status_label[status="muted"] {
+    color: #ff5555;
+    border-color: #ff5555;
+    background: rgba(255, 85, 85, 0.08);
+}
+
+#chat_area {
+    background: rgba(8, 8, 20, 0.6);
+    border: 1px solid #1e1e3e;
+    border-radius: 12px;
+    color: #cdd6f4;
+    font-size: 10pt;
+    font-family: "Segoe UI", "Arial";
+    selection-background-color: #44475a;
+}
+
+#input_field {
+    background: rgba(20, 20, 45, 0.9);
+    border: 1px solid #2a2a5a;
+    border-radius: 10px;
+    color: #cdd6f4;
+    font-size: 10pt;
+    padding: 10px 14px;
+    font-family: "Segoe UI", "Arial";
+}
+
+#input_field:focus {
+    border-color: #c4a45a;
+    background: rgba(25, 25, 55, 0.95);
+}
+
+#input_field::placeholder {
+    color: #4a4a7a;
+}
+
+QPushButton {
+    background: rgba(30, 30, 65, 0.9);
+    border: 1px solid #2a2a5a;
+    border-radius: 9px;
+    color: #8888cc;
+    padding: 9px 18px;
+    font-size: 9pt;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background: rgba(45, 45, 90, 0.95);
+    border-color: #c4a45a;
+    color: #c4a45a;
+}
+
+QPushButton:pressed {
+    background: rgba(196, 164, 90, 0.15);
+    border-color: #c4a45a;
+}
+
+#send_btn {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #2a1f5a, stop:1 #3d2d7a);
+    border: 1px solid #c4a45a;
+    color: #c4a45a;
+    font-weight: 700;
+    min-width: 60px;
+}
+
+#send_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #3d2d7a, stop:1 #5040a0);
+    color: #e8c87a;
+}
+
+#mic_btn {
+    background: rgba(80, 250, 123, 0.08);
+    border: 1px solid #2a5a3a;
+    border-radius: 20px;
+    min-width: 40px;
+    max-width: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    color: #50fa7b;
+    font-size: 14pt;
+}
+
+#mic_btn:hover {
+    background: rgba(80, 250, 123, 0.15);
+    border-color: #50fa7b;
+}
+
+#mic_btn[active="true"] {
+    background: rgba(80, 250, 123, 0.25);
+    border-color: #50fa7b;
+}
+
+#close_btn, #min_btn {
+    background: transparent;
+    border: 1px solid #2a2a5a;
+    border-radius: 12px;
+    color: #4a4a7a;
+    font-size: 12pt;
+    min-width: 26px;
+    max-width: 26px;
+    min-height: 26px;
+    max-height: 26px;
+    padding: 0;
+}
+
+#close_btn:hover {
+    background: rgba(255, 85, 85, 0.2);
+    border-color: #ff5555;
+    color: #ff5555;
+}
+
+#min_btn:hover {
+    background: rgba(196, 164, 90, 0.15);
+    border-color: #c4a45a;
+    color: #c4a45a;
+}
+
+QScrollBar:vertical {
+    background: rgba(13, 13, 26, 0.5);
+    width: 6px;
+    border-radius: 3px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background: #2a2a5a;
+    border-radius: 3px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #c4a45a;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QMenu {
+    background: #111128;
+    border: 1px solid #2a2a5a;
+    border-radius: 8px;
+    color: #cdd6f4;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 8px 24px;
+    border-radius: 6px;
+}
+
+QMenu::item:selected {
+    background: rgba(196, 164, 90, 0.15);
+    color: #c4a45a;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #2a2a5a;
+    margin: 4px 8px;
+}
+
+QToolTip {
+    background: #111128;
+    border: 1px solid #c4a45a;
+    color: #cdd6f4;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
