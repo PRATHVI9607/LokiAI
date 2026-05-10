@@ -27,6 +27,7 @@
 16. [Security Constraints & Safety Model](#16-security-constraints--safety-model)
 17. [Dependencies & Requirements](#17-dependencies--requirements)
 18. [Extended Feature Set (v1.1)](#18-extended-feature-set-v11)
+19. [Final Feature Set (v1.2) — All 50 Complete](#19-final-feature-set-v12--all-50-complete)
 
 ---
 
@@ -129,7 +130,7 @@ graph TD
         SC["System Ctrl\nvolume · brightness\nwifi · bluetooth"]
         SH["Shell Exec\nallowlist + blocklist"]
         AC["App & Browser\nopen · close · search"]
-        FT["15 Feature Modules\nRAG · vault · tasks\nfocus · git · code…"]
+        FT["41 Feature Modules\nRAG · vault · tasks · calendar\nscreenshot · expense · dynamic_ui\nfocus · git · code · phishing…"]
     end
 
     subgraph Storage["Local Storage"]
@@ -310,6 +311,18 @@ graph TD
         CBT["ClipboardManager\npyperclip polling loop\n20-item history ring buffer"]
     end
 
+    subgraph CS["Clipboard Sync Thread  (daemon, optional)"]
+        CST["ClipboardSync HTTP server :7778\nBidirectional mobile sync\nStarted on demand by user"]
+    end
+
+    subgraph FW["File Watcher Threads  (daemon, per job)"]
+        FWT["FileWatcher.WatchJob per directory\nPolling every N seconds\nauto-backup on modify\nauto-convert on create (media)"]
+    end
+
+    subgraph AT["Auto-Theme Thread  (daemon, optional)"]
+        ATT["DynamicUI auto_theme loop\nSleeps 1800s between ticks\nCalls apply_time_theme()"]
+    end
+
     subgraph BR["Browser Opener  (daemon, one-shot)"]
         BRT["Opens localhost:7777\nafter 2 second delay"]
     end
@@ -319,6 +332,9 @@ graph TD
     STTT -->|"on_transcript callback\n→ process_input"| UV
     TTST -->|"set_status callbacks\n→ WebSocket broadcast"| UV
     CBT -.->|"no direct cross-thread\ncall — history stored locally"| CBT
+    CST -.->|"reads/writes pyperclip only\nno main-loop calls"| CST
+    FWT -.->|"calls backup_manager or\nmedia_converter methods"| FWT
+    ATT -.->|"calls ctypes + writes theme file\nno main-loop calls"| ATT
     BRT -.->|"one-shot at startup"| BRT
 ```
 
@@ -358,21 +374,43 @@ flowchart TD
 
 ### 4.7 Action Router — Full Intent Dispatch Map
 
-The Action Router holds a flat dispatch table of 42 intent strings, each mapped to a handler method that calls into the registered action or feature module.
+The Action Router holds a flat dispatch table of **100+ intent strings** across 14 categories, each mapped to a handler method that calls into the registered feature or action module.
 
 ```mermaid
 graph LR
-    AR["ActionRouter\nroute_intent(intent)"] --> FILE["File Operations\n────────────────\nfile_create → FileOps.create_file\nfile_delete → FileOps.delete_file\nfile_move   → FileOps.move\nfile_read   → inline handler\nfolder_create → FileOps.create_folder\nfolder_delete → FileOps.delete_folder\nfile_search → FileSearch.search\nfile_organize → FileOrganizer.organize"]
+    AR["ActionRouter\nroute_intent(intent)"]
 
-    AR --> SYS["System Control\n────────────────\nvolume_set/get → SystemCtrl\nbrightness_set/get → SystemCtrl\nwifi_toggle → SystemCtrl\nbluetooth_toggle → SystemCtrl\napp_open/close → AppCtrl\nbrowser_open/search → BrowserCtrl\nsystem_monitor → SystemMonitor\nprocess_list/kill → ProcessManager"]
+    AR --> FILE["File Operations\nfile_create/delete/move/read\nfolder_create/delete\nfile_search · file_organize"]
 
-    AR --> SHELL["Shell\n────────────────\nshell → ShellExec.execute\n(allowlist + blocklist check)"]
+    AR --> SYS["System Control\nvolume_set/get\nbrightness_set/get\nwifi_toggle · bluetooth_toggle\napp_open/close\nbrowser_open/search\nsystem_monitor\nprocess_list/kill"]
 
-    AR --> INTEL["Intelligence\n────────────────\nweb_summarize → WebSummarizer\npdf_chat → PDFChat\ncode_analyze → CodeAssistant\ncode_convert → CodeAssistant\nreadme_generate → CodeAssistant\nregex_generate → CodeAssistant\nsql_build → CodeAssistant\ngit_status → GitHelper\ngit_commit → GitHelper\ncommit_message → GitHelper\nsecurity_scan → SecurityScanner"]
+    AR --> SHELL["Shell\nshell → ShellExec\nallowlist + blocklist"]
 
-    AR --> PROD["Productivity\n────────────────\nfocus_mode_enable/disable → FocusMode\ntask_add/list/complete/delete → TaskManager\nclipboard_show/clear → ClipboardManager\nvault_store/retrieve → Vault"]
+    AR --> INTEL["Intelligence\nweb_summarize · pdf_chat\ncode_analyze/convert/refactor\nreadme_generate\nregex_generate · sql_build\ngit_status/commit\ncommit_message\nsecurity_scan"]
 
-    AR --> META["Meta\n────────────────\nundo → UndoStack.pop_and_undo\nchat → return intent.message as-is"]
+    AR --> WRITE["Writing & Text\ntext_expand/continue\nbullets_to_prose\ntext_polish/tone/translate\ncitation_from_url/info\nemail_draft/reply\nfact_check · daily_briefing"]
+
+    AR --> DATA["Data & Conversion\ncurrency_convert · unit_convert\nnews_headlines/briefing\nmedia_convert · media_info\nupdate_check/all/package\ninstall_package"]
+
+    AR --> ENV["Env & Dev Tools\nenv_dockerfile\nenv_venv · env_compose\napi_mock_generate/data\ncode_refactor"]
+
+    AR --> FMGMT["File Management\nbackup_file/directory/list\ndeclutter_duplicates/large/old/suggest\nwatch_backup · watch_media_inbox\nwatch_list · watch_stop"]
+
+    AR --> WIN["Window & Process\nwindow_snap · window_tile_all\nwindow_layouts\nprocess_analyze/triage\nprocess_suspend/resume"]
+
+    AR --> SEC["Security & Privacy\nphishing_url · phishing_email\ndeepfake_check\nfootprint_startup/tasks\nfootprint_privacy/network/full"]
+
+    AR --> KG["Knowledge\nkg_ingest_file/dir\nkg_query · kg_connections\nkg_stats\nhistory_search/semantic\nhistory_recent/stats"]
+
+    AR --> SCREEN["Screen & Visual\nscreen_capture · screen_read\nscreen_search · screen_describe\nscreen_translate · screenshot_save"]
+
+    AR --> CAL["Calendar & Finance\ncalendar_list · calendar_conflicts\ncalendar_suggest_slot\ncalendar_import\nexpense_extract/from_file\nexpense_scan_folder/list/summary"]
+
+    AR --> UI["Dynamic UI & Sync\nui_theme_time · ui_theme_mood\nui_wallpaper\nui_auto_theme_start/stop\nui_list_themes\nclipboard_sync_start/stop/url\nclipboard_get/set\nmeeting_transcribe/minutes\nmeeting_action_items/summarize\ntask_prioritize_ai"]
+
+    AR --> PROD["Productivity\nfocus_mode_enable/disable\ntask_add/list/complete/delete\nclipboard_show/clear\nvault_store/retrieve"]
+
+    AR --> META["Meta\nundo · chat"]
 ```
 
 ---
@@ -1745,6 +1783,311 @@ graph LR
         K6[meeting_minutes] --> MTR
     end
 ```
+
+---
+
+---
+
+## 19. Final Feature Set (v1.2) — All 50 Complete
+
+This section documents the final 10 features and 3 enhancements that bring Loki to full coverage of all 50 requested capabilities.
+
+### 19.1 Screenshot Search & Screen Translation (`loki/features/screenshot_search.py`)
+
+Covers feature **#20 (Visual Search)** and **#19 (Content Translation Overlay)**.
+
+```mermaid
+flowchart TD
+    A([screen_capture / screen_read / screen_translate]) --> B[_capture_screen]
+    B --> C{PIL.ImageGrab\navailable?}
+    C -->|Yes| D[ImageGrab.grab → PNG bytes]
+    C -->|No| E[mss.grab → PNG bytes]
+    D & E --> F[_ocr_windows]
+    F --> G{Windows 10 WinRT\nOCR available?}
+    G -->|Yes| H[PowerShell WinRT\nWindows.Media.Ocr.OcrEngine]
+    G -->|No| I[pytesseract fallback]
+    H & I --> J{OCR text\nfound?}
+    J -->|screen_search| K[Keyword match\nover text lines]
+    J -->|screen_translate| L[LLM: translate\nto target language]
+    J -->|screen_describe| M[LLM: describe\nwhat user is doing]
+    J -->|screenshot_save| N[Write PNG to\n~/Pictures/]
+```
+
+**Capabilities:**
+- `capture_and_read(region?)` — capture full screen or a bounding-box region, return OCR text
+- `search_screen(query)` — find query string in currently visible screen text
+- `describe_screen()` — ask LLM to interpret what's on screen from OCR context
+- `translate_screen(language)` — OCR → LLM translation, returns translated text
+- `save_screenshot(path?)` — save PNG to disk
+
+**OCR fallback chain:** Windows WinRT (no deps) → pytesseract (optional, better accuracy)
+
+---
+
+### 19.2 Calendar Manager (`loki/features/calendar_manager.py`)
+
+Covers feature **#32 (Calendar Conflict Resolution)**.
+
+```mermaid
+flowchart TD
+    A([calendar_list / conflicts / suggest_slot]) --> B[_load_events]
+    B --> C{ics_path\nexplicit?}
+    C -->|Yes| D[Read specified .ics file]
+    C -->|No| E[Auto-discover:\nOutlook / OneDrive folders]
+    D & E --> F[_parse_ics\nstdlib only — no icalendar dep]
+    F --> G[Parse DTSTART DTEND\nSUMMARY LOCATION]
+
+    G --> H{Intent?}
+    H -->|list_events| I[Filter: now ≤ start ≤ now+N days\nSort by start time]
+    H -->|find_conflicts| J[O² overlap check:\na.start < b.end AND b.start < a.end]
+    H -->|suggest_alternatives| K[Walk next 7 business days\n9am–6pm in 30min slots\nSkip busy intervals]
+    K --> L{LLM available?}
+    L -->|Yes| M[LLM recommends best slot\nwith brief rationale]
+    L -->|No| N[Return top 5 free slots]
+```
+
+**ICS parsing:** pure stdlib — `str.splitlines()` + field splitting on `:`. Supports `DTSTART`, `DTEND`, `SUMMARY`, `DESCRIPTION`, `LOCATION`, `VALARM` skip.
+
+**Conflict detection:** O(n²) pairwise overlap for future events only — acceptable for typical calendar sizes (<500 events).
+
+---
+
+### 19.3 Expense Tracker (`loki/features/expense_tracker.py`)
+
+Covers feature **#37 (Expense Tracking from Emails)**.
+
+```mermaid
+flowchart LR
+    A([expense_extract / expense_from_file]) --> B{Input type?}
+    B -->|text string| C[Regex heuristics]
+    B -->|.eml file| D[email.parser.BytesParser\nExtract text/plain parts]
+    B -->|.txt file| E[Read text directly]
+    D & E --> C
+
+    C --> F{Amount\ndetected?}
+    F -->|No or partial| G{LLM available?}
+    G -->|Yes| H[LLM extracts JSON:\ndate vendor amount\ncurrency category]
+    G -->|No| I[Return: no amount found]
+    H & F -->|Yes| J[Build expense row dict]
+    J --> K[Append to CSV ledger\n~/LokiExpenses/expenses.csv]
+    K --> L[Return success + row summary]
+```
+
+**Regex patterns detect:**
+- Amount: `total|amount|charged|billed` followed by optional currency symbol + number
+- Date: `dd/mm/yyyy`, `Jan 15, 2025` and variants
+- Vendor: `from|merchant|seller` followed by company name
+
+**CSV ledger fields:** `date, vendor, amount, currency, category, description, source`
+
+**Additional methods:** `scan_folder(dir)`, `list_expenses(month?)`, `monthly_summary()`
+
+---
+
+### 19.4 Dynamic UI (`loki/features/dynamic_ui.py`)
+
+Covers feature **#48 (Dynamic UI Customization)**.
+
+```mermaid
+flowchart TD
+    A([ui_theme_time / ui_theme_mood / ui_wallpaper]) --> B{Intent?}
+
+    B -->|apply_time_theme| C[datetime.now.hour]
+    C --> D{Hour range?}
+    D -->|5–8| E[Dawn theme\nbg=#1a1a2e accent=#f4a261]
+    D -->|8–12| F[Morning theme\nbg=#0d0d1a accent=#c4a45a]
+    D -->|12–17| G[Afternoon theme\nbg=#0d0d1a accent=#8be9fd]
+    D -->|17–21| H[Evening theme\nbg=#0a0a14 accent=#bd93f9]
+    D -->|21–29| I[Night theme\nbg=#06060f accent=#50fa7b]
+
+    B -->|apply_mood_theme| J[Look up MOOD_THEMES dict\nfocus/creative/energetic\ncalm/professional/dark]
+
+    E & F & G & H & I & J --> K[_write_state\n~/.loki_ui_theme.json]
+    K --> L[_create_solid_bmp\nPillow: solid color 1920×1080]
+    L --> M[ctypes SystemParametersInfoW\nSPI_SETDESKWALLPAPER]
+
+    B -->|set_wallpaper path| N[Validate image file]
+    N --> O{PNG? Convert\nto BMP for ctypes}
+    O --> M
+
+    B -->|start_auto_theme| P[Daemon thread\nsleeps 1800s between ticks\ncalls apply_time_theme repeatedly]
+```
+
+**Theme state file** (`~/.loki_ui_theme.json`) is read by the FastAPI server `/api/theme` endpoint so the Next.js frontend can apply CSS variables on the next poll.
+
+---
+
+### 19.5 File Watcher (`loki/features/file_watcher.py`)
+
+Covers features **#42 (Auto Backup Triggers)** and **#47 (Automated Media Converter)**.
+
+```mermaid
+flowchart TD
+    A([watch_backup / watch_media_inbox]) --> B[Create WatchJob\npath + callback + extensions]
+    B --> C[Start daemon thread\nWatchJob._loop]
+    C --> D[Initial snapshot:\n{filepath: mtime}]
+    D --> E[Sleep poll_seconds]
+    E --> F[Scan directory\nRebuild snapshot]
+    F --> G{Diff vs\nprevious snapshot?}
+    G -->|New file| H[callback fp created]
+    G -->|mtime changed| I[callback fp modified]
+    G -->|File gone| J[callback fp deleted]
+
+    H --> K{Job type?}
+    K -->|backup| L[BackupManager.backup_file\nor backup_directory]
+    K -->|media| M{Extension in\nMEDIA_EXTENSIONS?}
+    M -->|Yes| N[MediaConverter.convert\nto output_format]
+    M -->|No| O[Skip]
+
+    G --> E
+```
+
+**No external dependencies** — pure Python threading + `os.walk`. Falls back gracefully if `watchdog` is not installed.
+
+**Concurrent jobs:** each directory gets its own `WatchJob` daemon thread. Jobs are keyed by `{type}:{path}` and deduplicated.
+
+---
+
+### 19.6 Clipboard Sync (`loki/features/clipboard_sync.py`)
+
+Covers feature **#7 (Cross-Platform Clipboard)** — mobile sync without a native app.
+
+```mermaid
+flowchart LR
+    A([clipboard_sync_start]) --> B[HTTPServer 0.0.0.0:7778\ndaemon thread]
+    B --> C{Request path?}
+    C -->|GET /| D[Serve HTML page\nshowing current clipboard]
+    C -->|GET /clip| E[pyperclip.paste\nreturn plain text]
+    C -->|POST /clip| F[Read body\npyperclip.copy body]
+    D --> G[Mobile browser opens URL]
+    G --> H[User reads or edits clipboard]
+    H --> I[POST → PC clipboard updated]
+    E --> J[Mobile JS fetches\ncurrent content]
+```
+
+**Access URL** is the local IP (detected via `socket.connect` to 8.8.8.8) on port 7778. Shown to user via `clipboard_sync_url` intent.
+
+**HTML page** served inline (no static files) — displays current clipboard, textarea to edit, two buttons (push/refresh).
+
+---
+
+### 19.7 Code Refactoring Suggestions (`code_assistant.refactor`)
+
+Covers feature **#25 (Refactoring Suggestions)**.
+
+**Method:** `CodeAssistant.refactor(path)` — reads file, sends to LLM with a prompt focused on:
+- Code smells (god functions, magic numbers, repeated logic)
+- DRY violations
+- Poor naming / missing abstractions
+- Performance issues
+- For each issue: states the problem, shows problematic snippet, provides refactored version
+
+---
+
+### 19.8 AI Task Prioritization (`task_manager.ai_prioritize`)
+
+Covers feature **#38 (Task Prioritization Engine)**.
+
+```mermaid
+flowchart TD
+    A([task_prioritize_ai]) --> B[Load pending tasks\nfrom MemoryManager]
+    B --> C[Format task list:\nid title priority due]
+    C --> D[LLM prompt:\nRank by urgency + impact\nReturn JSON list of IDs]
+    D --> E[Regex: extract int list]
+    E --> F[Re-order tasks by ranked IDs]
+    F --> G[Return ordered list\nwith position labels]
+```
+
+**Brain discovery:** the action router searches all registered features for one with `._brain` set — avoids tight coupling to a specific feature reference.
+
+---
+
+### 19.9 Deepfake / AI Media Detection (`phishing_detector.analyze_media_file`)
+
+Covers feature **#41 (Deepfake Detection)**.
+
+```mermaid
+flowchart TD
+    A([deepfake_check file_path]) --> B[Check file size]
+    B --> C{Video < 1MB?}
+    C -->|Yes| D[Signal: suspiciously small\nrisk += 2]
+    C -->|No| E[Continue]
+    D & E --> F[Check file age\nstat.st_mtime]
+    F --> G{Age < 1 hour?}
+    G -->|Yes| H[Signal: very recently created\nrisk += 1]
+    G -->|No| I[Continue]
+    H & I --> J{Image file?}
+    J -->|Yes| K[PIL Image.getexif]
+    K --> L{No EXIF data?}
+    L -->|Yes| M[Signal: AI-generated images\nlack camera EXIF\nrisk += 2]
+    L -->|No| N[Check dimensions]
+    N --> O{Width/Height in\n512/768/1024/1280?}
+    O -->|Yes| P[Signal: GAN output size\nrisk += 1]
+    D & H & M & P --> Q{LLM available\nAND risk > 0?}
+    Q -->|Yes| R[LLM verdict:\nLikely Authentic /\nPossibly Synthetic /\nLikely Deepfake]
+    Q -->|No| S[Return heuristic\nscore only]
+```
+
+**Risk levels:** Low 0–2 / Medium 3–5 / High 6–10
+
+---
+
+### 19.10 Full Feature Matrix (v1.2)
+
+| # | Feature | Module | Status |
+|---|---------|--------|--------|
+| 1 | Natural Language File Search | `file_search.py` | ✅ |
+| 2 | Automated App Launching | `app_ctrl.py` | ✅ |
+| 3 | System Health Monitoring | `system_monitor.py` | ✅ |
+| 4 | Automated Software Updates | `software_updater.py` | ✅ |
+| 5 | Intelligent Window Tiling | `window_tiler.py` | ✅ |
+| 6 | Background Process Triage | `process_triage.py` | ✅ |
+| 7 | Cross-Platform Clipboard Sync | `clipboard_sync.py` | ✅ |
+| 8 | Automated File Organization | `file_organizer.py` | ✅ |
+| 9 | Terminal Command Synthesis | `shell_exec.py` | ✅ |
+| 10 | Voice-to-System Commands | `system_ctrl.py` + voice pipeline | ✅ |
+| 11 | Instant Web Summarization | `web_summarizer.py` | ✅ |
+| 12 | PDF Deep-Dive Chat | `pdf_chat.py` | ✅ |
+| 13 | Real-time News Aggregation | `news_aggregator.py` | ✅ |
+| 14 | Fact-Checking Engine | `fact_checker.py` | ✅ |
+| 15 | Semantic Browser History | `semantic_browser_history.py` | ✅ |
+| 16 | Currency & Unit Conversion | `currency_converter.py` | ✅ |
+| 17 | Code Documentation Assistant | `code_assistant.py` | ✅ |
+| 18 | Automated Citation Generator | `citation_generator.py` | ✅ |
+| 19 | Content Translation | `screenshot_search.translate_screen` | ✅ |
+| 20 | Visual Search from Screenshot | `screenshot_search.py` | ✅ |
+| 21 | Auto-Bug Detection | `code_assistant.analyze` | ✅ |
+| 22 | Commit Message Generation | `git_helper.py` | ✅ |
+| 23 | README Automator | `code_assistant.generate_readme` | ✅ |
+| 24 | Environment Setup Scripts | `env_setup.py` | ✅ |
+| 25 | Refactoring Suggestions | `code_assistant.refactor` | ✅ |
+| 26 | API Mocking | `api_mocker.py` | ✅ |
+| 27 | SQL Query Builder | `code_assistant.build_sql` | ✅ |
+| 28 | Regex Generator | `code_assistant.generate_regex` | ✅ |
+| 29 | Code Migration Assistant | `code_assistant.convert` | ✅ |
+| 30 | Security Vulnerability Scanner | `security_scanner.py` | ✅ |
+| 31 | Smart Email Drafting | `email_drafter.py` | ✅ |
+| 32 | Calendar Conflict Resolution | `calendar_manager.py` | ✅ |
+| 33 | Focus Mode Guard | `focus_mode.py` | ✅ |
+| 34 | Meeting Transcription & Minutes | `meeting_transcriber.py` | ✅ |
+| 35 | Ghostwriter Assistant | `ghostwriter.py` | ✅ |
+| 36 | Daily Agenda Forecast | `daily_briefing.py` | ✅ |
+| 37 | Expense Tracking from Emails | `expense_tracker.py` | ✅ |
+| 38 | Task Prioritization Engine | `task_manager.ai_prioritize` | ✅ |
+| 39 | Grammar & Tone Polishing | `grammar_polisher.py` | ✅ |
+| 40 | Encrypted Vault / Password Store | `vault.py` | ✅ |
+| 41 | Deepfake / Phishing Detection | `phishing_detector.py` | ✅ |
+| 42 | Automated Backup Triggers | `file_watcher.py` + `backup_manager.py` | ✅ |
+| 43 | Encrypted Vault Management | `vault.py` | ✅ |
+| 44 | Digital Footprint Audit | `footprint_auditor.py` | ✅ |
+| 45 | Personal Knowledge Graph | `knowledge_graph.py` | ✅ |
+| 46 | Local LLM Fallback | `brain.py` Ollama integration | ✅ |
+| 47 | Automated Media Converter | `file_watcher.py` + `media_converter.py` | ✅ |
+| 48 | Dynamic UI Customization | `dynamic_ui.py` | ✅ |
+| 49 | Digital Decluttering | `digital_declutter.py` | ✅ |
+| 50 | AI Personality Customization | `brain_memory.py` personality modes | ✅ |
+
+**Total: 50/50 features implemented across 41 feature modules, wired through 100+ ActionRouter intents.**
 
 ---
 

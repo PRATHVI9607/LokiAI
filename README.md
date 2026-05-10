@@ -24,12 +24,16 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 | **Brightness Control** | Set / query screen brightness |
 | **Wi-Fi / Bluetooth** | Toggle adapters with one command |
 | **Window Tiler** | Snap or tile windows: left/right/quarters/grid (ctypes, no extra deps) |
+| **Dynamic UI** | Time-based wallpaper + theme switching (dawn/day/evening/night); mood themes; ctypes wallpaper API |
+| **File Watcher** | Polling-based watcher: auto-backup files on change, auto-convert media dropped into an inbox folder |
+| **Clipboard Sync** | Mobile clipboard sync — HTTP server on :7778, open in phone browser, no app install needed |
 
 ### Coding & Development
 
 | Feature | Description |
 |---------|-------------|
 | **Bug Analyzer** | LLM-powered code review for any file |
+| **Refactoring Advisor** | Identify code smells and get per-issue refactored alternatives |
 | **Commit Message Gen** | Reads `git diff`, writes the message |
 | **README Generator** | Documents your entire project automatically |
 | **Regex Generator** | Describe in English, get the pattern |
@@ -64,16 +68,20 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 | **Daily Briefing** | Morning brief: tasks + system health + news + date/time |
 | **Browser History Search** | Keyword and semantic (LLM) search over Chrome/Edge/Brave history |
 | **Knowledge Graph** | Extract entities and relationships from notes/files; query via LLM |
+| **Screenshot Search** | Capture screen, OCR text via Windows WinRT / pytesseract, search on-screen content |
+| **Screen Translator** | Capture → OCR → translate all visible text to any language |
 
 ### Productivity
 
 | Feature | Description |
 |---------|-------------|
-| **Task Manager** | Add, list, prioritize, and complete tasks via voice |
+| **Task Manager** | Add, list, complete tasks; AI-ranked priority order via LLM scoring |
+| **Calendar Manager** | Parse `.ics` files, detect scheduling conflicts, suggest free meeting slots |
+| **Expense Tracker** | Extract billing info from email text / `.eml` files; CSV ledger + monthly summary |
 | **Focus Mode** | Block distracting sites (YouTube, Reddit, etc.) via hosts file |
 | **Clipboard History** | Track and restore clipboard entries |
 | **Encrypted Vault** | AES-256-GCM secure key-value secret store |
-| **Backup Manager** | Timestamped file and directory backups |
+| **Backup Manager** | Timestamped file and directory backups; auto-trigger on file change via File Watcher |
 | **Digital Declutter** | Find duplicate files (MD5), large files, and files not touched in N days |
 | **Meeting Transcriber** | Whisper-based transcription + structured minutes generation |
 
@@ -90,7 +98,8 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 
 | Feature | Description |
 |---------|-------------|
-| **Phishing Detector** | Heuristic + LLM analysis of URLs and email text |
+| **Phishing Detector** | Heuristic + LLM analysis of URLs and email text for phishing signals |
+| **Deepfake Detector** | EXIF absence, GAN dimension heuristics + LLM verdict for AI-generated media |
 | **Footprint Auditor** | Audit startup entries, scheduled tasks, privacy settings, network listeners |
 | **Code Security Scanner** | Detect secrets and vulnerabilities in source files |
 | **Encrypted Vault** | PBKDF2 (310 000 iterations) + AES-256-GCM secret storage |
@@ -174,12 +183,25 @@ loki/
 │   ├── listener.py        Whisper STT
 │   ├── wakeword.py        "Hey Loki" detection
 │   ├── tts.py             edge-tts (Microsoft Neural voices)
-│   ├── action_router.py   Intent dispatch to 70+ handlers
+│   ├── action_router.py   Intent dispatch — 100+ handlers covering all 50 features
 │   ├── undo_stack.py      Reversible actions (25-deep)
 │   ├── memory.py          Persistent conversation + task storage
 │   └── audit.py           Structured audit log for all actions
-├── features/              35 feature modules
-├── actions/               5 system action modules (file, shell, system, app, browser)
+├── features/              41 feature modules
+│   ├── OS & System        file_search, system_monitor, process_manager, process_triage,
+│   │                      file_organizer, window_tiler, dynamic_ui, file_watcher, clipboard_sync
+│   ├── Intelligence       web_summarizer, pdf_chat, rag_engine, screenshot_search,
+│   │                      semantic_browser_history, knowledge_graph, fact_checker
+│   ├── Coding             code_assistant, git_helper, security_scanner, api_mocker, env_setup
+│   ├── Writing            ghostwriter, grammar_polisher, citation_generator,
+│   │                      email_drafter, daily_briefing
+│   ├── Data               currency_converter, news_aggregator, media_converter,
+│   │                      calendar_manager, expense_tracker
+│   ├── Files              backup_manager, digital_declutter, software_updater
+│   ├── Security           vault, phishing_detector, footprint_auditor
+│   ├── Meetings           meeting_transcriber
+│   └── Productivity       task_manager, focus_mode, clipboard_manager
+├── actions/               5 system action modules (file_ops, shell_exec, system_ctrl, app_ctrl, browser_ctrl)
 └── ui/                    FastAPI server + Next.js frontend (Norse dark theme)
 ```
 
@@ -231,6 +253,12 @@ loki/
 **Media conversion fails** — Install ffmpeg and add it to PATH: `winget install Gyan.FFmpeg`
 
 **Browser history search fails** — Close Chrome/Edge first; SQLite locks the file while the browser is open.
+
+**Screenshot OCR returns nothing** — Windows OCR requires Windows 10 1809+. Install optional: `pip install pytesseract` and [Tesseract](https://github.com/UB-Mannheim/tesseract/wiki) for better accuracy.
+
+**Calendar features need an ICS file** — Export from Google Calendar (Settings → Export) or Outlook (File → Open & Export → Import/Export).
+
+**Clipboard sync not reachable on phone** — Ensure both devices are on the same Wi-Fi network. Check Windows Firewall allows port 7778.
 
 ---
 
