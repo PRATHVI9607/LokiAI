@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { WifiOff, ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, WifiOff } from "lucide-react";
 import StatusOrb from "./StatusOrb";
 import MessageBubble from "./MessageBubble";
 import InputBar from "./InputBar";
@@ -11,15 +11,15 @@ import PersonalityPicker from "./PersonalityPicker";
 import { type ChatMessage, type Status, type Personality, type FileEntry } from "@/hooks/useLoki";
 
 const PERSONALITY_LABELS: Record<Personality, string> = {
-  loki: "LOKI",
+  loki:   "LOKI",
   jarvis: "JARVIS",
   friday: "FRIDAY",
 };
 
 const PERSONALITY_COLORS: Record<Personality, string> = {
-  loki: "#c4a45a",
-  jarvis: "#8be9fd",
-  friday: "#50fa7b",
+  loki:   "#F5C518",
+  jarvis: "#38BDF8",
+  friday: "#10D97E",
 };
 
 interface ChatPanelProps {
@@ -42,6 +42,7 @@ export default function ChatPanel({
   indexedFiles,
   onSend, onToggleMute, onUndo, onClear, onFilePanel, onPersonalityChange,
 }: ChatPanelProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const personalityBtnRef = useRef<HTMLButtonElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
@@ -51,12 +52,24 @@ export default function ChatPanel({
 
   useEffect(() => setMounted(true), []);
 
+  // Auto-scroll to latest message
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
-  const DROPDOWN_W = 220;
+  // Apply personality CSS custom properties imperatively to avoid inline style= prop
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const c = PERSONALITY_COLORS[personality];
+    el.style.setProperty("--p-color", c);
+    el.style.setProperty("--p-border", `${c}40`);
+    el.style.setProperty("--p-bg", `${c}14`);
+    el.style.setProperty("--p-bg-hover", `${c}22`);
+  }, [personality]);
+
+  const DROPDOWN_W = 200;
   const DROPDOWN_H = 160;
 
   const computeAndSetPos = useCallback(() => {
@@ -74,7 +87,7 @@ export default function ChatPanel({
     });
   }, [computeAndSetPos]);
 
-  // Close on viewport resize or scroll
+  // Close picker on viewport resize or scroll
   useEffect(() => {
     if (!showPersonality) return;
     const close = () => setShowPersonality(false);
@@ -86,7 +99,7 @@ export default function ChatPanel({
     };
   }, [showPersonality]);
 
-  // Apply dropdown position imperatively so no JSX style= prop is needed
+  // Apply dropdown position imperatively — no JSX style= prop needed
   useEffect(() => {
     const el = portalRef.current;
     if (!el) return;
@@ -94,7 +107,7 @@ export default function ChatPanel({
     el.style.left = `${dropdownPos.left}px`;
   }, [dropdownPos]);
 
-  // Set aria-expanded imperatively — axe static analyzer flags any JSX {expression}
+  // Set aria-expanded imperatively — axe static analyzer flags any JSX {expression} in ARIA attrs
   useEffect(() => {
     personalityBtnRef.current?.setAttribute("aria-expanded", showPersonality ? "true" : "false");
   }, [showPersonality]);
@@ -125,139 +138,135 @@ export default function ChatPanel({
     };
   }, [showPersonality]);
 
-  const pColor = PERSONALITY_COLORS[personality];
-
-  // CSS custom properties drive all personality-color CSS classes.
-  // This single style prop (CSS vars) is the accepted pattern for dynamic theming.
-  const personalityVars = {
-    "--p-color": pColor,
-    "--p-glow": `${pColor}22`,
-    "--p-mid": `${pColor}44`,
-  } as React.CSSProperties;
-
   const isOffline = status === "offline";
 
   return (
-    <motion.div
-      className="chat-panel glass-strong rounded-2xl flex flex-col overflow-hidden relative"
-      style={personalityVars}
-      initial={{ opacity: 0, scale: 0.92, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {/* Header */}
-      <div className="chat-header-bg flex items-center justify-between px-5 py-4 border-b border-loki-purple/40">
-        <div className="flex flex-col">
-          <h1 className="gold-text text-xl font-bold tracking-wide">LOKI</h1>
-          {/* Personality badge */}
-          <button
-            ref={personalityBtnRef}
-            type="button"
-            className="flex items-center gap-1 mt-0.5 group"
-            onClick={handlePersonalityToggle}
-            aria-label="Select personality mode"
-          >
-            <div className="personality-dot w-1.5 h-1.5 rounded-full" />
-            <span className="personality-label text-xs tracking-widest">
-              {PERSONALITY_LABELS[personality]}
-            </span>
-            <ChevronDown
-              size={10}
-              className="text-loki-muted group-hover:text-loki-text transition-colors"
-              style={{ transform: showPersonality ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s" }}
-            />
-          </button>
-        </div>
+    <div ref={rootRef} className="flex-1 flex flex-col min-w-0 min-h-0">
 
-        <div className="flex items-center gap-3">
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <header className="app-header">
+        <span className="loki-logo">LOKI</span>
+        <div className="header-divider" />
+
+        {/* Personality selector */}
+        <button
+          ref={personalityBtnRef}
+          type="button"
+          className="personality-btn"
+          onClick={handlePersonalityToggle}
+          aria-label="Select personality mode"
+          aria-haspopup="listbox"
+        >
+          <div className="personality-btn-dot" />
+          <span className="personality-btn-label">{PERSONALITY_LABELS[personality]}</span>
+          <ChevronDown
+            size={10}
+            aria-hidden="true"
+            className={`transition-transform duration-200 ${showPersonality ? "rotate-180" : "rotate-0"}`}
+            style={{ color: "var(--p-color)" }}
+          />
+        </button>
+
+        {/* Right side: RAG pill + offline banner + status */}
+        <div className="ml-auto flex items-center gap-3">
           <AnimatePresence>
+            {indexedFiles.length > 0 && (
+              <motion.span
+                key="rag"
+                className="rag-pill"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+              >
+                RAG · {indexedFiles.length}f
+              </motion.span>
+            )}
             {isOffline && (
               <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0 }}
-                className="flex items-center gap-1 text-loki-error text-xs"
+                key="offline"
+                className="offline-banner"
+                initial={{ opacity: 0, x: 8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 8 }}
+                transition={{ duration: 0.2 }}
               >
-                <WifiOff size={12} />
-                <span>Offline</span>
-              </motion.div>
-            )}
-            {indexedFiles.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="rag-badge text-xs px-2 py-0.5 rounded-full"
-              >
-                RAG: {indexedFiles.length}f
+                <WifiOff size={11} aria-hidden="true" />
+                Offline
               </motion.div>
             )}
           </AnimatePresence>
           <StatusOrb status={status} />
         </div>
-      </div>
+      </header>
 
-      {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto py-4 flex flex-col gap-3 scroll-smooth"
-      >
-        <AnimatePresence initial={false}>
-          {messages.map((msg) => (
-            <MessageBubble key={msg.id} msg={msg} />
-          ))}
-        </AnimatePresence>
+      {/* ── Chat body ──────────────────────────────────────────── */}
+      <div className="chat-body">
 
-        {/* Thinking indicator */}
-        <AnimatePresence>
-          {status === "thinking" && (
-            <motion.div
-              className="flex items-center gap-2 px-4"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-            >
-              <div className="thinking-avatar w-7 h-7 rounded-full flex-shrink-0" />
-              <div className="msg-bubble msg-loki flex items-center gap-1.5 py-3 px-4">
-                <span className="typing-dot w-2 h-2 rounded-full bg-loki-gold inline-block" />
-                <span className="typing-dot w-2 h-2 rounded-full bg-loki-gold inline-block" />
-                <span className="typing-dot w-2 h-2 rounded-full bg-loki-gold inline-block" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Messages scroll area */}
+        <div ref={scrollRef} className="messages-area">
+          <AnimatePresence initial={false}>
+            {messages.map((msg) => (
+              <MessageBubble key={msg.id} msg={msg} />
+            ))}
+          </AnimatePresence>
 
-        {/* Live transcript */}
-        <AnimatePresence>
-          {transcript && status === "listening" && (
-            <motion.div className="px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <div className="transcript-preview text-xs text-loki-muted italic px-3 py-2 rounded-lg">
+          {/* Thinking indicator */}
+          <AnimatePresence>
+            {status === "thinking" && (
+              <motion.div
+                className="thinking-row"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="msg-avatar" aria-hidden="true" />
+                <div className="msg-bubble msg-bubble-loki flex items-center gap-1.5 py-3">
+                  <span className="thinking-dot" aria-hidden="true" />
+                  <span className="thinking-dot" aria-hidden="true" />
+                  <span className="thinking-dot" aria-hidden="true" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Live transcript */}
+          <AnimatePresence>
+            {transcript && status === "listening" && (
+              <motion.div
+                className="transcript-strip"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                aria-live="polite"
+                aria-label="Live transcript"
+              >
                 🎙 {transcript}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Input bar */}
+        <InputBar
+          onSend={onSend}
+          onToggleMute={onToggleMute}
+          onUndo={onUndo}
+          onClear={onClear}
+          onFileClick={onFilePanel}
+          isMuted={isMuted}
+          status={status}
+          filesCount={indexedFiles.length}
+        />
       </div>
 
-      {/* Input */}
-      <InputBar
-        onSend={onSend}
-        onToggleMute={onToggleMute}
-        onUndo={onUndo}
-        onClear={onClear}
-        onFileClick={onFilePanel}
-        isMuted={isMuted}
-        status={status}
-        filesCount={indexedFiles.length}
-      />
-
-      {/* Personality picker — portal into document.body to escape overflow:hidden */}
+      {/* Personality picker — portaled to body to escape any overflow:hidden ancestor */}
       {mounted && createPortal(
         <AnimatePresence>
           {showPersonality && (
-            <div
-              ref={portalRef}
-              className="personality-dropdown-portal"
-            >
+            <div ref={portalRef} className="personality-dropdown-portal">
               <PersonalityPicker
                 current={personality}
                 onChange={onPersonalityChange}
@@ -268,6 +277,6 @@ export default function ChatPanel({
         </AnimatePresence>,
         document.body
       )}
-    </motion.div>
+    </div>
   );
 }

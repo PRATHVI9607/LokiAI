@@ -7,7 +7,7 @@ import { type Personality } from "@/hooks/useLoki";
 
 const MODES: { id: Personality; label: string; desc: string }[] = [
   { id: "loki",   label: "Loki",   desc: "Witty Norse trickster" },
-  { id: "jarvis", label: "Jarvis", desc: "Formal & precise"       },
+  { id: "jarvis", label: "Jarvis", desc: "Formal & precise" },
   { id: "friday", label: "Friday", desc: "Casual & collaborative" },
 ];
 
@@ -21,12 +21,12 @@ export default function PersonalityPicker({ current, onChange, onClose }: Props)
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Set aria-pressed imperatively — axe static analyzer flags any JSX {expression}
+  // Set aria-pressed imperatively — axe static analyzer flags any JSX {expression} in ARIA attrs
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const el = containerRef.current;
+    if (!el) return;
     MODES.forEach((m) => {
-      const btn = container.querySelector<HTMLButtonElement>(`[data-personality="${m.id}"]`);
+      const btn = el.querySelector<HTMLButtonElement>(`[data-personality="${m.id}"]`);
       btn?.setAttribute("aria-pressed", m.id === current ? "true" : "false");
     });
   }, [current]);
@@ -34,16 +34,17 @@ export default function PersonalityPicker({ current, onChange, onClose }: Props)
   return (
     <motion.div
       ref={containerRef}
-      className="personality-picker glass-strong rounded-xl overflow-hidden"
+      className="personality-picker"
       initial={{ opacity: 0, y: -8, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -8, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.18 }}
     >
-      <div className="px-3 py-2 border-b border-loki-purple/40">
-        <p className="text-xs text-loki-muted font-medium tracking-wider uppercase">Personality</p>
-        {error && <p className="text-xs text-loki-error mt-1">{error}</p>}
+      <div className="picker-header">
+        <p className="text-xs font-semibold tracking-widest uppercase text-loki-dim">Personality</p>
+        {error && <p className="picker-error">{error}</p>}
       </div>
+
       {MODES.map((m) => (
         <button
           key={m.id}
@@ -59,19 +60,14 @@ export default function PersonalityPicker({ current, onChange, onClose }: Props)
               setError(err instanceof Error ? err.message : "Failed to change personality");
             }
           }}
-          className={`mode-btn w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-loki-purple/30 transition-colors
-            ${current === m.id ? "bg-loki-purple/40" : ""}`}
+          className={`mode-btn w-full flex items-center gap-3 px-3 py-2.5 text-left ${current === m.id ? "mode-btn-active" : ""}`}
         >
-          <div
-            className={`mode-dot w-2 h-2 rounded-full flex-shrink-0 ${current === m.id ? "mode-dot-active" : ""}`}
-          />
-          <div>
-            <p className="text-xs font-medium text-loki-text">{m.label}</p>
-            <p className="text-xs text-loki-muted">{m.desc}</p>
+          <div className={`w-2 h-2 rounded-full flex-shrink-0 mode-dot ${current === m.id ? "mode-dot-active" : ""}`} />
+          <div className="flex-1 min-w-0">
+            <p className={`mode-label ${current === m.id ? "mode-label-active" : ""}`}>{m.label}</p>
+            <p className="text-xs text-loki-dim">{m.desc}</p>
           </div>
-          {current === m.id && (
-            <Check size={12} className="mode-check ml-auto flex-shrink-0" aria-hidden="true" />
-          )}
+          {current === m.id && <Check size={12} aria-hidden="true" className="flex-shrink-0 mode-check" />}
         </button>
       ))}
     </motion.div>

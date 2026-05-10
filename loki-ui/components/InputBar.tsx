@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, type KeyboardEvent } from "react";
-import { motion } from "framer-motion";
 import { Send, Mic, MicOff, RotateCcw, Trash2, Paperclip } from "lucide-react";
 import { type Status } from "@/hooks/useLoki";
 
@@ -22,6 +21,8 @@ export default function InputBar({
 }: InputBarProps) {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const isOffline = status === "offline";
+  const isListening = status === "listening";
 
   const submit = () => {
     const trimmed = value.trim();
@@ -35,89 +36,74 @@ export default function InputBar({
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); }
   };
 
-  const isOffline = status === "offline";
-
   return (
-    <div className="px-4 py-3 border-t border-loki-purple/40 flex flex-col gap-2">
-      <div className="flex gap-2 items-center">
+    <div className="input-bar">
+      {/* Main input row */}
+      <div className="input-row">
         <input
           ref={inputRef}
+          type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={onKey}
-          placeholder={isOffline ? "Connecting to Loki…" : "Speak or type…"}
+          placeholder={isOffline ? "Connecting to Loki…" : isListening ? "Listening… or type here" : "Speak or type…"}
           disabled={isOffline}
-          className="
-            flex-1 bg-loki-purple/30 border border-loki-purple/50 rounded-xl
-            px-4 py-2.5 text-sm text-loki-text placeholder-loki-muted
-            focus:outline-none focus:border-loki-gold/60 focus:bg-loki-purple/50
-            disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200
-          "
+          aria-label="Message input"
+          className="input-field"
         />
-        <motion.button
+        <button
+          type="button"
           onClick={submit}
           disabled={!value.trim() || isOffline}
-          whileTap={{ scale: 0.9 }}
-          className="p-2.5 rounded-xl bg-loki-gold/20 border border-loki-gold/40 text-loki-gold
-            hover:bg-loki-gold/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
-          title="Send"
+          aria-label="Send message"
+          className="send-btn"
         >
-          <Send size={16} />
-        </motion.button>
+          <Send size={15} />
+          Send
+        </button>
       </div>
 
-      <div className="flex gap-2 items-center">
-        {/* File upload button */}
-        <motion.button
+      {/* Action row */}
+      <div className="action-row">
+        <button
+          type="button"
           onClick={onFileClick}
-          whileTap={{ scale: 0.9 }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200
-            ${filesCount > 0
-              ? "bg-loki-gold/15 border-loki-gold/30 text-loki-gold"
-              : "bg-loki-purple/40 border-loki-purple-light/50 text-loki-muted hover:text-loki-text"
-            }`}
-          title="Index files for RAG"
+          aria-label="Toggle file panel"
+          className={`action-btn ${filesCount > 0 ? "action-btn-gold" : ""}`}
         >
-          <Paperclip size={13} />
-          Files{filesCount > 0 ? ` (${filesCount})` : ""}
-        </motion.button>
+          <Paperclip size={12} />
+          Files{filesCount > 0 ? ` · ${filesCount}` : ""}
+        </button>
 
-        <motion.button
+        <button
+          type="button"
           onClick={onToggleMute}
-          whileTap={{ scale: 0.9 }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200
-            ${isMuted
-              ? "bg-loki-error/20 border-loki-error/40 text-loki-error"
-              : "bg-loki-purple/40 border-loki-purple-light/50 text-loki-muted hover:text-loki-text"
-            }`}
-          title={isMuted ? "Unmute mic" : "Mute mic"}
+          aria-label={isMuted ? "Unmute microphone" : "Mute microphone"}
+          className={`action-btn ${isListening ? "action-btn-mic-live" : isMuted ? "action-btn-red" : ""}`}
         >
-          {isMuted ? <MicOff size={13} /> : <Mic size={13} />}
-          {isMuted ? "Muted" : "Mic"}
-        </motion.button>
+          {isMuted ? <MicOff size={12} /> : <Mic size={12} />}
+          {isListening ? "Listening…" : isMuted ? "Muted" : "Mic"}
+        </button>
 
-        <motion.button
+        <button
+          type="button"
           onClick={onUndo}
-          whileTap={{ scale: 0.9 }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-            bg-loki-purple/40 border border-loki-purple-light/50 text-loki-muted
-            hover:text-loki-text transition-all duration-200"
-          title="Undo last action"
+          aria-label="Undo last action"
+          className="action-btn"
         >
-          <RotateCcw size={13} />
+          <RotateCcw size={12} />
           Undo
-        </motion.button>
+        </button>
 
-        <motion.button
+        <button
+          type="button"
           onClick={onClear}
-          whileTap={{ scale: 0.9 }}
-          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-            bg-loki-purple/40 border border-loki-purple-light/50 text-loki-muted
-            hover:text-loki-error hover:border-loki-error/40 transition-all duration-200"
-          title="Clear chat"
+          aria-label="Clear chat"
+          className="action-btn action-btn-red ml-auto"
         >
-          <Trash2 size={13} />
-        </motion.button>
+          <Trash2 size={12} />
+          Clear
+        </button>
       </div>
     </div>
   );

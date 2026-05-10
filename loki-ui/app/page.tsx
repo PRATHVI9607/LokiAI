@@ -20,18 +20,25 @@ export default function Home() {
   const [showFiles, setShowFiles] = useState(false);
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden flex items-center justify-center gap-4">
-      {/* 2.5D Norse rune particle background */}
-      <RuneCanvas status={status} />
+    <div className="app-shell">
+      {/* Animated rune particle background */}
+      <div className="app-bg">
+        <RuneCanvas status={status} />
+      </div>
 
-      {/* Depth radial gradients — z-[1] keeps them above canvas but below content */}
-      <div className="fixed inset-0 pointer-events-none bg-radial-purple z-[1]" />
-      <div className="fixed inset-0 pointer-events-none bg-radial-gold z-[1]" />
+      {/* Depth vignette over canvas */}
+      <div className="app-vignette" />
 
-      {/* File panel (left of chat) — wrapper only exists when panel is open */}
-      <AnimatePresence>
-        {showFiles && (
-          <div className="relative z-10">
+      {/* Corner Norse rune decorations */}
+      <div className="rune-glow fixed top-6 left-8 text-5xl pointer-events-none select-none z-[2]" aria-hidden="true">ᚦ</div>
+      <div className="rune-glow fixed bottom-8 right-10 text-4xl pointer-events-none select-none z-[2]" aria-hidden="true">ᛟ</div>
+      <div className="rune-glow fixed top-12 right-12 text-3xl pointer-events-none select-none z-[2]" aria-hidden="true">ᚱ</div>
+      <div className="rune-glow fixed bottom-16 left-12 text-3xl pointer-events-none select-none z-[2]" aria-hidden="true">ᛁ</div>
+
+      {/* Full-height UI layer: sidebar + chat */}
+      <div className="app-layer">
+        <AnimatePresence>
+          {showFiles && (
             <FilePanel
               files={indexedFiles}
               ragAvailable={ragAvailable}
@@ -39,12 +46,9 @@ export default function Home() {
               onDelete={deleteFile}
               onClose={() => setShowFiles(false)}
             />
-          </div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
 
-      {/* Main chat panel */}
-      <div className="relative z-10">
         <ChatPanel
           messages={messages}
           status={status}
@@ -60,12 +64,6 @@ export default function Home() {
           onPersonalityChange={setPersonality}
         />
       </div>
-
-      {/* Corner Norse rune decorations */}
-      <div className="fixed top-6 left-8 text-5xl rune-glow rune-corner-tl pointer-events-none select-none z-[2]">ᚦ</div>
-      <div className="fixed bottom-8 right-10 text-4xl rune-glow rune-corner-br pointer-events-none select-none z-[2]">ᛟ</div>
-      <div className="fixed top-12 right-12 text-3xl rune-glow rune-corner-tr pointer-events-none select-none z-[2]">ᚱ</div>
-      <div className="fixed bottom-16 left-12 text-3xl rune-glow rune-corner-bl pointer-events-none select-none z-[2]">ᛁ</div>
-    </main>
+    </div>
   );
 }
