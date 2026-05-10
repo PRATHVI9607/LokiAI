@@ -94,6 +94,11 @@ export default function ChatPanel({
     el.style.left = `${dropdownPos.left}px`;
   }, [dropdownPos]);
 
+  // Set aria-expanded imperatively — axe static analyzer flags any JSX {expression}
+  useEffect(() => {
+    personalityBtnRef.current?.setAttribute("aria-expanded", showPersonality ? "true" : "false");
+  }, [showPersonality]);
+
   // Click-outside + Escape → close and return focus
   useEffect(() => {
     if (!showPersonality) return;
@@ -150,7 +155,6 @@ export default function ChatPanel({
             type="button"
             className="flex items-center gap-1 mt-0.5 group"
             onClick={handlePersonalityToggle}
-            aria-expanded={showPersonality ? "true" : "false"}
             aria-label="Select personality mode"
           >
             <div className="personality-dot w-1.5 h-1.5 rounded-full" />
