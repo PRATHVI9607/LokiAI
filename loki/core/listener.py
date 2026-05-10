@@ -1,14 +1,12 @@
 """
 Speech listener — microphone + VAD + Whisper STT.
+Callback-based; no Qt dependency.
 """
 
-import io
 import logging
 import threading
 import numpy as np
-from typing import Optional
-
-from PyQt6.QtCore import QObject, pyqtSignal
+from typing import Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -34,19 +32,14 @@ except ImportError:
     logger.warning("openai-whisper not available")
 
 
-class SpeechListener(QObject):
+class SpeechListener:
     """Listens to microphone, detects speech, transcribes with Whisper."""
-
-    transcript_ready = pyqtSignal(str)
-    listening_started = pyqtSignal()
-    listening_stopped = pyqtSignal()
 
     SAMPLE_RATE = 16000
     FRAME_MS = 30
     FRAME_SAMPLES = int(SAMPLE_RATE * FRAME_MS / 1000)
 
     def __init__(self, config: dict):
-        super().__init__()
         self._config = config.get("audio", {})
         self._whisper_config = config.get("whisper", {})
         self._vad_level = self._config.get("vad_aggressiveness", 2)
@@ -55,9 +48,12 @@ class SpeechListener(QObject):
         self._thread: Optional[threading.Thread] = None
         self._model = None
 
+        self.on_transcript: Optional[Callable[[str], None]] = None
+        self.on_listening_started: Optional[Callable] = None
+        self.on_listening_stopped: Optional[Callable] = None
+
         if WHISPER_AVAILABLE:
             model_name = self._whisper_config.get("model", "base.en")
-            device = self._whisper_config.get("device", "cpu")
             logger.info(f"Loading Whisper model: {model_name}")
             try:
                 self._model = whisper.load_model(model_name)
@@ -71,14 +67,16 @@ class SpeechListener(QObject):
         self._listening = True
         self._thread = threading.Thread(target=self._listen_loop, daemon=True)
         self._thread.start()
-        self.listening_started.emit()
+        if self.on_listening_started:
+            self.on_listening_started()
         logger.info("Listening started")
 
     def stop_listening(self) -> None:
         self._listening = False
         if self._thread:
             self._thread.join(timeout=3)
-        self.listening_stopped.emit()
+        if self.on_listening_stopped:
+            self.on_listening_stopped()
         logger.info("Listening stopped")
 
     def _listen_loop(self) -> None:
@@ -145,6 +143,7 @@ class SpeechListener(QObject):
             text = result.get("text", "").strip()
             if text:
                 logger.info(f"Transcribed: {text}")
-                self.transcript_ready.emit(text)
+                if self.on_transcript:
+                    self.on_transcript(text)
         except Exception as e:
             logger.error(f"Transcription error: {e}")

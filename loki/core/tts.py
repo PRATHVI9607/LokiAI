@@ -1,5 +1,6 @@
 """
 Loki TTS — edge-tts primary (Microsoft Neural), pyttsx3 fallback.
+Callback-based; no Qt dependency.
 """
 
 import asyncio
@@ -8,9 +9,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import Any, Optional
-
-from PyQt6.QtCore import QObject, pyqtSignal
+from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -36,14 +35,10 @@ except Exception:
     PYGAME_AVAILABLE = False
 
 
-class LokiTTS(QObject):
+class LokiTTS:
     """Text-to-speech engine with edge-tts primary, pyttsx3 fallback."""
 
-    speaking_started = pyqtSignal()
-    speaking_stopped = pyqtSignal()
-
     def __init__(self, config: dict):
-        super().__init__()
         self._config = config
         self._engine_name = config.get("engine", "edge")
         self._voice = config.get("voice", "en-GB-RyanNeural")
@@ -52,6 +47,9 @@ class LokiTTS(QObject):
         self._pyttsx3_engine: Optional[Any] = None
         self._speaking = False
         self._lock = threading.Lock()
+
+        self.on_speaking_started: Optional[Callable] = None
+        self.on_speaking_stopped: Optional[Callable] = None
 
         if self._engine_name == "pyttsx3" or not EDGE_TTS_AVAILABLE:
             self._init_pyttsx3()
@@ -63,7 +61,6 @@ class LokiTTS(QObject):
             return
         try:
             self._pyttsx3_engine = pyttsx3.init()
-            # Set a deeper, more authoritative voice
             voices = self._pyttsx3_engine.getProperty("voices")
             for voice in voices:
                 if "male" in voice.name.lower() or "david" in voice.name.lower():
@@ -74,7 +71,7 @@ class LokiTTS(QObject):
         except Exception as e:
             logger.error(f"pyttsx3 init failed: {e}")
 
-    def speak(self, text: str, streaming: bool = False) -> None:
+    def speak(self, text: str) -> None:
         if not text or not text.strip():
             return
         with self._lock:
@@ -82,7 +79,8 @@ class LokiTTS(QObject):
                 return
             self._speaking = True
 
-        self.speaking_started.emit()
+        if self.on_speaking_started:
+            self.on_speaking_started()
         thread = threading.Thread(target=self._speak_thread, args=(text,), daemon=True)
         thread.start()
 
@@ -99,7 +97,8 @@ class LokiTTS(QObject):
         finally:
             with self._lock:
                 self._speaking = False
-            self.speaking_stopped.emit()
+            if self.on_speaking_stopped:
+                self.on_speaking_stopped()
 
     def _speak_edge(self, text: str) -> None:
         async def _run():
@@ -144,7 +143,6 @@ class LokiTTS(QObject):
         if not played:
             try:
                 import subprocess
-                # WMPlayer.OCX.7 supports MP3 natively; 8s ceiling covers any TTS clip
                 safe = path.replace("'", "''")
                 ps = (
                     f"$w=New-Object -ComObject WMPlayer.OCX.7;"

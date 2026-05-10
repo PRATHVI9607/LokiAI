@@ -1,14 +1,13 @@
 """
 Wakeword detector — Whisper-based "Hey Loki" detection.
 Porcupine is optional if access key is configured.
+Callback-based; no Qt dependency.
 """
 
 import logging
 import threading
 import numpy as np
-from typing import Optional
-
-from PyQt6.QtCore import QObject, pyqtSignal
+from typing import Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -31,27 +30,26 @@ except ImportError:
     PORCUPINE_AVAILABLE = False
 
 
-class WakewordDetector(QObject):
+class WakewordDetector:
     """Detects 'Hey Loki' wakeword using Whisper or Porcupine."""
-
-    wakeword_detected = pyqtSignal()
-    transcript_available = pyqtSignal(str)
 
     SAMPLE_RATE = 16000
     CHUNK_SECONDS = 2.0
 
     WAKEWORD_VARIANTS = {
         "hey loki", "hay loki", "hello loki", "ok loki", "okay loki",
-        "loki", "hey lolly", "hey lucky",  # common mishears
+        "loki", "hey lolly", "hey lucky",
     }
 
     def __init__(self, config: dict):
-        super().__init__()
         self._config = config.get("wakeword", {})
         self._method = self._config.get("method", "whisper")
         self._running = False
         self._thread: Optional[threading.Thread] = None
         self._model = None
+
+        self.on_wakeword: Optional[Callable] = None
+        self.on_transcript: Optional[Callable[[str], None]] = None
 
         if self._method == "whisper" and WHISPER_AVAILABLE:
             try:
@@ -93,7 +91,8 @@ class WakewordDetector(QObject):
                 audio_np = audio[:, 0]
                 if self._is_wakeword(audio_np):
                     logger.info("Wakeword detected!")
-                    self.wakeword_detected.emit()
+                    if self.on_wakeword:
+                        self.on_wakeword()
 
             except Exception as e:
                 logger.error(f"Wakeword loop error: {e}")
@@ -112,8 +111,8 @@ class WakewordDetector(QObject):
             result = self._model.transcribe(audio_np, language="en", fp16=False)
             text = result.get("text", "").strip().lower()
 
-            if text:
-                self.transcript_available.emit(text)
+            if text and self.on_transcript:
+                self.on_transcript(text)
 
             for variant in self.WAKEWORD_VARIANTS:
                 if variant in text:

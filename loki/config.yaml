@@ -7,8 +7,8 @@ assistant:
 
 llm:
   ollama_model: phi3:mini
-  fallback_model: meta-llama/llama-3.1-8b-instruct:free
-  second_fallback_model: microsoft/phi-3-mini-128k-instruct:free
+  fallback_model: mistralai/mistral-7b-instruct:free
+  second_fallback_model: google/gemma-2-9b-it:free
   max_tokens: 400
   temperature: 0.75
 
@@ -32,15 +32,8 @@ tts:
   fallback_engine: pyttsx3
 
 ui:
-  width: 480
-  height: 620
-  position: bottom_right
-  start_hidden: false
-  always_on_top: true
+  port: 7777
   conversation_timeout_seconds: 30
-  theme: dark_norse    # dark theme with purple/gold accents
-  show_avatar: true
-  opacity: 0.97
 
 memory:
   max_turns: 30

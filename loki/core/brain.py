@@ -128,18 +128,25 @@ class LokiBrain:
         self._config = config
         self._memory_dir = Path(memory_dir)
 
-        self._ollama_client: Optional[Any] = None
+        self._ollama_probe_client: Optional[Any] = None
+        self._ollama_infer_client: Optional[Any] = None
         self._ollama_model = config.get("ollama_model", "phi3:mini")
         self._ollama_available = False
 
         try:
-            self._ollama_client = OpenAI(
+            self._ollama_probe_client = OpenAI(
                 base_url="http://localhost:11434/v1",
                 api_key="ollama",
-                timeout=3.0,      # fail fast — no Ollama = no point waiting
-                max_retries=0,    # skip automatic retries
+                timeout=3.0,   # fail fast for probe only
+                max_retries=0,
             )
-            self._ollama_client.models.list()
+            self._ollama_probe_client.models.list()
+            self._ollama_infer_client = OpenAI(
+                base_url="http://localhost:11434/v1",
+                api_key="ollama",
+                timeout=120.0,  # local models need up to 2 min on first load
+                max_retries=0,
+            )
             self._ollama_available = True
             logger.info(f"Ollama connected: {self._ollama_model}")
         except Exception:
@@ -221,9 +228,9 @@ class LokiBrain:
         messages = self._build_messages(user_message)
         response_text = ""
 
-        if self._ollama_available and self._ollama_client:
+        if self._ollama_available and self._ollama_infer_client:
             try:
-                response = self._ollama_client.chat.completions.create(
+                response = self._ollama_infer_client.chat.completions.create(
                     model=self._ollama_model,
                     messages=messages,
                     max_tokens=self._max_tokens,

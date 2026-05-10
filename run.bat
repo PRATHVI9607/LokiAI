@@ -5,4 +5,6 @@ if not exist venv\Scripts\activate.bat (
     exit /b 1
 )
 call venv\Scripts\activate.bat
+echo Starting Loki AI...
+echo Open http://localhost:7777 in your browser.
 python main.py %*
