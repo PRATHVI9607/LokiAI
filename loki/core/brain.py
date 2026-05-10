@@ -345,16 +345,14 @@ class LokiBrain:
         """
         Summarize the oldest COMPRESSION_BATCH messages via Ollama,
         store summary in brain_memory, drop those messages from history.
+        History is only mutated after a successful LLM call.
         """
         if not self._brain_memory:
-            # Without brain_memory, just truncate
             self._conversation_history = self._conversation_history[-self._max_turns * 2:]
             return
 
         to_compress = self._conversation_history[:COMPRESSION_BATCH]
-        self._conversation_history = self._conversation_history[COMPRESSION_BATCH:]
 
-        # Build a summary prompt
         convo_text = "\n".join(
             f"{m['role'].upper()}: {m['content'][:300]}" for m in to_compress
         )
@@ -365,7 +363,14 @@ class LokiBrain:
                 f"capturing key decisions, facts learned, and tasks discussed:\n\n{convo_text}"
             )},
         ]
-        summary = self._call_llm(summary_prompt, max_tokens=150)
+        try:
+            summary = self._call_llm(summary_prompt, max_tokens=150)
+        except Exception as e:
+            logger.warning(f"Compression LLM call failed: {e} — history unchanged")
+            return
+
+        # Only mutate history after LLM succeeds
+        self._conversation_history = self._conversation_history[COMPRESSION_BATCH:]
         if summary:
             self._brain_memory.add_session_summary(summary)
             logger.info(f"Compressed {len(to_compress)} messages → session summary")

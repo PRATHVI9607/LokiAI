@@ -15,7 +15,6 @@ import asyncio
 import json
 import logging
 import os
-import shutil
 import webbrowser
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
@@ -119,16 +118,22 @@ class LokiServer:
             if not self._rag_engine.is_available:
                 raise HTTPException(503, "nomic-embed-text not available — run: ollama pull nomic-embed-text")
 
+            # Sanitize filename — strip any path components
+            raw_name = file.filename or "upload"
+            safe_name = Path(raw_name).name
+            if not safe_name or safe_name in (".", ".."):
+                raise HTTPException(400, "Invalid filename")
+
             uploads_dir = self._uploads_dir or Path("loki/memory/uploads")
             uploads_dir.mkdir(parents=True, exist_ok=True)
-            dest = uploads_dir / file.filename
+            dest = uploads_dir / safe_name
 
             content = await file.read()
-            dest.write_bytes(content)
+            await asyncio.to_thread(dest.write_bytes, content)
 
-            result = self._rag_engine.index_file(dest)
+            result = await asyncio.to_thread(self._rag_engine.index_file, dest)
             if result.get("success"):
-                self._broadcast_sync({"type": "file_indexed", "filename": file.filename,
+                self._broadcast_sync({"type": "file_indexed", "filename": safe_name,
                                       "chunk_count": result.get("chunk_count", 0)})
             return JSONResponse(result)
 
@@ -136,12 +141,22 @@ class LokiServer:
         async def delete_file(filename: str):
             if not self._rag_engine:
                 raise HTTPException(503, "RAG engine not initialized")
-            removed = self._rag_engine.delete_file(filename)
-            uploads_dir = self._uploads_dir or Path("loki/memory/uploads")
-            file_path = uploads_dir / filename
+
+            # Prevent path traversal — keep only the final name component
+            safe_name = Path(filename).name
+            if not safe_name or safe_name in (".", ".."):
+                raise HTTPException(400, "Invalid filename")
+
+            uploads_dir = (self._uploads_dir or Path("loki/memory/uploads")).resolve()
+            file_path = (uploads_dir / safe_name).resolve()
+            # Confirm resolved path is inside uploads_dir
+            if uploads_dir not in file_path.parents:
+                raise HTTPException(400, "Invalid filename")
+
+            removed = self._rag_engine.delete_file(safe_name)
             if file_path.exists():
                 file_path.unlink()
-            return {"success": True, "chunks_removed": removed, "filename": filename}
+            return {"success": True, "chunks_removed": removed, "filename": safe_name}
 
         @app.get("/files")
         async def list_files():
@@ -156,7 +171,7 @@ class LokiServer:
         @app.get("/brain")
         async def get_brain():
             if not self._brain_memory:
-                return {"error": "Brain memory not initialized"}
+                raise HTTPException(503, "Brain memory not initialized")
             return self._brain_memory.to_dict()
 
         @app.post("/brain/personality")

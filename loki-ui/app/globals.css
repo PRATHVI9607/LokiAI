@@ -159,3 +159,58 @@ body {
   color: rgba(107, 107, 168, 0.15);
   transform: rotate(-8deg);
 }
+
+/* ─── ChatPanel ──────────────────────────────────────────────── */
+/* CSS custom properties --p-color, --p-glow, --p-mid are set inline
+   on the chat-panel root by ChatPanel.tsx (one style prop, unavoidable). */
+.chat-panel {
+  width: 440px;
+  height: 640px;
+  box-shadow:
+    0 0 60px rgba(196, 164, 90, 0.08),
+    0 25px 60px rgba(0, 0, 0, 0.6),
+    0 0 1px var(--p-glow, transparent);
+}
+
+.chat-header-bg {
+  background: linear-gradient(180deg, rgba(42, 42, 90, 0.5) 0%, transparent 100%);
+}
+
+.personality-label { color: var(--p-color); }
+.personality-dot   { background: var(--p-color); }
+
+.rag-badge {
+  background: var(--p-glow);
+  color: var(--p-color);
+  border: 1px solid var(--p-mid);
+}
+
+.thinking-avatar {
+  background: radial-gradient(circle at 35% 35%, #c4a45acc, #2a2a5a);
+  box-shadow: 0 0 10px #c4a45a44;
+}
+
+.transcript-preview {
+  background: rgba(107, 107, 168, 0.1);
+  border: 1px dashed rgba(107, 107, 168, 0.3);
+}
+
+/* Personality dropdown portal — top/left driven by --dt/--dl CSS vars set inline */
+.personality-dropdown-portal {
+  position: fixed;
+  top: var(--dt);
+  left: var(--dl);
+  z-index: 9999;
+}
+
+/* ─── PersonalityPicker ──────────────────────────────────────── */
+.personality-picker { width: 220px; }
+
+/* Per-mode color driven by data-personality attribute — avoids inline styles */
+.mode-btn[data-personality="loki"]   { --mode-color: #c4a45a; }
+.mode-btn[data-personality="jarvis"] { --mode-color: #8be9fd; }
+.mode-btn[data-personality="friday"] { --mode-color: #50fa7b; }
+
+.mode-dot         { background: var(--mode-color); }
+.mode-dot-active  { box-shadow: 0 0 8px var(--mode-color); }
+.mode-check       { color: var(--mode-color); }

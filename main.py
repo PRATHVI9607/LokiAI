@@ -226,8 +226,9 @@ class LokiApplication:
         # KORTEX-inspired components
         self.brain_memory = BrainMemory(memory_dir)
         self.audit_log = AuditLog(memory_dir)
-        ollama_url = f"http://localhost:{self.config.get('wakeword', {}).get('ollama_port', 11434)}"
-        self.rag_engine = RagEngine(memory_dir, ollama_url="http://localhost:11434")
+        ollama_port = self.config.get("llm", {}).get("ollama_port", 11434)
+        ollama_url = f"http://localhost:{ollama_port}"
+        self.rag_engine = RagEngine(memory_dir, ollama_url=ollama_url)
 
         self.brain = LokiBrain(
             self.config.get("llm", {}),

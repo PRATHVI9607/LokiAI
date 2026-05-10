@@ -7,6 +7,7 @@ Tier 3: destructive/external ops (logged with full payload).
 
 import json
 import logging
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -37,11 +38,12 @@ MAX_ENTRIES = 1000
 
 
 class AuditLog:
-    """Append-only audit log stored as JSONL."""
+    """Append-only audit log stored as JSONL. Thread-safe."""
 
     def __init__(self, memory_dir: Path):
         self._path = Path(memory_dir) / "audit.jsonl"
         self._path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = threading.Lock()
 
     def log(
         self,
@@ -52,7 +54,7 @@ class AuditLog:
     ) -> None:
         tier = INTENT_TIERS.get(intent, 2)
         if tier == 1:
-            return  # don't log read-only ops
+            return
 
         entry = {
             "ts": datetime.now().isoformat(),
@@ -64,34 +66,41 @@ class AuditLog:
             "result": result_summary[:200] if result_summary else "",
         }
         try:
-            with open(self._path, "a", encoding="utf-8") as f:
-                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-            self._rotate_if_needed()
+            with self._lock:
+                with open(self._path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+                self._rotate_if_needed()
         except Exception as e:
             logger.error(f"Audit log write failed: {e}")
 
-    def _sanitize(self, params: Dict) -> Dict:
-        """Redact sensitive keys from params."""
+    def _sanitize(self, params: Any) -> Any:
+        """Recursively redact sensitive keys from params."""
         sensitive = {"value", "password", "key", "secret", "token"}
-        return {
-            k: "***" if k.lower() in sensitive else v
-            for k, v in params.items()
-        }
+        if isinstance(params, dict):
+            return {
+                k: "***" if k.lower() in sensitive else self._sanitize(v)
+                for k, v in params.items()
+            }
+        if isinstance(params, list):
+            return [self._sanitize(item) for item in params]
+        return params
 
     def _rotate_if_needed(self) -> None:
+        """Trim log to MAX_ENTRIES. Must be called while self._lock is held."""
         try:
             lines = self._path.read_text(encoding="utf-8").splitlines()
             if len(lines) > MAX_ENTRIES:
                 keep = lines[-MAX_ENTRIES:]
                 self._path.write_text("\n".join(keep) + "\n", encoding="utf-8")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Audit log rotation failed: {e}")
 
     def get_recent(self, n: int = 20, tier_min: int = 2) -> List[Dict]:
         if not self._path.exists():
             return []
         try:
-            lines = self._path.read_text(encoding="utf-8").splitlines()
+            with self._lock:
+                lines = self._path.read_text(encoding="utf-8").splitlines()
             entries = []
             for line in reversed(lines):
                 if not line.strip():

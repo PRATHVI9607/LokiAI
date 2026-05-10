@@ -28,10 +28,10 @@ export default function Home() {
       <div className="fixed inset-0 pointer-events-none bg-radial-purple z-[1]" />
       <div className="fixed inset-0 pointer-events-none bg-radial-gold z-[1]" />
 
-      {/* File panel (left of chat) */}
-      <div className="relative z-10">
-        <AnimatePresence>
-          {showFiles && (
+      {/* File panel (left of chat) — wrapper only exists when panel is open */}
+      <AnimatePresence>
+        {showFiles && (
+          <div className="relative z-10">
             <FilePanel
               files={indexedFiles}
               ragAvailable={ragAvailable}
@@ -39,9 +39,9 @@ export default function Home() {
               onDelete={deleteFile}
               onClose={() => setShowFiles(false)}
             />
-          )}
-        </AnimatePresence>
-      </div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Main chat panel */}
       <div className="relative z-10">
@@ -52,7 +52,6 @@ export default function Home() {
           isMuted={isMuted}
           personality={personality}
           indexedFiles={indexedFiles}
-          ragAvailable={ragAvailable}
           onSend={sendMessage}
           onToggleMute={toggleMute}
           onUndo={requestUndo}

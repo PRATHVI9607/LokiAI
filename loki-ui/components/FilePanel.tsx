@@ -17,20 +17,28 @@ export default function FilePanel({ files, ragAvailable, onUpload, onDelete, onC
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const uploadingRef = useRef(false);
 
   const handleFiles = useCallback(async (fileList: FileList | null) => {
-    if (!fileList) return;
+    if (!fileList || uploadingRef.current) return;
+    uploadingRef.current = true;
     for (const file of Array.from(fileList)) {
       setUploading(file.name);
-      await onUpload(file);
-      setUploading(null);
+      try {
+        await onUpload(file);
+      } catch {
+        // error surfaced via system_message inside onUpload
+      } finally {
+        setUploading(null);
+      }
     }
+    uploadingRef.current = false;
   }, [onUpload]);
 
-  const onDrop = useCallback((e: React.DragEvent) => {
+  const onDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
-    handleFiles(e.dataTransfer.files);
+    await handleFiles(e.dataTransfer.files);
   }, [handleFiles]);
 
   const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragging(true); };
@@ -56,13 +64,33 @@ export default function FilePanel({ files, ragAvailable, onUpload, onDelete, onC
             </span>
           )}
         </div>
-        <button onClick={onClose} className="text-loki-muted hover:text-loki-text transition-colors">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close file panel"
+          className="text-loki-muted hover:text-loki-text transition-colors"
+        >
           <X size={14} />
         </button>
       </div>
 
+      {/* Hidden file input — outside drop zone to avoid nested interactive controls */}
+      <input
+        ref={inputRef}
+        id="loki-file-input"
+        type="file"
+        multiple
+        aria-label="Upload files for indexing"
+        className="hidden"
+        onChange={(e) => handleFiles(e.target.files)}
+        accept=".py,.js,.ts,.tsx,.jsx,.go,.rs,.java,.cpp,.c,.h,.md,.txt,.yaml,.yml,.json,.toml,.pdf,.sql,.sh"
+      />
+
       {/* Drop zone */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Drop files here or click to upload"
         className={`mx-3 mt-3 rounded-xl border-2 border-dashed p-4 text-center cursor-pointer transition-all duration-200
           ${dragging
             ? "border-loki-gold bg-loki-gold/10"
@@ -72,20 +100,18 @@ export default function FilePanel({ files, ragAvailable, onUpload, onDelete, onC
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
       >
         <Upload size={20} className={`mx-auto mb-1 ${dragging ? "text-loki-gold" : "text-loki-muted"}`} />
         <p className="text-xs text-loki-muted">
           {uploading ? `Indexing ${uploading}…` : "Drop files or click to upload"}
         </p>
         <p className="text-xs text-loki-muted/60 mt-0.5">py, js, ts, md, txt, pdf, yaml…</p>
-        <input
-          ref={inputRef}
-          type="file"
-          multiple
-          className="hidden"
-          onChange={(e) => handleFiles(e.target.files)}
-          accept=".py,.js,.ts,.tsx,.jsx,.go,.rs,.java,.cpp,.c,.h,.md,.txt,.yaml,.yml,.json,.toml,.pdf,.sql,.sh"
-        />
       </div>
 
       {/* File list */}
@@ -111,8 +137,10 @@ export default function FilePanel({ files, ragAvailable, onUpload, onDelete, onC
                     <span className="text-xs text-loki-muted/60">{f.chunkCount}c</span>
                   )}
                   <button
+                    type="button"
                     onClick={() => onDelete(f.filename)}
-                    className="opacity-0 group-hover:opacity-100 text-loki-muted hover:text-loki-error transition-all"
+                    aria-label={`Remove ${f.filename}`}
+                    className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 text-loki-muted hover:text-loki-error transition-all"
                   >
                     <Trash2 size={11} />
                   </button>

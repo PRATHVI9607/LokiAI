@@ -93,6 +93,7 @@ class RagEngine:
                 json={"model": "nomic-embed-text", "input": text},
                 timeout=30,
             )
+            resp.raise_for_status()
             data = resp.json()
             emb = data.get("embeddings", [[]])[0]
             if emb:
@@ -105,6 +106,8 @@ class RagEngine:
 
     @staticmethod
     def _chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> List[str]:
+        if chunk_size <= overlap:
+            raise ValueError(f"chunk_size ({chunk_size}) must be greater than overlap ({overlap})")
         words = text.split()
         if not words:
             return []
@@ -123,8 +126,8 @@ class RagEngine:
             if suffix == ".pdf":
                 try:
                     import fitz  # PyMuPDF
-                    doc = fitz.open(str(path))
-                    return "\n".join(page.get_text() for page in doc)
+                    with fitz.open(str(path)) as doc:
+                        return "\n".join(page.get_text() for page in doc)
                 except ImportError:
                     logger.warning("PyMuPDF not installed — PDF text extraction unavailable")
                     return ""

@@ -37,9 +37,25 @@ interface UseLokiReturn {
   setPersonality: (mode: Personality) => Promise<void>;
 }
 
-const WS_URL = "ws://localhost:7777/ws";
-const API_BASE = "http://localhost:7777";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:7777";
+const WS_URL = API_BASE.replace(/^http/, "ws") + "/ws";
 const RECONNECT_DELAY = 2000;
+const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10 MB
+
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs = 10_000
+): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 export function useLoki(): UseLokiReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -65,13 +81,15 @@ export function useLoki(): UseLokiReturn {
     setMessages((prev) => [...prev.slice(-200), msg]);
   }, []);
 
-  // Load file list on mount
   const refreshFiles = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/files`);
+      const res = await fetchWithTimeout(`${API_BASE}/files`);
+      if (!res.ok) return;
       const data = await res.json();
       setRagAvailable(data.available ?? false);
-      setIndexedFiles((data.files ?? []).map((f: string) => ({ filename: f })));
+      if (Array.isArray(data.files)) {
+        setIndexedFiles(data.files.map((f: string) => ({ filename: f })));
+      }
     } catch {
       // backend not ready yet
     }
@@ -157,24 +175,44 @@ export function useLoki(): UseLokiReturn {
   const clearMessages = useCallback(() => setMessages([]), []);
 
   const uploadFile = useCallback(async (file: File) => {
+    if (file.size > FILE_SIZE_LIMIT) {
+      addMessage("system_message", `File too large: ${file.name} (max 10 MB)`);
+      return;
+    }
     const form = new FormData();
     form.append("file", file);
     try {
-      const res = await fetch(`${API_BASE}/upload`, { method: "POST", body: form });
+      const res = await fetchWithTimeout(
+        `${API_BASE}/upload`,
+        { method: "POST", body: form },
+        30_000
+      );
+      if (!res.ok) {
+        const text = await res.text().catch(() => res.statusText);
+        addMessage("system_message", `Upload failed: ${text}`);
+        return;
+      }
       const data = await res.json();
       if (!data.success) {
         addMessage("system_message", `Upload failed: ${data.message}`);
       } else {
         addMessage("system_message", data.message);
       }
-    } catch (e) {
+    } catch {
       addMessage("system_message", "Upload failed — backend unreachable.");
     }
   }, [addMessage]);
 
   const deleteFile = useCallback(async (filename: string) => {
     try {
-      await fetch(`${API_BASE}/upload/${encodeURIComponent(filename)}`, { method: "DELETE" });
+      const res = await fetchWithTimeout(
+        `${API_BASE}/upload/${encodeURIComponent(filename)}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) {
+        addMessage("system_message", "Failed to remove file.");
+        return;
+      }
       setIndexedFiles((prev) => prev.filter((f) => f.filename !== filename));
       addMessage("system_message", `Removed: ${filename}`);
     } catch {
@@ -184,11 +222,15 @@ export function useLoki(): UseLokiReturn {
 
   const setPersonality = useCallback(async (mode: Personality) => {
     try {
-      await fetch(`${API_BASE}/brain/personality`, {
+      const res = await fetchWithTimeout(`${API_BASE}/brain/personality`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode }),
       });
+      if (!res.ok) {
+        addMessage("system_message", "Failed to change personality.");
+        return;
+      }
       setPersonalityState(mode);
     } catch {
       addMessage("system_message", "Failed to change personality.");
