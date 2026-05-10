@@ -375,12 +375,12 @@ class LokiApplication:
             self.server.add_system_message(f"Loki online. Welcome back, {name}.")
             self.server.set_status("idle")
 
-        app = self.server.get_app()
-
-        @app.on_event("startup")
         async def on_startup():
             asyncio.create_task(_startup())
             self.server.set_loop(asyncio.get_event_loop())
+
+        self.server.add_startup_handler(on_startup)
+        app = self.server.get_app()
 
         # Open browser after a short delay
         def open_browser():

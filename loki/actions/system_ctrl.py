@@ -33,7 +33,9 @@ class SystemCtrl:
         if PYCAW_AVAILABLE:
             try:
                 devices = AudioUtilities.GetSpeakers()
-                interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+                # Newer pycaw wraps IMMDevice in AudioDevice; unwrap if needed
+                com_dev = getattr(devices, "_dev", devices)
+                interface = com_dev.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
                 self._vol_iface = cast(interface, POINTER(IAudioEndpointVolume))
             except Exception as e:
                 logger.warning(f"Volume control unavailable: {e}")

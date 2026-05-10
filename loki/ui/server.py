@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import webbrowser
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
 
@@ -69,7 +70,15 @@ class LokiServer:
     def __init__(self, config: dict):
         self._cfg = config.get("ui", {})
         self._port = self._cfg.get("port", 7777)
-        self._app = FastAPI(title="Loki AI")
+        self._startup_fns: List[Callable] = []
+
+        @asynccontextmanager
+        async def _lifespan(app):
+            for fn in self._startup_fns:
+                await fn()
+            yield
+
+        self._app = FastAPI(title="Loki AI", lifespan=_lifespan)
         self._manager = ConnectionManager()
         self._loop: Optional[asyncio.AbstractEventLoop] = None
 
@@ -83,6 +92,10 @@ class LokiServer:
         self.on_user_message: Optional[Callable[[str], None]] = None
         self.on_mute_toggle: Optional[Callable[[bool], None]] = None
         self.on_undo: Optional[Callable] = None
+
+    def add_startup_handler(self, fn: Callable) -> None:
+        """Register a coroutine to run at server startup (replaces on_event)."""
+        self._startup_fns.append(fn)
 
         self._setup_routes()
 
