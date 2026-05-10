@@ -224,21 +224,17 @@ export function useLoki(): UseLokiReturn {
   }, [addMessage]);
 
   const setPersonality = useCallback(async (mode: Personality) => {
-    try {
-      const res = await fetchWithTimeout(`${API_BASE}/brain/personality`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode }),
-      });
-      if (!res.ok) {
-        addMessage("system_message", "Failed to change personality.");
-        return;
-      }
-      setPersonalityState(mode);
-    } catch {
-      addMessage("system_message", "Failed to change personality.");
+    const res = await fetchWithTimeout(`${API_BASE}/brain/personality`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error((body as { detail?: string }).detail ?? `HTTP ${res.status}`);
     }
-  }, [addMessage]);
+    setPersonalityState(mode);
+  }, [setPersonalityState]);
 
   return {
     messages, status, transcript, isVisible, isMuted,

@@ -93,11 +93,11 @@ class LokiServer:
         self.on_mute_toggle: Optional[Callable[[bool], None]] = None
         self.on_undo: Optional[Callable] = None
 
+        self._setup_routes()
+
     def add_startup_handler(self, fn: Callable) -> None:
         """Register a coroutine to run at server startup (replaces on_event)."""
         self._startup_fns.append(fn)
-
-        self._setup_routes()
 
     def set_components(self, rag_engine=None, brain_memory=None, audit_log=None, uploads_dir=None):
         self._rag_engine = rag_engine
@@ -194,7 +194,11 @@ class LokiServer:
                 raise HTTPException(503, "Brain memory not initialized")
             if mode not in ("loki", "jarvis", "friday"):
                 raise HTTPException(400, f"Unknown personality: {mode}")
-            self._brain_memory.personality = mode
+            try:
+                self._brain_memory.personality = mode
+            except Exception as e:
+                logger.error(f"personality save failed: {e}")
+                raise HTTPException(500, f"Failed to persist personality: {e}")
             self._broadcast_sync({"type": "personality_changed", "mode": mode})
             return {"success": True, "personality": mode}
 
