@@ -34,10 +34,13 @@ desktop.ini
 *.log
 loki/loki.log
 
-# Loki runtime data
+# Loki runtime data (generated at runtime, not source)
 loki/memory/conversation.json
 loki/memory/user_profile.json
 loki/memory/vault.enc
+loki/memory/brain.json
+loki/memory/rag_index.json
+loki/memory/uploads/
 
 # Testing
 .pytest_cache/
