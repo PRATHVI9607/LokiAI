@@ -135,3 +135,30 @@ class CodeAssistant:
         )
         result = self._ask(prompt)
         return {"success": True, "message": result.strip(), "data": {"query": result.strip()}}
+
+    def refactor(self, path: str) -> Dict[str, Any]:
+        """Identify code smells and suggest specific refactoring improvements."""
+        err = self._require_brain()
+        if err:
+            return err
+
+        file_path = Path(path).expanduser().resolve()
+        if not file_path.exists():
+            return {"success": False, "message": f"File not found: {file_path}"}
+        if file_path.suffix.lower() not in SUPPORTED_EXTENSIONS:
+            return {"success": False, "message": f"Unsupported file type: {file_path.suffix}"}
+
+        try:
+            code = file_path.read_text(encoding="utf-8", errors="replace")[:self.MAX_CODE_CHARS]
+        except Exception as e:
+            return {"success": False, "message": f"Cannot read file: {e}"}
+
+        prompt = (
+            f"Analyze this {file_path.suffix.lstrip('.')} code for refactoring opportunities. "
+            f"Focus on: code smells, DRY violations, overly complex functions, poor naming, "
+            f"missing abstractions, and performance issues. "
+            f"For each issue: state the problem, show the problematic code, and provide the refactored version.\n\n"
+            f"File: {file_path.name}\n```{file_path.suffix.lstrip('.')}\n{code}\n```"
+        )
+        result = self._ask(prompt)
+        return {"success": True, "message": result, "data": {"file": str(file_path)}}

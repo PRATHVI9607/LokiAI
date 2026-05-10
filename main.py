@@ -78,6 +78,14 @@ from loki.features.meeting_transcriber import MeetingTranscriber
 from loki.features.footprint_auditor import FootprintAuditor
 from loki.features.semantic_browser_history import SemanticBrowserHistory
 
+# Remaining / enhancement features
+from loki.features.screenshot_search import ScreenshotSearch
+from loki.features.calendar_manager import CalendarManager
+from loki.features.expense_tracker import ExpenseTracker
+from loki.features.dynamic_ui import DynamicUI
+from loki.features.file_watcher import FileWatcher
+from loki.features.clipboard_sync import ClipboardSync
+
 from loki.ui.server import create_loki_server
 
 LOKI_LOG = PROJECT_ROOT / "loki" / "loki.log"
@@ -336,6 +344,17 @@ class LokiApplication:
         self.footprint_auditor = FootprintAuditor()
         self.browser_history = SemanticBrowserHistory(brain=self.brain)
 
+        # Remaining / enhancement features
+        self.screenshot_search = ScreenshotSearch(brain=self.brain)
+        self.calendar_manager = CalendarManager(brain=self.brain)
+        self.expense_tracker = ExpenseTracker(brain=self.brain)
+        self.dynamic_ui = DynamicUI()
+        self.file_watcher = FileWatcher(
+            backup_manager=self.backup_manager,
+            media_converter=self.media_converter,
+        )
+        self.clipboard_sync = ClipboardSync()
+
         self.router = ActionRouter(self.undo_stack)
         self.router.register_action("file_ops", self.file_ops)
         self.router.register_action("shell_exec", self.shell)
@@ -379,6 +398,13 @@ class LokiApplication:
         self.router.register_feature("meeting_transcriber", self.meeting_transcriber)
         self.router.register_feature("footprint_auditor", self.footprint_auditor)
         self.router.register_feature("browser_history", self.browser_history)
+        # Remaining / enhancement features
+        self.router.register_feature("screenshot_search", self.screenshot_search)
+        self.router.register_feature("calendar_manager", self.calendar_manager)
+        self.router.register_feature("expense_tracker", self.expense_tracker)
+        self.router.register_feature("dynamic_ui", self.dynamic_ui)
+        self.router.register_feature("file_watcher", self.file_watcher)
+        self.router.register_feature("clipboard_sync", self.clipboard_sync)
 
         self.conversation = ConversationManager(
             self.config, self.server, self.tts, self.brain, self.router, self.audit_log

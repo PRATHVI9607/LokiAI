@@ -200,3 +200,79 @@ class PhishingDetector:
             "message": msg,
             "data": {"risk_score": risk, "level": level, "signals": signals, "urls": url_results, "llm_verdict": llm_verdict},
         }
+
+    def analyze_media_file(self, file_path: str) -> dict:
+        """
+        Deepfake / AI-generated media heuristic detection.
+        Checks file metadata, compression artifacts, and LLM description.
+        No ML model required — uses metadata + heuristics + LLM.
+        """
+        import os
+        import struct
+        fp = Path(file_path).expanduser().resolve()
+        if not fp.exists():
+            return {"success": False, "message": f"File not found: {fp}"}
+
+        signals: list[str] = []
+        risk = 0
+        ext = fp.suffix.lower()
+        size_mb = round(fp.stat().st_size / 1048576, 2)
+
+        # Suspiciously small video files often indicate synthetic/re-encoded content
+        if ext in {".mp4", ".avi", ".mkv", ".mov"} and size_mb < 1:
+            signals.append(f"Video file unusually small ({size_mb} MB) — may be re-encoded synthetic content")
+            risk += 2
+
+        # Check if file has been modified very recently (freshly generated)
+        import time
+        mtime = fp.stat().st_mtime
+        age_hours = (time.time() - mtime) / 3600
+        if age_hours < 1:
+            signals.append("File was created/modified within the last hour")
+            risk += 1
+
+        # Check for missing or stripped EXIF metadata (common in AI-generated images)
+        if ext in {".jpg", ".jpeg", ".png"}:
+            try:
+                from PIL import Image
+                img = Image.open(fp)
+                exif = img.getexif() if hasattr(img, "getexif") else {}
+                if not exif:
+                    signals.append("No EXIF metadata found — common in AI-generated images")
+                    risk += 2
+                w, h = img.size
+                # AI images often have exact power-of-2 or standard GAN dimensions
+                gan_sizes = {512, 1024, 256, 768, 1280}
+                if w in gan_sizes and h in gan_sizes:
+                    signals.append(f"Image dimensions {w}×{h} match common GAN output sizes")
+                    risk += 1
+            except Exception:
+                pass
+
+        # LLM-based analysis if available
+        llm_verdict = ""
+        if self._brain and signals:
+            prompt = (
+                f"I have a media file with these suspicious characteristics:\n"
+                f"- File: {fp.name} ({ext}, {size_mb} MB)\n"
+                f"- Signals: {'; '.join(signals)}\n\n"
+                f"Based on these signals, assess the likelihood this is AI-generated or a deepfake. "
+                f"Verdict: Likely Authentic / Possibly Synthetic / Likely Deepfake. One sentence why."
+            )
+            llm_verdict = self._llm(prompt)
+
+        risk = min(risk, 10)
+        level = "Low" if risk < 3 else "Medium" if risk < 6 else "High"
+        msg = f"Deepfake risk for '{fp.name}': {level} ({risk}/10)"
+        if signals:
+            msg += "\n" + "\n".join(f"  ⚠ {s}" for s in signals)
+        else:
+            msg += "\n  No suspicious signals detected."
+        if llm_verdict:
+            msg += f"\n\nAI assessment: {llm_verdict}"
+
+        return {
+            "success": True,
+            "message": msg,
+            "data": {"file": str(fp), "risk_score": risk, "level": level, "signals": signals, "llm_verdict": llm_verdict},
+        }

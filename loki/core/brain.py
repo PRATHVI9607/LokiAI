@@ -164,6 +164,57 @@ INTENTS (meetings):
 - meeting_action_items: params={text_or_path}
 - meeting_summarize: params={transcript}
 
+INTENTS (screen & visual):
+- screen_capture: params={region?}
+- screen_read: params={region?}
+- screen_search: params={query}
+- screen_describe: params={}
+- screen_translate: params={target_language?}
+- screenshot_save: params={output_path?}
+
+INTENTS (calendar):
+- calendar_list: params={days?, ics_path?}
+- calendar_conflicts: params={ics_path?}
+- calendar_suggest_slot: params={event_title, duration_minutes?, ics_path?}
+- calendar_import: params={ics_path}
+
+INTENTS (expenses):
+- expense_extract: params={text}
+- expense_from_file: params={file_path}
+- expense_scan_folder: params={folder}
+- expense_list: params={month?}
+- expense_summary: params={}
+
+INTENTS (dynamic UI):
+- ui_theme_time: params={}
+- ui_theme_mood: params={mood}
+- ui_wallpaper: params={image_path}
+- ui_auto_theme_start: params={}
+- ui_auto_theme_stop: params={}
+- ui_list_themes: params={}
+
+INTENTS (file watcher):
+- watch_backup: params={path, destination?, poll_seconds?}
+- watch_media_inbox: params={inbox_dir, output_format?}
+- watch_list: params={}
+- watch_stop: params={path}
+
+INTENTS (clipboard sync):
+- clipboard_sync_start: params={}
+- clipboard_sync_stop: params={}
+- clipboard_sync_url: params={}
+- clipboard_get: params={}
+- clipboard_set: params={text}
+
+INTENTS (code refactoring):
+- code_refactor: params={path}
+
+INTENTS (task AI prioritize):
+- task_prioritize_ai: params={}
+
+INTENTS (deepfake detection):
+- deepfake_check: params={file_path}
+
 INTENTS (misc):
 - undo: params={}
 - chat: params={}  (no action, pure conversation)

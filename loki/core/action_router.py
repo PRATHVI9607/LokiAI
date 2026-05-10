@@ -142,6 +142,48 @@ class ActionRouter:
             "history_semantic": self._handle_history_semantic,
             "history_recent": self._handle_history_recent,
             "history_stats": self._handle_history_stats,
+            # Screen & Visual
+            "screen_capture": self._handle_screen_capture,
+            "screen_read": self._handle_screen_read,
+            "screen_search": self._handle_screen_search,
+            "screen_describe": self._handle_screen_describe,
+            "screen_translate": self._handle_screen_translate,
+            "screenshot_save": self._handle_screenshot_save,
+            # Calendar
+            "calendar_list": self._handle_calendar_list,
+            "calendar_conflicts": self._handle_calendar_conflicts,
+            "calendar_suggest_slot": self._handle_calendar_suggest_slot,
+            "calendar_import": self._handle_calendar_import,
+            # Expenses
+            "expense_extract": self._handle_expense_extract,
+            "expense_from_file": self._handle_expense_from_file,
+            "expense_scan_folder": self._handle_expense_scan_folder,
+            "expense_list": self._handle_expense_list,
+            "expense_summary": self._handle_expense_summary,
+            # Dynamic UI
+            "ui_theme_time": self._handle_ui_theme_time,
+            "ui_theme_mood": self._handle_ui_theme_mood,
+            "ui_wallpaper": self._handle_ui_wallpaper,
+            "ui_auto_theme_start": self._handle_ui_auto_start,
+            "ui_auto_theme_stop": self._handle_ui_auto_stop,
+            "ui_list_themes": self._handle_ui_list_themes,
+            # File Watcher
+            "watch_backup": self._handle_watch_backup,
+            "watch_media_inbox": self._handle_watch_media_inbox,
+            "watch_list": self._handle_watch_list,
+            "watch_stop": self._handle_watch_stop,
+            # Clipboard Sync
+            "clipboard_sync_start": self._handle_clipboard_sync_start,
+            "clipboard_sync_stop": self._handle_clipboard_sync_stop,
+            "clipboard_sync_url": self._handle_clipboard_sync_url,
+            "clipboard_get": self._handle_clipboard_get,
+            "clipboard_set": self._handle_clipboard_set,
+            # Code Refactor
+            "code_refactor": self._handle_code_refactor,
+            # Task AI Prioritize
+            "task_prioritize_ai": self._handle_task_prioritize_ai,
+            # Deepfake
+            "deepfake_check": self._handle_deepfake_check,
             # Meetings
             "meeting_transcribe": self._handle_meeting_transcribe,
             "meeting_minutes": self._handle_meeting_minutes,
@@ -609,6 +651,155 @@ class ActionRouter:
     def _handle_history_stats(self, p):
         f = self._features.get("browser_history")
         return f.get_stats(p.get("browser", "auto")) if f else self._missing("browser_history")
+
+    # --- Screen & Visual ---
+    def _handle_screen_capture(self, p):
+        f = self._features.get("screenshot_search")
+        return f.capture_and_read(p.get("region")) if f else self._missing("screenshot_search")
+
+    def _handle_screen_read(self, p):
+        f = self._features.get("screenshot_search")
+        return f.capture_and_read(p.get("region")) if f else self._missing("screenshot_search")
+
+    def _handle_screen_search(self, p):
+        f = self._features.get("screenshot_search")
+        return f.search_screen(p.get("query", "")) if f else self._missing("screenshot_search")
+
+    def _handle_screen_describe(self, p):
+        f = self._features.get("screenshot_search")
+        return f.describe_screen() if f else self._missing("screenshot_search")
+
+    def _handle_screen_translate(self, p):
+        f = self._features.get("screenshot_search")
+        return f.translate_screen(p.get("target_language", "English")) if f else self._missing("screenshot_search")
+
+    def _handle_screenshot_save(self, p):
+        f = self._features.get("screenshot_search")
+        return f.save_screenshot(p.get("output_path")) if f else self._missing("screenshot_search")
+
+    # --- Calendar ---
+    def _handle_calendar_list(self, p):
+        f = self._features.get("calendar_manager")
+        return f.list_events(int(p.get("days", 7)), p.get("ics_path")) if f else self._missing("calendar_manager")
+
+    def _handle_calendar_conflicts(self, p):
+        f = self._features.get("calendar_manager")
+        return f.find_conflicts(p.get("ics_path")) if f else self._missing("calendar_manager")
+
+    def _handle_calendar_suggest_slot(self, p):
+        f = self._features.get("calendar_manager")
+        return f.suggest_alternatives(p.get("event_title", "Meeting"), int(p.get("duration_minutes", 60)), p.get("ics_path")) if f else self._missing("calendar_manager")
+
+    def _handle_calendar_import(self, p):
+        f = self._features.get("calendar_manager")
+        return f.import_ics(p.get("ics_path", "")) if f else self._missing("calendar_manager")
+
+    # --- Expenses ---
+    def _handle_expense_extract(self, p):
+        f = self._features.get("expense_tracker")
+        return f.extract_from_text(p.get("text", "")) if f else self._missing("expense_tracker")
+
+    def _handle_expense_from_file(self, p):
+        f = self._features.get("expense_tracker")
+        return f.extract_from_file(p.get("file_path", "")) if f else self._missing("expense_tracker")
+
+    def _handle_expense_scan_folder(self, p):
+        f = self._features.get("expense_tracker")
+        return f.scan_folder(p.get("folder", "")) if f else self._missing("expense_tracker")
+
+    def _handle_expense_list(self, p):
+        f = self._features.get("expense_tracker")
+        return f.list_expenses(p.get("month")) if f else self._missing("expense_tracker")
+
+    def _handle_expense_summary(self, p):
+        f = self._features.get("expense_tracker")
+        return f.monthly_summary() if f else self._missing("expense_tracker")
+
+    # --- Dynamic UI ---
+    def _handle_ui_theme_time(self, p):
+        f = self._features.get("dynamic_ui")
+        return f.apply_time_theme() if f else self._missing("dynamic_ui")
+
+    def _handle_ui_theme_mood(self, p):
+        f = self._features.get("dynamic_ui")
+        return f.apply_mood_theme(p.get("mood", "focus")) if f else self._missing("dynamic_ui")
+
+    def _handle_ui_wallpaper(self, p):
+        f = self._features.get("dynamic_ui")
+        return f.set_wallpaper(p.get("image_path", "")) if f else self._missing("dynamic_ui")
+
+    def _handle_ui_auto_start(self, p):
+        f = self._features.get("dynamic_ui")
+        return f.start_auto_theme() if f else self._missing("dynamic_ui")
+
+    def _handle_ui_auto_stop(self, p):
+        f = self._features.get("dynamic_ui")
+        return f.stop_auto_theme() if f else self._missing("dynamic_ui")
+
+    def _handle_ui_list_themes(self, p):
+        f = self._features.get("dynamic_ui")
+        return f.list_themes() if f else self._missing("dynamic_ui")
+
+    # --- File Watcher ---
+    def _handle_watch_backup(self, p):
+        f = self._features.get("file_watcher")
+        return f.watch_for_backup(p.get("path", ""), p.get("destination"), float(p.get("poll_seconds", 30))) if f else self._missing("file_watcher")
+
+    def _handle_watch_media_inbox(self, p):
+        f = self._features.get("file_watcher")
+        return f.watch_media_inbox(p.get("inbox_dir", ""), p.get("output_format", "mp4")) if f else self._missing("file_watcher")
+
+    def _handle_watch_list(self, p):
+        f = self._features.get("file_watcher")
+        return f.list_watchers() if f else self._missing("file_watcher")
+
+    def _handle_watch_stop(self, p):
+        f = self._features.get("file_watcher")
+        return f.stop_watch(p.get("path", "")) if f else self._missing("file_watcher")
+
+    # --- Clipboard Sync ---
+    def _handle_clipboard_sync_start(self, p):
+        f = self._features.get("clipboard_sync")
+        return f.start() if f else self._missing("clipboard_sync")
+
+    def _handle_clipboard_sync_stop(self, p):
+        f = self._features.get("clipboard_sync")
+        return f.stop() if f else self._missing("clipboard_sync")
+
+    def _handle_clipboard_sync_url(self, p):
+        f = self._features.get("clipboard_sync")
+        return f.get_url() if f else self._missing("clipboard_sync")
+
+    def _handle_clipboard_get(self, p):
+        f = self._features.get("clipboard_sync")
+        return f.get_clipboard() if f else self._missing("clipboard_sync")
+
+    def _handle_clipboard_set(self, p):
+        f = self._features.get("clipboard_sync")
+        return f.set_clipboard(p.get("text", "")) if f else self._missing("clipboard_sync")
+
+    # --- Code Refactor ---
+    def _handle_code_refactor(self, p):
+        f = self._features.get("code_assistant")
+        return f.refactor(p.get("path", "")) if f else self._missing("code_assistant")
+
+    # --- Task AI Prioritize ---
+    def _handle_task_prioritize_ai(self, p):
+        f = self._features.get("task_manager")
+        if not f:
+            return self._missing("task_manager")
+        # Pass the brain from phishing_detector or any available feature that has it
+        brain = None
+        for feat in self._features.values():
+            if hasattr(feat, "_brain") and feat._brain:
+                brain = feat._brain
+                break
+        return f.ai_prioritize(brain)
+
+    # --- Deepfake Check ---
+    def _handle_deepfake_check(self, p):
+        f = self._features.get("phishing_detector")
+        return f.analyze_media_file(p.get("file_path", "")) if f else self._missing("phishing_detector")
 
     # --- Meetings ---
     def _handle_meeting_transcribe(self, p):

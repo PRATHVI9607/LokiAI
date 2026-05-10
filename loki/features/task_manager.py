@@ -56,3 +56,44 @@ class TaskManager:
         if self._memory.delete_task(task_id):
             return {"success": True, "message": f"Task #{task_id} deleted."}
         return {"success": False, "message": f"Task #{task_id} not found."}
+
+    def ai_prioritize(self, brain=None) -> Dict[str, Any]:
+        """Re-rank tasks using LLM scoring based on urgency, impact, and effort."""
+        if not brain:
+            return {"success": False, "message": "LLM required for AI prioritization."}
+
+        tasks = self._memory.list_tasks(filter_done=False)
+        if not tasks:
+            return {"success": True, "message": "No pending tasks to prioritize.", "data": []}
+
+        task_lines = "\n".join(
+            f"  [{t['id']}] {t['title']} (priority: {t.get('priority','medium')}, due: {t.get('due','unset')})"
+            for t in tasks
+        )
+        prompt = (
+            f"Rank these tasks by urgency and importance. "
+            f"Consider deadlines, difficulty, and dependencies. "
+            f"Return ONLY a JSON list of task IDs in priority order, e.g. [3, 1, 2].\n\n"
+            f"Tasks:\n{task_lines}"
+        )
+        import json as _json, re as _re
+        raw = "".join(brain.ask(prompt))
+        try:
+            match = _re.search(r"\[[\d,\s]+\]", raw)
+            if match:
+                ranked_ids = _json.loads(match.group())
+                id_to_task = {t["id"]: t for t in tasks}
+                ranked = [id_to_task[tid] for tid in ranked_ids if tid in id_to_task]
+                # Append any tasks not in the LLM's output
+                ranked_set = {t["id"] for t in ranked}
+                ranked += [t for t in tasks if t["id"] not in ranked_set]
+
+                lines = [f"AI-prioritized task order:"]
+                for i, t in enumerate(ranked, 1):
+                    due = f" [due: {t['due']}]" if t.get("due") else ""
+                    lines.append(f"  {i}. [{t['id']}] {t['title']}{due}")
+                return {"success": True, "message": "\n".join(lines), "data": {"ranked": ranked}}
+        except Exception:
+            pass
+
+        return {"success": False, "message": "Could not parse LLM ranking response."}
