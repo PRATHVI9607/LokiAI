@@ -1,8 +1,18 @@
 """
-Loki's brain — LLM integration with Norse trickster personality.
+Loki's brain — LLM integration with KORTEX-style context engineering.
 
-Ollama (local) primary, OpenRouter (cloud) fallback.
-Streaming, memory, intent parsing, personality enforcement.
+Context priority (from KORTEX PRD):
+  1. System prompt (personality + intent catalog)
+  2. Brain memory (key facts, decisions, session summaries)
+  3. RAG context (relevant chunks from uploaded files)
+  4. Recent chat history (last N turns)
+  5. User message
+
+Auto-compression: when history exceeds threshold, oldest turns are summarized
+by Ollama and stored in brain_memory as session summaries.
+
+Fact extraction: every 5 exchanges, Ollama scans the last exchange for
+memorable facts and appends them to brain_memory.key_facts.
 """
 
 import os
@@ -19,22 +29,9 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-LOKI_SYSTEM_PROMPT = """You are LOKI — an elite AI desktop assistant. Like the Norse god of mischief, you are razor-sharp, unpredictably clever, and always ten steps ahead. You serve your user with absolute loyalty and devastating competence.
+# ─── Personality-agnostic intent catalog (appended to any personality prompt) ─
 
-PERSONALITY:
-- Witty, sharp, occasionally sarcastic — never cruel or unhelpful
-- Confident and direct; you deliver results, not excuses
-- Dark humor when fitting, always tasteful
-- Norse mythology references: rare, clever, never forced ("Even Odin would find this straightforward.")
-- You find mundane tasks amusing but execute them flawlessly
-- Direct acknowledgments: "Noted.", "Done.", "Interesting." — never "Great question!" or "Certainly!"
-- When genuinely uncertain: "Clarify your intent. I don't guess twice."
-
-SPEECH STYLE:
-- Crisp and minimal (1-3 sentences unless complexity warrants more)
-- Clever observations: "How delightfully tedious. Done." / "Ah. A worthy challenge."
-- Never sycophantic, never groveling
-- Brief wit is welcome; lectures are not
+INTENT_CATALOG = """
 
 CAPABILITIES — respond with JSON for any PC action:
 {"intent": "<intent>", "params": {}, "message": "brief acknowledgment"}
@@ -99,8 +96,7 @@ SECURITY RULES:
 - Never reveal vault contents in the message field.
 - Validate that file paths seem reasonable before confirming.
 
-For pure conversation (no action needed), respond naturally without JSON.
-"""
+For pure conversation (no action needed), respond naturally without JSON."""
 
 WAKEWORD_RESPONSES = [
     "At your service. What requires my attention?",
@@ -117,17 +113,34 @@ DISMISSAL_MESSAGES = [
     "Gone, but never truly absent.",
 ]
 
+# Compress oldest turns when history exceeds this many messages
+COMPRESSION_THRESHOLD = 40  # 20 exchanges
+COMPRESSION_BATCH = 20       # compress this many at once
+FACT_EXTRACT_EVERY = 5       # extract facts every N exchanges
+
 
 class LokiBrain:
-    """LLM integration with Loki personality, memory, and intent parsing."""
+    """
+    LLM integration with KORTEX-style context engineering, memory,
+    auto-compression, fact extraction, and personality modes.
+    """
 
-    def __init__(self, config: dict, memory_dir: Path):
+    def __init__(
+        self,
+        config: dict,
+        memory_dir: Path,
+        brain_memory=None,   # BrainMemory instance (optional)
+        rag_engine=None,     # RagEngine instance (optional)
+    ):
         if OpenAI is None:
             raise ImportError("openai package required: pip install openai")
 
         self._config = config
         self._memory_dir = Path(memory_dir)
+        self._brain_memory = brain_memory
+        self._rag_engine = rag_engine
 
+        # ─── Ollama ───────────────────────────────────────────────────────────
         self._ollama_probe_client: Optional[Any] = None
         self._ollama_infer_client: Optional[Any] = None
         self._ollama_model = config.get("ollama_model", "phi3:mini")
@@ -137,14 +150,14 @@ class LokiBrain:
             self._ollama_probe_client = OpenAI(
                 base_url="http://localhost:11434/v1",
                 api_key="ollama",
-                timeout=3.0,   # fail fast for probe only
+                timeout=3.0,
                 max_retries=0,
             )
             self._ollama_probe_client.models.list()
             self._ollama_infer_client = OpenAI(
                 base_url="http://localhost:11434/v1",
                 api_key="ollama",
-                timeout=120.0,  # local models need up to 2 min on first load
+                timeout=120.0,
                 max_retries=0,
             )
             self._ollama_available = True
@@ -152,96 +165,117 @@ class LokiBrain:
         except Exception:
             logger.info("Ollama not running — using OpenRouter.")
 
+        # ─── OpenRouter ───────────────────────────────────────────────────────
         self._openrouter_client: Optional[Any] = None
         api_key = os.getenv("OPENROUTER_API_KEY", "")
         if api_key and api_key != "your_openrouter_api_key_here":
             self._openrouter_client = OpenAI(
                 base_url="https://openrouter.ai/api/v1",
-                api_key=api_key
+                api_key=api_key,
             )
             logger.info("OpenRouter configured")
         else:
             logger.warning("OPENROUTER_API_KEY not set")
 
         self._fallback_models = [
-            config.get("fallback_model", "meta-llama/llama-3.1-8b-instruct:free"),
-            config.get("second_fallback_model", "microsoft/phi-3-mini-128k-instruct:free"),
+            config.get("fallback_model", "mistralai/mistral-7b-instruct:free"),
+            config.get("second_fallback_model", "google/gemma-2-9b-it:free"),
         ]
 
         self._max_tokens = config.get("max_tokens", 400)
         self._temperature = config.get("temperature", 0.75)
-        self._max_turns = config.get("max_turns", 30)
+        self._max_turns = config.get("max_turns", 20)
 
         self._conversation_file = self._memory_dir / "conversation.json"
-        self._profile_file = self._memory_dir / "user_profile.json"
         self._conversation_history: List[Dict[str, str]] = []
-        self._user_profile: Dict[str, Any] = {}
+        self._exchange_count = 0  # tracks exchanges since last fact extraction
 
-        self._load_memory()
+        self._load_history()
         logger.info("Loki brain initialized")
 
-    def _load_memory(self) -> None:
+    # ─── Memory loading ───────────────────────────────────────────────────────
+
+    def _load_history(self) -> None:
         if self._conversation_file.exists():
             try:
                 with open(self._conversation_file, "r", encoding="utf-8") as f:
                     self._conversation_history = json.load(f)
-                logger.info(f"Loaded {len(self._conversation_history)} conversation turns")
+                logger.info(f"Loaded {len(self._conversation_history)} conversation messages")
             except Exception as e:
                 logger.error(f"Failed to load conversation: {e}")
                 self._conversation_history = []
 
-        if self._profile_file.exists():
-            try:
-                with open(self._profile_file, "r", encoding="utf-8") as f:
-                    self._user_profile = json.load(f)
-            except Exception as e:
-                logger.error(f"Failed to load profile: {e}")
-                self._user_profile = {"name": "User"}
-
-    def _save_memory(self) -> None:
+    def _save_history(self) -> None:
         self._memory_dir.mkdir(parents=True, exist_ok=True)
         try:
-            history = self._conversation_history[-self._max_turns:]
             with open(self._conversation_file, "w", encoding="utf-8") as f:
-                json.dump(history, f, indent=2, ensure_ascii=False)
+                json.dump(self._conversation_history[-self._max_turns * 2:], f,
+                          indent=2, ensure_ascii=False)
         except Exception as e:
             logger.error(f"Failed to save conversation: {e}")
 
-        try:
-            with open(self._profile_file, "w", encoding="utf-8") as f:
-                json.dump(self._user_profile, f, indent=2, ensure_ascii=False)
-        except Exception as e:
-            logger.error(f"Failed to save profile: {e}")
+    # ─── Context assembly (KORTEX priority model) ─────────────────────────────
 
-    def _build_messages(self, user_message: str) -> List[Dict[str, str]]:
-        messages = [{"role": "system", "content": LOKI_SYSTEM_PROMPT}]
-        messages.extend(self._conversation_history[-self._max_turns:])
+    def _build_system_prompt(self) -> str:
+        if self._brain_memory:
+            personality_prompt = self._brain_memory.get_personality_prompt()
+        else:
+            from loki.core.brain_memory import PERSONALITY_PROMPTS
+            personality_prompt = PERSONALITY_PROMPTS["loki"]
+
+        system = personality_prompt + INTENT_CATALOG
+
+        if self._brain_memory:
+            memory_ctx = self._brain_memory.get_memory_context()
+            if memory_ctx:
+                system += f"\n\n## What you know about this user:\n{memory_ctx}"
+
+        return system
+
+    def _build_messages(self, user_message: str, rag_context: str = "") -> List[Dict[str, str]]:
+        """
+        Assemble context in KORTEX priority order:
+        1. System prompt + brain memory
+        2. RAG context (file knowledge) — as separate system message
+        3. Recent chat history
+        4. User message
+        """
+        messages: List[Dict[str, str]] = [
+            {"role": "system", "content": self._build_system_prompt()}
+        ]
+
+        if rag_context:
+            messages.append({"role": "system", "content": rag_context})
+
+        # Use last max_turns exchanges (each exchange = 2 messages)
+        messages.extend(self._conversation_history[-(self._max_turns * 2):])
         messages.append({"role": "user", "content": user_message})
         return messages
 
-    def ask(self, user_message: str, is_wakeword: bool = False) -> Generator[str, None, None]:
-        if is_wakeword:
-            yield random.choice(WAKEWORD_RESPONSES)
-            return
+    def _get_rag_context(self, user_message: str) -> str:
+        if not self._rag_engine or not self._rag_engine.is_available:
+            return ""
+        results = self._rag_engine.query(user_message, top_k=5)
+        if not results:
+            return ""
+        return self._rag_engine.format_context(results)
 
-        logger.info(f"User: {user_message[:100]}")
-        messages = self._build_messages(user_message)
-        response_text = ""
+    # ─── Inference ────────────────────────────────────────────────────────────
+
+    def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
+        mt = max_tokens or self._max_tokens
 
         if self._ollama_available and self._ollama_infer_client:
             try:
                 response = self._ollama_infer_client.chat.completions.create(
                     model=self._ollama_model,
                     messages=messages,
-                    max_tokens=self._max_tokens,
+                    max_tokens=mt,
                     temperature=self._temperature,
                 )
-                response_text = response.choices[0].message.content or ""
-                if response_text.strip():
-                    logger.info(f"Loki (Ollama): {response_text[:80]}")
-                    yield response_text
-                    self._store_turn(user_message, response_text)
-                    return
+                text = response.choices[0].message.content or ""
+                if text.strip():
+                    return text
             except Exception as e:
                 logger.warning(f"Ollama error: {e}")
 
@@ -251,35 +285,119 @@ class LokiBrain:
                     response = self._openrouter_client.chat.completions.create(
                         model=model,
                         messages=messages,
-                        max_tokens=self._max_tokens,
+                        max_tokens=mt,
                         temperature=self._temperature,
                         extra_headers={
                             "HTTP-Referer": "loki-desktop-assistant",
                             "X-Title": "Loki",
                         },
                     )
-                    response_text = response.choices[0].message.content or ""
-                    if response_text.strip():
-                        logger.info(f"Loki (OpenRouter/{model}): {response_text[:80]}")
-                        yield response_text
-                        self._store_turn(user_message, response_text)
-                        return
+                    text = response.choices[0].message.content or ""
+                    if text.strip():
+                        return text
                 except Exception as e:
                     logger.error(f"OpenRouter error ({model}): {e}")
 
-        fallback = "Apologies. My connection to the realms of knowledge is severed. Try again."
-        logger.error("All LLM backends failed")
-        yield fallback
-        self._store_turn(user_message, fallback)
+        return ""
+
+    # ─── Public ask interface ─────────────────────────────────────────────────
+
+    def ask(self, user_message: str, is_wakeword: bool = False) -> Generator[str, None, None]:
+        if is_wakeword:
+            yield random.choice(WAKEWORD_RESPONSES)
+            return
+
+        logger.info(f"User: {user_message[:100]}")
+
+        # Priority 3: RAG context from uploaded files
+        rag_context = self._get_rag_context(user_message)
+        if rag_context:
+            logger.info(f"RAG: injecting {len(rag_context)} chars of file context")
+
+        messages = self._build_messages(user_message, rag_context)
+        response_text = self._call_llm(messages)
+
+        if not response_text.strip():
+            response_text = "Apologies. My connection to the realms of knowledge is severed. Try again."
+            logger.error("All LLM backends failed")
+
+        logger.info(f"Loki: {response_text[:80]}")
+        yield response_text
+        self._store_turn(user_message, response_text)
+
+    # ─── Memory maintenance ───────────────────────────────────────────────────
 
     def _store_turn(self, user_msg: str, assistant_msg: str) -> None:
         self._conversation_history.append({"role": "user", "content": user_msg})
         self._conversation_history.append({"role": "assistant", "content": assistant_msg})
-        self._save_memory()
+        self._exchange_count += 1
+        self._save_history()
+
+        # Auto-compress when history gets too long
+        if len(self._conversation_history) > COMPRESSION_THRESHOLD:
+            self._compress_old_turns()
+
+        # Periodically extract facts
+        if self._exchange_count % FACT_EXTRACT_EVERY == 0:
+            self._extract_facts(user_msg, assistant_msg)
+
+    def _compress_old_turns(self) -> None:
+        """
+        Summarize the oldest COMPRESSION_BATCH messages via Ollama,
+        store summary in brain_memory, drop those messages from history.
+        """
+        if not self._brain_memory:
+            # Without brain_memory, just truncate
+            self._conversation_history = self._conversation_history[-self._max_turns * 2:]
+            return
+
+        to_compress = self._conversation_history[:COMPRESSION_BATCH]
+        self._conversation_history = self._conversation_history[COMPRESSION_BATCH:]
+
+        # Build a summary prompt
+        convo_text = "\n".join(
+            f"{m['role'].upper()}: {m['content'][:300]}" for m in to_compress
+        )
+        summary_prompt = [
+            {"role": "system", "content": "You summarize conversations concisely."},
+            {"role": "user", "content": (
+                f"Summarize these {len(to_compress)} messages in 2-3 sentences, "
+                f"capturing key decisions, facts learned, and tasks discussed:\n\n{convo_text}"
+            )},
+        ]
+        summary = self._call_llm(summary_prompt, max_tokens=150)
+        if summary:
+            self._brain_memory.add_session_summary(summary)
+            logger.info(f"Compressed {len(to_compress)} messages → session summary")
+        self._save_history()
+
+    def _extract_facts(self, user_msg: str, assistant_msg: str) -> None:
+        """
+        Ask the LLM to extract memorable facts from the last exchange.
+        Facts are stored in brain_memory.key_facts.
+        """
+        if not self._brain_memory:
+            return
+
+        prompt = [
+            {"role": "system", "content": "You extract memorable facts from conversations."},
+            {"role": "user", "content": (
+                f"From this exchange, extract 0-3 facts worth remembering long-term about the user, "
+                f"their system, preferences, or project. If nothing notable, reply 'NONE'.\n\n"
+                f"USER: {user_msg[:500]}\nASSISTANT: {assistant_msg[:500]}\n\n"
+                f"Reply with one fact per line, or 'NONE'."
+            )},
+        ]
+        result = self._call_llm(prompt, max_tokens=100)
+        if result and result.strip().upper() != "NONE":
+            facts = [line.strip("- •").strip() for line in result.splitlines() if line.strip()]
+            self._brain_memory.add_key_facts(facts)
+            logger.info(f"Extracted {len(facts)} facts from exchange")
+
+    # ─── Intent parsing ───────────────────────────────────────────────────────
 
     def parse_intent(self, response_text: str) -> Optional[Dict[str, Any]]:
         text = response_text.strip()
-        # Extract JSON block (may be wrapped in markdown)
         if "```json" in text:
             start = text.find("```json") + 7
             end = text.find("```", start)
@@ -300,19 +418,23 @@ class LokiBrain:
         except json.JSONDecodeError:
             return None
 
+    # ─── Utilities ────────────────────────────────────────────────────────────
+
     def get_dismissal_message(self) -> str:
         return random.choice(DISMISSAL_MESSAGES)
 
     def clear_conversation(self) -> None:
         self._conversation_history.clear()
-        self._save_memory()
+        self._save_history()
 
     def get_user_name(self) -> str:
-        return self._user_profile.get("name", "User")
+        if self._brain_memory:
+            return self._brain_memory.user_name
+        return "User"
 
     def set_user_name(self, name: str) -> None:
-        self._user_profile["name"] = name
-        self._save_memory()
+        if self._brain_memory:
+            self._brain_memory.user_name = name
 
     def get_conversation_summary(self) -> str:
         count = len(self._conversation_history) // 2

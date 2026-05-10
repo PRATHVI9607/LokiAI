@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "role": "user",
+    "content": "hey"
+  },
+  {
+    "role": "assistant",
+    "content": "Apologies. My connection to the realms of knowledge is severed. Try again."
+  },
+  {
+    "role": "user",
+    "content": "hey loki"
+  },
+  {
+    "role": "assistant",
+    "content": "Apologies. My connection to the realms of knowledge is severed. Try again."
+  },
+  {
+    "role": "user",
+    "content": "loki"
+  },
+  {
+    "role": "assistant",
+    "content": "Apologies. My connection to the realms of knowledge is severed. Try again."
+  }
+]

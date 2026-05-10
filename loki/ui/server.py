@@ -1,20 +1,28 @@
 """
 FastAPI + WebSocket server — replaces PyQt6 UI.
 The Next.js frontend connects via ws://localhost:7777/ws.
+
+New endpoints (KORTEX-inspired):
+  POST /upload           — index a file for RAG
+  DELETE /upload/{name}  — remove file from index
+  GET  /files            — list indexed files
+  GET  /brain            — current brain memory state
+  POST /brain/personality — switch personality mode
+  GET  /audit            — recent audit log entries
 """
 
 import asyncio
 import json
 import logging
 import os
-import random
+import shutil
 import webbrowser
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +30,6 @@ UI_DIST = Path(__file__).parent.parent.parent / "loki-ui" / "out"
 
 
 class ConnectionManager:
-    """Manages active WebSocket connections."""
-
     def __init__(self):
         self._connections: Set[WebSocket] = set()
 
@@ -53,12 +59,12 @@ class ConnectionManager:
 
 class LokiServer:
     """
-    FastAPI server that bridges the Python backend to the Next.js UI.
+    FastAPI server bridging Python backend ↔ Next.js UI.
 
-    Callbacks set by main.py:
-      on_user_message(text: str)  — user typed/said something
-      on_mute_toggle(muted: bool) — user toggled mic mute
-      on_undo()                   — user pressed undo
+    Callbacks wired by main.py:
+      on_user_message(text: str)
+      on_mute_toggle(muted: bool)
+      on_undo()
     """
 
     def __init__(self, config: dict):
@@ -68,11 +74,26 @@ class LokiServer:
         self._manager = ConnectionManager()
         self._loop: Optional[asyncio.AbstractEventLoop] = None
 
+        # Component references (set by main.py after init)
+        self._rag_engine = None
+        self._brain_memory = None
+        self._audit_log = None
+        self._uploads_dir: Optional[Path] = None
+
+        # Callbacks
         self.on_user_message: Optional[Callable[[str], None]] = None
         self.on_mute_toggle: Optional[Callable[[bool], None]] = None
         self.on_undo: Optional[Callable] = None
 
         self._setup_routes()
+
+    def set_components(self, rag_engine=None, brain_memory=None, audit_log=None, uploads_dir=None):
+        self._rag_engine = rag_engine
+        self._brain_memory = brain_memory
+        self._audit_log = audit_log
+        self._uploads_dir = Path(uploads_dir) if uploads_dir else None
+
+    # ─── Routes ───────────────────────────────────────────────────────────────
 
     def _setup_routes(self) -> None:
         app = self._app
@@ -90,6 +111,78 @@ class LokiServer:
                     await self._handle_client_message(msg)
             except WebSocketDisconnect:
                 self._manager.disconnect(ws)
+
+        @app.post("/upload")
+        async def upload_file(file: UploadFile = File(...)):
+            if not self._rag_engine:
+                raise HTTPException(503, "RAG engine not initialized")
+            if not self._rag_engine.is_available:
+                raise HTTPException(503, "nomic-embed-text not available — run: ollama pull nomic-embed-text")
+
+            uploads_dir = self._uploads_dir or Path("loki/memory/uploads")
+            uploads_dir.mkdir(parents=True, exist_ok=True)
+            dest = uploads_dir / file.filename
+
+            content = await file.read()
+            dest.write_bytes(content)
+
+            result = self._rag_engine.index_file(dest)
+            if result.get("success"):
+                self._broadcast_sync({"type": "file_indexed", "filename": file.filename,
+                                      "chunk_count": result.get("chunk_count", 0)})
+            return JSONResponse(result)
+
+        @app.delete("/upload/{filename}")
+        async def delete_file(filename: str):
+            if not self._rag_engine:
+                raise HTTPException(503, "RAG engine not initialized")
+            removed = self._rag_engine.delete_file(filename)
+            uploads_dir = self._uploads_dir or Path("loki/memory/uploads")
+            file_path = uploads_dir / filename
+            if file_path.exists():
+                file_path.unlink()
+            return {"success": True, "chunks_removed": removed, "filename": filename}
+
+        @app.get("/files")
+        async def list_files():
+            if not self._rag_engine:
+                return {"files": [], "chunk_count": 0, "available": False}
+            return {
+                "files": self._rag_engine.indexed_files,
+                "chunk_count": self._rag_engine.chunk_count,
+                "available": self._rag_engine.is_available,
+            }
+
+        @app.get("/brain")
+        async def get_brain():
+            if not self._brain_memory:
+                return {"error": "Brain memory not initialized"}
+            return self._brain_memory.to_dict()
+
+        @app.post("/brain/personality")
+        async def set_personality(body: dict):
+            mode = body.get("mode", "loki")
+            if not self._brain_memory:
+                raise HTTPException(503, "Brain memory not initialized")
+            if mode not in ("loki", "jarvis", "friday"):
+                raise HTTPException(400, f"Unknown personality: {mode}")
+            self._brain_memory.personality = mode
+            self._broadcast_sync({"type": "personality_changed", "mode": mode})
+            return {"success": True, "personality": mode}
+
+        @app.get("/audit")
+        async def get_audit(n: int = 20):
+            if not self._audit_log:
+                return {"entries": []}
+            return {"entries": self._audit_log.get_recent(n)}
+
+        @app.get("/health")
+        async def health():
+            return {
+                "status": "ok",
+                "rag_available": bool(self._rag_engine and self._rag_engine.is_available),
+                "brain_loaded": self._brain_memory is not None,
+            }
 
         # Serve Next.js static export if built
         if UI_DIST.exists():
@@ -113,10 +206,9 @@ class LokiServer:
             if self.on_undo:
                 self.on_undo()
 
-    # ─── Outbound helpers (called from Python threads) ───────────────────────
+    # ─── Outbound helpers ─────────────────────────────────────────────────────
 
     def _broadcast_sync(self, payload: dict) -> None:
-        """Thread-safe broadcast: schedule on the event loop from any thread."""
         if self._loop and self._loop.is_running():
             asyncio.run_coroutine_threadsafe(
                 self._manager.broadcast(payload), self._loop
@@ -146,7 +238,7 @@ class LokiServer:
     def hide_window(self) -> None:
         self._broadcast_sync({"type": "hide"})
 
-    # ─── Lifecycle ───────────────────────────────────────────────────────────
+    # ─── Lifecycle ────────────────────────────────────────────────────────────
 
     def get_app(self) -> FastAPI:
         return self._app

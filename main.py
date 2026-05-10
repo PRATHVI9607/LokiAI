@@ -21,12 +21,15 @@ PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from loki.core.brain import LokiBrain
+from loki.core.brain_memory import BrainMemory
 from loki.core.listener import SpeechListener
 from loki.core.wakeword import WakewordDetector
 from loki.core.tts import create_tts_engine
 from loki.core.action_router import ActionRouter
 from loki.core.undo_stack import UndoStack
 from loki.core.memory import MemoryManager
+from loki.core.audit import AuditLog
+from loki.features.rag_engine import RagEngine
 
 from loki.actions.file_ops import FileOps
 from loki.actions.shell_exec import ShellExec
@@ -80,12 +83,13 @@ logger = logging.getLogger("loki.main")
 class ConversationManager:
     """Orchestrates wakeword → listen → process → respond flow."""
 
-    def __init__(self, config: dict, server, tts, brain: LokiBrain, router: ActionRouter):
+    def __init__(self, config: dict, server, tts, brain: LokiBrain, router: ActionRouter, audit_log=None):
         self._cfg = config
         self._server = server
         self._tts = tts
         self._brain = brain
         self._router = router
+        self._audit = audit_log
         self._active = False
         self._timeout_sec = config.get("ui", {}).get("conversation_timeout_seconds", 30)
         self._timeout_handle = None
@@ -155,6 +159,15 @@ class ConversationManager:
         result = self._router.route_intent(intent)
         result_msg = result.get("message", "")
 
+        # Audit log
+        if self._audit:
+            self._audit.log(
+                intent=intent.get("intent", "unknown"),
+                params=intent.get("params", {}),
+                success=result.get("success", False),
+                result_summary=result_msg,
+            )
+
         if result_msg and result_msg != loki_msg:
             self._server.add_loki_message(result_msg)
             if result.get("success"):
@@ -209,9 +222,27 @@ class LokiApplication:
 
         self.undo_stack = UndoStack(max_depth=self.config.get("undo", {}).get("max_depth", 25))
         self.memory = MemoryManager(memory_dir)
-        self.brain = LokiBrain(self.config.get("llm", {}), memory_dir)
+
+        # KORTEX-inspired components
+        self.brain_memory = BrainMemory(memory_dir)
+        self.audit_log = AuditLog(memory_dir)
+        ollama_url = f"http://localhost:{self.config.get('wakeword', {}).get('ollama_port', 11434)}"
+        self.rag_engine = RagEngine(memory_dir, ollama_url="http://localhost:11434")
+
+        self.brain = LokiBrain(
+            self.config.get("llm", {}),
+            memory_dir,
+            brain_memory=self.brain_memory,
+            rag_engine=self.rag_engine,
+        )
         self.tts = create_tts_engine(self.config)
         self.server = create_loki_server(self.config)
+        self.server.set_components(
+            rag_engine=self.rag_engine,
+            brain_memory=self.brain_memory,
+            audit_log=self.audit_log,
+            uploads_dir=memory_dir / "uploads",
+        )
 
         actions_cfg = self.config.get("actions", {})
         self.file_ops = FileOps(self.undo_stack)
@@ -258,7 +289,7 @@ class LokiApplication:
         self.router.register_feature("file_organizer", self.file_organizer)
 
         self.conversation = ConversationManager(
-            self.config, self.server, self.tts, self.brain, self.router
+            self.config, self.server, self.tts, self.brain, self.router, self.audit_log
         )
 
         self.listener = SpeechListener(self.config)

@@ -12,6 +12,12 @@ export interface ChatMessage {
 }
 
 export type Status = "idle" | "listening" | "thinking" | "speaking" | "offline";
+export type Personality = "loki" | "jarvis" | "friday";
+
+export interface FileEntry {
+  filename: string;
+  chunkCount?: number;
+}
 
 interface UseLokiReturn {
   messages: ChatMessage[];
@@ -19,13 +25,20 @@ interface UseLokiReturn {
   transcript: string;
   isVisible: boolean;
   isMuted: boolean;
+  personality: Personality;
+  indexedFiles: FileEntry[];
+  ragAvailable: boolean;
   sendMessage: (text: string) => void;
   toggleMute: () => void;
   requestUndo: () => void;
   clearMessages: () => void;
+  uploadFile: (file: File) => Promise<void>;
+  deleteFile: (filename: string) => Promise<void>;
+  setPersonality: (mode: Personality) => Promise<void>;
 }
 
 const WS_URL = "ws://localhost:7777/ws";
+const API_BASE = "http://localhost:7777";
 const RECONNECT_DELAY = 2000;
 
 export function useLoki(): UseLokiReturn {
@@ -34,6 +47,9 @@ export function useLoki(): UseLokiReturn {
   const [transcript, setTranscript] = useState("");
   const [isVisible, setIsVisible] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
+  const [personality, setPersonalityState] = useState<Personality>("loki");
+  const [indexedFiles, setIndexedFiles] = useState<FileEntry[]>([]);
+  const [ragAvailable, setRagAvailable] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -46,7 +62,19 @@ export function useLoki(): UseLokiReturn {
       text,
       ts: Date.now(),
     };
-    setMessages((prev) => [...prev.slice(-200), msg]); // cap at 200 messages
+    setMessages((prev) => [...prev.slice(-200), msg]);
+  }, []);
+
+  // Load file list on mount
+  const refreshFiles = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/files`);
+      const data = await res.json();
+      setRagAvailable(data.available ?? false);
+      setIndexedFiles((data.files ?? []).map((f: string) => ({ filename: f })));
+    } catch {
+      // backend not ready yet
+    }
   }, []);
 
   const connect = useCallback(() => {
@@ -57,6 +85,7 @@ export function useLoki(): UseLokiReturn {
 
     ws.onopen = () => {
       setStatus("idle");
+      refreshFiles();
     };
 
     ws.onclose = () => {
@@ -65,44 +94,35 @@ export function useLoki(): UseLokiReturn {
       reconnectRef.current = setTimeout(connect, RECONNECT_DELAY);
     };
 
-    ws.onerror = () => {
-      ws.close();
-    };
+    ws.onerror = () => ws.close();
 
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
         switch (msg.type) {
-          case "loki_message":
-            addMessage("loki_message", msg.text);
-            break;
-          case "user_message":
-            addMessage("user_message", msg.text);
-            break;
-          case "system_message":
-            addMessage("system_message", msg.text);
-            break;
-          case "status":
-            setStatus(msg.status as Status);
-            break;
-          case "transcript":
-            setTranscript(msg.text);
-            break;
-          case "clear_transcript":
-            setTranscript("");
-            break;
-          case "show":
-            setIsVisible(true);
-            break;
-          case "hide":
-            setIsVisible(false);
+          case "loki_message":      addMessage("loki_message", msg.text); break;
+          case "user_message":      addMessage("user_message", msg.text); break;
+          case "system_message":    addMessage("system_message", msg.text); break;
+          case "status":            setStatus(msg.status as Status); break;
+          case "transcript":        setTranscript(msg.text); break;
+          case "clear_transcript":  setTranscript(""); break;
+          case "show":              setIsVisible(true); break;
+          case "hide":              setIsVisible(false); break;
+          case "personality_changed": setPersonalityState(msg.mode as Personality); break;
+          case "file_indexed":
+            setIndexedFiles((prev) => {
+              const exists = prev.find((f) => f.filename === msg.filename);
+              if (exists) return prev.map((f) => f.filename === msg.filename
+                ? { ...f, chunkCount: msg.chunk_count } : f);
+              return [...prev, { filename: msg.filename, chunkCount: msg.chunk_count }];
+            });
             break;
         }
       } catch {
         // ignore malformed
       }
     };
-  }, [addMessage]);
+  }, [addMessage, refreshFiles]);
 
   useEffect(() => {
     connect();
@@ -118,12 +138,9 @@ export function useLoki(): UseLokiReturn {
     }
   }, []);
 
-  const sendMessage = useCallback(
-    (text: string) => {
-      send({ type: "user_message", text });
-    },
-    [send]
-  );
+  const sendMessage = useCallback((text: string) => {
+    send({ type: "user_message", text });
+  }, [send]);
 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
@@ -137,19 +154,51 @@ export function useLoki(): UseLokiReturn {
     send({ type: "undo" });
   }, [send]);
 
-  const clearMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
+  const clearMessages = useCallback(() => setMessages([]), []);
+
+  const uploadFile = useCallback(async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const res = await fetch(`${API_BASE}/upload`, { method: "POST", body: form });
+      const data = await res.json();
+      if (!data.success) {
+        addMessage("system_message", `Upload failed: ${data.message}`);
+      } else {
+        addMessage("system_message", data.message);
+      }
+    } catch (e) {
+      addMessage("system_message", "Upload failed — backend unreachable.");
+    }
+  }, [addMessage]);
+
+  const deleteFile = useCallback(async (filename: string) => {
+    try {
+      await fetch(`${API_BASE}/upload/${encodeURIComponent(filename)}`, { method: "DELETE" });
+      setIndexedFiles((prev) => prev.filter((f) => f.filename !== filename));
+      addMessage("system_message", `Removed: ${filename}`);
+    } catch {
+      addMessage("system_message", "Failed to remove file.");
+    }
+  }, [addMessage]);
+
+  const setPersonality = useCallback(async (mode: Personality) => {
+    try {
+      await fetch(`${API_BASE}/brain/personality`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      });
+      setPersonalityState(mode);
+    } catch {
+      addMessage("system_message", "Failed to change personality.");
+    }
+  }, [addMessage]);
 
   return {
-    messages,
-    status,
-    transcript,
-    isVisible,
-    isMuted,
-    sendMessage,
-    toggleMute,
-    requestUndo,
-    clearMessages,
+    messages, status, transcript, isVisible, isMuted,
+    personality, indexedFiles, ragAvailable,
+    sendMessage, toggleMute, requestUndo, clearMessages,
+    uploadFile, deleteFile, setPersonality,
   };
 }
