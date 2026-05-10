@@ -39,7 +39,10 @@ interface UseLokiReturn {
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:7777";
-const WS_URL = API_BASE.replace(/^http/, "ws") + "/ws";
+const WS_URL = API_BASE
+  .replace(/^https:\/\//, "wss://")
+  .replace(/^http:\/\//, "ws://")
+  + "/ws";
 const RECONNECT_DELAY = 2000;
 const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10 MB
 

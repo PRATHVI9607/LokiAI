@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { type Personality } from "@/hooks/useLoki";
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export default function PersonalityPicker({ current, onChange, onClose }: Props) {
+  const [error, setError] = useState<string | null>(null);
+
   return (
     <motion.div
       className="personality-picker glass-strong rounded-xl overflow-hidden"
@@ -27,19 +30,22 @@ export default function PersonalityPicker({ current, onChange, onClose }: Props)
     >
       <div className="px-3 py-2 border-b border-loki-purple/40">
         <p className="text-xs text-loki-muted font-medium tracking-wider uppercase">Personality</p>
+        {error && <p className="text-xs text-loki-error mt-1">{error}</p>}
       </div>
       {MODES.map((m) => (
         <button
           key={m.id}
           type="button"
           data-personality={m.id}
-          aria-pressed={current === m.id}
+          aria-pressed={current === m.id ? "true" : "false"}
           aria-label={`${m.label}: ${m.desc}`}
           onClick={async () => {
+            setError(null);
             try {
               await onChange(m.id);
-            } finally {
               onClose();
+            } catch (err) {
+              setError(err instanceof Error ? err.message : "Failed to change personality");
             }
           }}
           className={`mode-btn w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-loki-purple/30 transition-colors

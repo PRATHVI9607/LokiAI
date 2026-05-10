@@ -226,7 +226,15 @@ class LokiApplication:
         # KORTEX-inspired components
         self.brain_memory = BrainMemory(memory_dir)
         self.audit_log = AuditLog(memory_dir)
-        ollama_port = self.config.get("llm", {}).get("ollama_port", 11434)
+        llm_port = self.config.get("llm", {}).get("ollama_port")
+        wakeword_port = self.config.get("wakeword", {}).get("ollama_port")
+        if llm_port is not None:
+            ollama_port = llm_port
+        elif wakeword_port is not None:
+            logger.warning("'wakeword.ollama_port' is deprecated; move it to 'llm.ollama_port'")
+            ollama_port = wakeword_port
+        else:
+            ollama_port = 11434
         ollama_url = f"http://localhost:{ollama_port}"
         self.rag_engine = RagEngine(memory_dir, ollama_url=ollama_url)
 

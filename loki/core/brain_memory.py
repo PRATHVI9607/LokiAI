@@ -5,6 +5,7 @@ Stores key facts, architecture decisions, user preferences, session summaries,
 and personality mode. Survives restarts and grows smarter over time.
 """
 
+import copy
 import json
 import logging
 import os
@@ -95,6 +96,7 @@ class BrainMemory:
                 tmp.unlink(missing_ok=True)
             except Exception:
                 pass
+            raise
 
     def save(self) -> None:
         with self._lock:
@@ -243,4 +245,4 @@ class BrainMemory:
 
     def to_dict(self) -> Dict[str, Any]:
         with self._lock:
-            return dict(self._data)
+            return copy.deepcopy(self._data)

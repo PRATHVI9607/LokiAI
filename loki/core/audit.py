@@ -73,16 +73,23 @@ class AuditLog:
         except Exception as e:
             logger.error(f"Audit log write failed: {e}")
 
-    def _sanitize(self, params: Any) -> Any:
+    def _sanitize(self, params: Any, _visited: Optional[set] = None) -> Any:
         """Recursively redact sensitive keys from params."""
+        if _visited is None:
+            _visited = set()
+        obj_id = id(params)
+        if obj_id in _visited:
+            return "<circular>"
         sensitive = {"value", "password", "key", "secret", "token"}
         if isinstance(params, dict):
+            _visited.add(obj_id)
             return {
-                k: "***" if k.lower() in sensitive else self._sanitize(v)
+                k: "***" if k.lower() in sensitive else self._sanitize(v, _visited)
                 for k, v in params.items()
             }
         if isinstance(params, list):
-            return [self._sanitize(item) for item in params]
+            _visited.add(obj_id)
+            return [self._sanitize(item, _visited) for item in params]
         return params
 
     def _rotate_if_needed(self) -> None:

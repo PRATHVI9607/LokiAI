@@ -195,11 +195,9 @@ body {
   border: 1px dashed rgba(107, 107, 168, 0.3);
 }
 
-/* Personality dropdown portal — top/left driven by --dt/--dl CSS vars set inline */
+/* Personality dropdown portal — top/left set imperatively via JS (portalRef) */
 .personality-dropdown-portal {
   position: fixed;
-  top: var(--dt);
-  left: var(--dl);
   z-index: 9999;
 }
 

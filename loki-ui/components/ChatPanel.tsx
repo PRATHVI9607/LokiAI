@@ -44,6 +44,7 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const personalityBtnRef = useRef<HTMLButtonElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const [showPersonality, setShowPersonality] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const [mounted, setMounted] = useState(false);
@@ -55,15 +56,69 @@ export default function ChatPanel({
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
+  const DROPDOWN_W = 220;
+  const DROPDOWN_H = 160;
+
+  const computeAndSetPos = useCallback(() => {
+    if (!personalityBtnRef.current) return;
+    const r = personalityBtnRef.current.getBoundingClientRect();
+    const top = Math.max(8, Math.min(r.bottom + 4, window.innerHeight - DROPDOWN_H - 8));
+    const left = Math.max(8, Math.min(r.left, window.innerWidth - DROPDOWN_W - 8));
+    setDropdownPos({ top, left });
+  }, []);
+
   const handlePersonalityToggle = useCallback(() => {
     setShowPersonality((prev) => {
-      if (!prev && personalityBtnRef.current) {
-        const r = personalityBtnRef.current.getBoundingClientRect();
-        setDropdownPos({ top: r.bottom + 4, left: r.left });
-      }
+      if (!prev) computeAndSetPos();
       return !prev;
     });
-  }, []);
+  }, [computeAndSetPos]);
+
+  // Close on viewport resize or scroll
+  useEffect(() => {
+    if (!showPersonality) return;
+    const close = () => setShowPersonality(false);
+    window.addEventListener("resize", close);
+    window.addEventListener("scroll", close, true);
+    return () => {
+      window.removeEventListener("resize", close);
+      window.removeEventListener("scroll", close, true);
+    };
+  }, [showPersonality]);
+
+  // Apply dropdown position imperatively so no JSX style= prop is needed
+  useEffect(() => {
+    const el = portalRef.current;
+    if (!el) return;
+    el.style.top = `${dropdownPos.top}px`;
+    el.style.left = `${dropdownPos.left}px`;
+  }, [dropdownPos]);
+
+  // Click-outside + Escape → close and return focus
+  useEffect(() => {
+    if (!showPersonality) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (
+        portalRef.current && !portalRef.current.contains(e.target as Node) &&
+        personalityBtnRef.current && !personalityBtnRef.current.contains(e.target as Node)
+      ) {
+        setShowPersonality(false);
+        personalityBtnRef.current?.focus();
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowPersonality(false);
+        personalityBtnRef.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [showPersonality]);
 
   const pColor = PERSONALITY_COLORS[personality];
 
@@ -95,7 +150,7 @@ export default function ChatPanel({
             type="button"
             className="flex items-center gap-1 mt-0.5 group"
             onClick={handlePersonalityToggle}
-            aria-expanded={showPersonality}
+            aria-expanded={showPersonality ? "true" : "false"}
             aria-label="Select personality mode"
           >
             <div className="personality-dot w-1.5 h-1.5 rounded-full" />
@@ -196,8 +251,8 @@ export default function ChatPanel({
         <AnimatePresence>
           {showPersonality && (
             <div
+              ref={portalRef}
               className="personality-dropdown-portal"
-              style={{ "--dt": `${dropdownPos.top}px`, "--dl": `${dropdownPos.left}px` } as React.CSSProperties}
             >
               <PersonalityPicker
                 current={personality}
