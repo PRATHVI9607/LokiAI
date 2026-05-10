@@ -26,6 +26,7 @@
 15. [Data Persistence & Storage](#15-data-persistence--storage)
 16. [Security Constraints & Safety Model](#16-security-constraints--safety-model)
 17. [Dependencies & Requirements](#17-dependencies--requirements)
+18. [Extended Feature Set (v1.1)](#18-extended-feature-set-v11)
 
 ---
 
@@ -1434,6 +1435,316 @@ File delete, folder delete, and process kill operations check `confirm_destructi
 |----------|----------|-------------|
 | `OPENROUTER_API_KEY` | No* | Cloud LLM fallback (*not needed if Ollama is running) |
 | `PORCUPINE_ACCESS_KEY` | No | Enables Porcupine wakeword (free tier available) |
+
+---
+
+## 18. Extended Feature Set (v1.1)
+
+This section documents the 25 features added in the second development phase, bringing the total capability count to 50+.
+
+### 18.1 Writing & Text Features
+
+#### GhostWriter (`loki/features/ghostwriter.py`)
+AI-powered long-form writing assistant.
+
+| Method | Intent | Description |
+|--------|--------|-------------|
+| `expand(text)` | `text_expand` | Expand a short note or bullet point into a full paragraph |
+| `continue_text(text)` | `text_continue` | Continue writing from where the user left off |
+| `bullets_to_prose(text)` | `text_bullets_to_prose` | Convert a bullet list into flowing prose |
+
+#### GrammarPolisher (`loki/features/grammar_polisher.py`)
+Grammar correction and tone transformation.
+
+| Method | Intent | Description |
+|--------|--------|-------------|
+| `polish(text)` | `text_polish` | Fix grammar, clarity, and style issues |
+| `change_tone(text, tone)` | `text_change_tone` | Rewrite in formal / casual / persuasive / academic tone |
+| `translate(text, language)` | `text_translate` | Translate to any language via LLM |
+
+#### CitationGenerator (`loki/features/citation_generator.py`)
+Academic citation formatting from URLs or manual metadata.
+
+- Supports: **APA**, **MLA**, **Chicago**, **IEEE**
+- URL mode: fetches Open Graph / meta tags via requests + BeautifulSoup
+- Manual mode: formats from author/title/year/publisher dict
+
+#### EmailDrafter (`loki/features/email_drafter.py`)
+Professional email and reply generation via LLM.
+
+- `draft(subject, context, to?)` → full email body
+- `reply(original, intent?)` → contextual reply
+
+#### FactChecker (`loki/features/fact_checker.py`)
+Claim verification using DuckDuckGo HTML search + LLM verdict.
+
+```mermaid
+flowchart TD
+    A[Claim text] --> B[DuckDuckGo HTML search]
+    B --> C[Extract top 3 result snippets]
+    C --> D[LLM verdict: True/False/Unverifiable]
+    D --> E[Return verdict + evidence]
+```
+
+#### DailyBriefing (`loki/features/daily_briefing.py`)
+Morning brief combining: date/time, pending tasks, system health summary, top news headlines. Integrates `TaskManager`, `SystemMonitor`, and `NewsAggregator`.
+
+---
+
+### 18.2 Data & Conversion Features
+
+#### CurrencyConverter (`loki/features/currency_converter.py`)
+- **Live rates:** `open.er-api.com/v6/latest/{base}` (free, no key)
+- **LLM fallback:** if API unreachable, asks LLM for approximate rate
+- **Unit conversion:** 50+ SI units — length, mass, temperature, volume, speed, data, pressure, energy
+
+#### NewsAggregator (`loki/features/news_aggregator.py`)
+RSS-based news aggregation with no external dependencies beyond `requests`.
+
+Topics: technology, science, world, business, sports — each mapped to a BBC/Reuters RSS feed URL.  
+XML parsed via `xml.etree.ElementTree` (stdlib only).
+
+#### MediaConverter (`loki/features/media_converter.py`)
+ffmpeg subprocess wrapper for audio/video/image format conversion.
+
+```mermaid
+flowchart LR
+    A[Input file] --> B{ffmpeg on PATH?}
+    B -->|No| C[Return error with install URL]
+    B -->|Yes| D[Quality preset mapping]
+    D --> E[subprocess.run ffmpeg]
+    E -->|rc=0| F[Return output path + size]
+    E -->|rc!=0| G[Return stderr]
+```
+
+---
+
+### 18.3 Software & Environment Features
+
+#### SoftwareUpdater (`loki/features/software_updater.py`)
+Windows Package Manager (winget) integration.
+
+| Method | Intent |
+|--------|--------|
+| `check_updates()` | `update_check` |
+| `update_all()` | `update_all` |
+| `update_package(name)` | `update_package` |
+| `install_package(name)` | `install_package` |
+
+Gracefully reports if winget is not installed (Microsoft Store).
+
+#### EnvSetup (`loki/features/env_setup.py`)
+LLM-generated project environment configuration.
+
+- Reads key project files (`requirements.txt`, `package.json`, `go.mod`, etc.) to infer stack
+- Generates: production Dockerfile (multi-stage), PowerShell venv setup script, docker-compose.yml
+
+#### ApiMocker (`loki/features/api_mocker.py`)
+LLM-generated mock API server code (FastAPI) + sample JSON data.
+
+---
+
+### 18.4 File Management Features
+
+#### BackupManager (`loki/features/backup_manager.py`)
+Timestamped file and directory backups via `shutil`.
+
+- Default backup root: `~/LokiBackups/`
+- Directory backup skips: `__pycache__`, `node_modules`, `.git`, `.venv`, `.next`
+- `list_backups(filter?)` — shows recent 20 backup entries
+
+#### DigitalDeclutter (`loki/features/digital_declutter.py`)
+Storage cleanup analysis.
+
+```mermaid
+flowchart TD
+    A[suggest_cleanup] --> B[find_duplicates]
+    A --> C[find_large_files]
+    A --> D[find_old_files]
+    B --> E[MD5 hash per file via hashlib]
+    E --> F[Group by identical hash]
+    C --> G[os.walk + stat.st_size filter]
+    D --> H[stat.st_mtime vs cutoff date]
+```
+
+- Skips: `.git`, `node_modules`, `__pycache__`, `.venv`, `.next`, `dist`, `build`
+- Reports wasted space in MB for each duplicate group
+
+---
+
+### 18.5 Window & Process Features
+
+#### WindowTiler (`loki/features/window_tiler.py`)
+Windows window management using ctypes (no pywin32 dependency).
+
+**Layouts:** `left`, `right`, `top`, `bottom`, `topleft`, `topright`, `bottomleft`, `bottomright`, `maximize`, `center`
+
+```mermaid
+flowchart TD
+    A[snap_window layout] --> B[_calc layout → x,y,w,h]
+    B --> C{window_title given?}
+    C -->|Yes| D[EnumWindows → match title]
+    C -->|No| E[GetForegroundWindow]
+    D --> F[MoveWindow via user32]
+    E --> F
+```
+
+- `tile_all()` — enumerates visible non-minimized windows, arranges in N×M grid
+- Work area from `SystemParametersInfoW(SPI_GETWORKAREA)` — respects taskbar
+
+#### ProcessTriage (`loki/features/process_triage.py`)
+Resource management for demanding applications.
+
+- `analyze()` — top N processes by RAM, flags safe-to-close candidates
+- `triage_for_app(app_name, dry_run)` — terminates non-essential processes (Discord, Slack, Steam, etc.)
+- `suspend_process / resume_process` — SIGSTOP/SIGCONT equivalent via `psutil.Process.suspend()`
+- Protected list: system, csrss, lsass, winlogon, explorer, dwm, and other critical processes
+
+---
+
+### 18.6 Security & Privacy Features
+
+#### PhishingDetector (`loki/features/phishing_detector.py`)
+Two-layer phishing analysis.
+
+**Heuristic signals:**
+- IP address as hostname instead of domain name
+- Domain resembles known brand (homograph/lookalike check)
+- Excessive subdomains (> 4 levels)
+- Suspicious TLDs (`.tk`, `.ml`, `.xyz`, etc.)
+- URL contains `@` symbol
+- Sensitive keywords in path (`login`, `verify`, `secure`, etc.)
+- Email: phishing language patterns, urgency words, credential requests
+
+**LLM layer:** if heuristic risk ≥ 3, sends URL + signals to LLM for a brief verdict.
+
+Risk scoring: 0–10. Low: 0–2 / Medium: 3–5 / High: 6–10.
+
+#### FootprintAuditor (`loki/features/footprint_auditor.py`)
+Windows privacy and persistence audit.
+
+| Method | Intent | Data Source |
+|--------|--------|-------------|
+| `audit_startup()` | `footprint_startup` | Registry Run keys + Startup folders |
+| `audit_scheduled_tasks()` | `footprint_tasks` | PowerShell `Get-ScheduledTask` |
+| `audit_privacy_settings()` | `footprint_privacy` | Registry `CapabilityAccessManager` |
+| `audit_network_listeners()` | `footprint_network` | PowerShell `Get-NetTCPConnection` |
+| `full_audit()` | `footprint_full` | All four above |
+
+Flags scheduled tasks using PowerShell, cmd, mshta, rundll32 as potentially suspicious.
+
+---
+
+### 18.7 Knowledge & History Features
+
+#### KnowledgeGraph (`loki/features/knowledge_graph.py`)
+Personal knowledge graph over local notes and files.
+
+```mermaid
+flowchart TD
+    A[ingest_file / ingest_directory] --> B[Read file text up to 3000 chars]
+    B --> C{LLM available?}
+    C -->|Yes| D[LLM extracts entities + relations as JSON]
+    C -->|No| E[Regex: capitalized multi-word phrases]
+    D --> F[Merge into nodes and edges dicts]
+    E --> F
+    F --> G[Persist to ~/.loki_knowledge_graph.json]
+    H[query / find_connections] --> I[Build graph summary string]
+    I --> J[LLM answers from graph context]
+```
+
+- Supported file types: `.txt`, `.md`, `.rst`, `.py`, `.js`, `.ts`, `.json`, `.yaml`
+- Entity types: person, place, organization, concept, technology, event, project
+- `find_connections(entity)` — shows all graph edges for a node
+
+#### SemanticBrowserHistory (`loki/features/semantic_browser_history.py`)
+Search over Chrome / Edge / Brave SQLite history databases.
+
+- Copies history DB to temp file (browsers hold a lock on the live file)
+- Chromium timestamp decoding: microseconds since 1601-01-01 → UTC datetime
+- `search(query)` — keyword match over title and URL
+- `semantic_search(query)` — sends compact history listing to LLM, returns most relevant entries
+- `get_stats()` — top 10 domains by visit count over last 30 days
+
+---
+
+### 18.8 Meeting Features
+
+#### MeetingTranscriber (`loki/features/meeting_transcriber.py`)
+Meeting audio transcription and minutes generation using Whisper.
+
+```mermaid
+flowchart TD
+    A[generate_minutes audio_path] --> B[transcribe via Whisper]
+    B --> C{Transcription OK?}
+    C -->|No| D[Return error]
+    C -->|Yes| E[Build minutes prompt]
+    E --> F[LLM generates structured minutes]
+    F --> G[Return transcript + minutes]
+```
+
+Minutes structure:
+1. Meeting Summary (2–3 sentences)
+2. Key Discussion Points (bullet list)
+3. Decisions Made
+4. Action Items (person → task)
+5. Next Steps
+
+- `extract_action_items(text_or_path)` — works on audio files, text files, or raw transcript strings
+- Shares the global Whisper model instance from the STT module (no double-load)
+
+---
+
+### 18.9 Action Router Additions
+
+All 25 new features are registered in `ActionRouter.route_intent()`. Total intent count: **70+**.
+
+```mermaid
+graph LR
+    subgraph Writing
+        W1[text_expand] --> GW[GhostWriter]
+        W2[text_continue] --> GW
+        W3[text_bullets_to_prose] --> GW
+        W4[text_polish] --> GP[GrammarPolisher]
+        W5[text_change_tone] --> GP
+        W6[text_translate] --> GP
+        W7[citation_from_url] --> CG[CitationGenerator]
+        W8[email_draft] --> ED[EmailDrafter]
+        W9[fact_check] --> FC[FactChecker]
+        W10[daily_briefing] --> DB[DailyBriefing]
+    end
+    subgraph Data
+        D1[currency_convert] --> CC[CurrencyConverter]
+        D2[unit_convert] --> CC
+        D3[news_headlines] --> NA[NewsAggregator]
+        D4[media_convert] --> MC[MediaConverter]
+        D5[update_check] --> SU[SoftwareUpdater]
+    end
+    subgraph Files
+        F1[backup_file] --> BM[BackupManager]
+        F2[backup_directory] --> BM
+        F3[declutter_duplicates] --> DD[DigitalDeclutter]
+        F4[env_dockerfile] --> ES[EnvSetup]
+    end
+    subgraph WindowProc
+        P1[window_snap] --> WT[WindowTiler]
+        P2[window_tile_all] --> WT
+        P3[process_analyze] --> PT[ProcessTriage]
+        P4[process_triage] --> PT
+    end
+    subgraph Security
+        S1[phishing_url] --> PD[PhishingDetector]
+        S2[footprint_full] --> FA[FootprintAuditor]
+    end
+    subgraph Knowledge
+        K1[kg_ingest_file] --> KG[KnowledgeGraph]
+        K2[kg_query] --> KG
+        K3[history_search] --> BH[BrowserHistory]
+        K4[history_semantic] --> BH
+        K5[meeting_transcribe] --> MTR[MeetingTranscriber]
+        K6[meeting_minutes] --> MTR
+    end
+```
 
 ---
 

@@ -77,6 +77,76 @@ class ActionRouter:
             "clipboard_clear": self._handle_clipboard_clear,
             "vault_store": self._handle_vault_store,
             "vault_retrieve": self._handle_vault_retrieve,
+            # Writing & Text
+            "text_expand": self._handle_text_expand,
+            "text_continue": self._handle_text_continue,
+            "text_bullets_to_prose": self._handle_bullets_to_prose,
+            "text_polish": self._handle_text_polish,
+            "text_change_tone": self._handle_text_change_tone,
+            "text_translate": self._handle_text_translate,
+            "citation_from_url": self._handle_citation_url,
+            "citation_from_info": self._handle_citation_info,
+            "email_draft": self._handle_email_draft,
+            "email_reply": self._handle_email_reply,
+            "fact_check": self._handle_fact_check,
+            "daily_briefing": self._handle_daily_briefing,
+            # Data & Conversion
+            "currency_convert": self._handle_currency_convert,
+            "unit_convert": self._handle_unit_convert,
+            "news_headlines": self._handle_news_headlines,
+            "news_briefing": self._handle_news_briefing,
+            "media_convert": self._handle_media_convert,
+            "media_info": self._handle_media_info,
+            # Software & Environment
+            "update_check": self._handle_update_check,
+            "update_all": self._handle_update_all,
+            "update_package": self._handle_update_package,
+            "install_package": self._handle_install_package,
+            "env_dockerfile": self._handle_env_dockerfile,
+            "env_venv": self._handle_env_venv,
+            "env_compose": self._handle_env_compose,
+            "api_mock_generate": self._handle_api_mock_generate,
+            "api_mock_data": self._handle_api_mock_data,
+            # File Management
+            "backup_file": self._handle_backup_file,
+            "backup_directory": self._handle_backup_directory,
+            "backup_list": self._handle_backup_list,
+            "declutter_duplicates": self._handle_declutter_dups,
+            "declutter_large": self._handle_declutter_large,
+            "declutter_old": self._handle_declutter_old,
+            "declutter_suggest": self._handle_declutter_suggest,
+            # Window & Process
+            "window_snap": self._handle_window_snap,
+            "window_tile_all": self._handle_window_tile_all,
+            "window_layouts": self._handle_window_layouts,
+            "process_analyze": self._handle_process_analyze,
+            "process_triage": self._handle_process_triage,
+            "process_suspend": self._handle_process_suspend,
+            "process_resume": self._handle_process_resume,
+            # Security & Privacy
+            "phishing_url": self._handle_phishing_url,
+            "phishing_email": self._handle_phishing_email,
+            "footprint_startup": self._handle_footprint_startup,
+            "footprint_tasks": self._handle_footprint_tasks,
+            "footprint_privacy": self._handle_footprint_privacy,
+            "footprint_network": self._handle_footprint_network,
+            "footprint_full": self._handle_footprint_full,
+            # Knowledge Graph
+            "kg_ingest_file": self._handle_kg_ingest_file,
+            "kg_ingest_dir": self._handle_kg_ingest_dir,
+            "kg_query": self._handle_kg_query,
+            "kg_connections": self._handle_kg_connections,
+            "kg_stats": self._handle_kg_stats,
+            # Browser History
+            "history_search": self._handle_history_search,
+            "history_semantic": self._handle_history_semantic,
+            "history_recent": self._handle_history_recent,
+            "history_stats": self._handle_history_stats,
+            # Meetings
+            "meeting_transcribe": self._handle_meeting_transcribe,
+            "meeting_minutes": self._handle_meeting_minutes,
+            "meeting_action_items": self._handle_meeting_action_items,
+            "meeting_summarize": self._handle_meeting_summarize,
             # Meta
             "undo": self._handle_undo,
             "chat": lambda p: {"success": True, "message": intent.get("message", "")},
@@ -300,6 +370,262 @@ class ActionRouter:
     def _handle_vault_retrieve(self, p):
         feat = self._features.get("vault")
         return feat.retrieve(p.get("key", "")) if feat else self._missing("vault")
+
+    # --- Writing & Text ---
+    def _handle_text_expand(self, p):
+        f = self._features.get("ghostwriter")
+        return f.expand(p.get("text", "")) if f else self._missing("ghostwriter")
+
+    def _handle_text_continue(self, p):
+        f = self._features.get("ghostwriter")
+        return f.continue_text(p.get("text", "")) if f else self._missing("ghostwriter")
+
+    def _handle_bullets_to_prose(self, p):
+        f = self._features.get("ghostwriter")
+        return f.bullets_to_prose(p.get("text", "")) if f else self._missing("ghostwriter")
+
+    def _handle_text_polish(self, p):
+        f = self._features.get("grammar_polisher")
+        return f.polish(p.get("text", "")) if f else self._missing("grammar_polisher")
+
+    def _handle_text_change_tone(self, p):
+        f = self._features.get("grammar_polisher")
+        return f.change_tone(p.get("text", ""), p.get("tone", "professional")) if f else self._missing("grammar_polisher")
+
+    def _handle_text_translate(self, p):
+        f = self._features.get("grammar_polisher")
+        return f.translate(p.get("text", ""), p.get("language", "Spanish")) if f else self._missing("grammar_polisher")
+
+    def _handle_citation_url(self, p):
+        f = self._features.get("citation_generator")
+        return f.from_url(p.get("url", ""), p.get("style", "apa")) if f else self._missing("citation_generator")
+
+    def _handle_citation_info(self, p):
+        f = self._features.get("citation_generator")
+        return f.from_info(p.get("info", ""), p.get("style", "apa")) if f else self._missing("citation_generator")
+
+    def _handle_email_draft(self, p):
+        f = self._features.get("email_drafter")
+        return f.draft(p.get("subject", ""), p.get("context", ""), p.get("to")) if f else self._missing("email_drafter")
+
+    def _handle_email_reply(self, p):
+        f = self._features.get("email_drafter")
+        return f.reply(p.get("original", ""), p.get("intent")) if f else self._missing("email_drafter")
+
+    def _handle_fact_check(self, p):
+        f = self._features.get("fact_checker")
+        return f.check(p.get("claim", "")) if f else self._missing("fact_checker")
+
+    def _handle_daily_briefing(self, p):
+        f = self._features.get("daily_briefing")
+        return f.generate() if f else self._missing("daily_briefing")
+
+    # --- Data & Conversion ---
+    def _handle_currency_convert(self, p):
+        f = self._features.get("currency_converter")
+        return f.convert_currency(p.get("amount", 1), p.get("from_currency", "USD"), p.get("to_currency", "EUR")) if f else self._missing("currency_converter")
+
+    def _handle_unit_convert(self, p):
+        f = self._features.get("currency_converter")
+        return f.convert_unit(p.get("amount", 1), p.get("from_unit", ""), p.get("to_unit", "")) if f else self._missing("currency_converter")
+
+    def _handle_news_headlines(self, p):
+        f = self._features.get("news_aggregator")
+        return f.get_headlines(p.get("topic"), p.get("count", 10)) if f else self._missing("news_aggregator")
+
+    def _handle_news_briefing(self, p):
+        f = self._features.get("news_aggregator")
+        return f.get_briefing(p.get("topics")) if f else self._missing("news_aggregator")
+
+    def _handle_media_convert(self, p):
+        f = self._features.get("media_converter")
+        return f.convert(p.get("input_path", ""), p.get("output_format", ""), p.get("output_path"), p.get("quality", "medium")) if f else self._missing("media_converter")
+
+    def _handle_media_info(self, p):
+        f = self._features.get("media_converter")
+        return f.get_info(p.get("file_path", "")) if f else self._missing("media_converter")
+
+    # --- Software & Environment ---
+    def _handle_update_check(self, p):
+        f = self._features.get("software_updater")
+        return f.check_updates() if f else self._missing("software_updater")
+
+    def _handle_update_all(self, p):
+        f = self._features.get("software_updater")
+        return f.update_all() if f else self._missing("software_updater")
+
+    def _handle_update_package(self, p):
+        f = self._features.get("software_updater")
+        return f.update_package(p.get("package_name", "")) if f else self._missing("software_updater")
+
+    def _handle_install_package(self, p):
+        f = self._features.get("software_updater")
+        return f.install_package(p.get("package_name", "")) if f else self._missing("software_updater")
+
+    def _handle_env_dockerfile(self, p):
+        f = self._features.get("env_setup")
+        return f.generate_dockerfile(p.get("project_path", ".")) if f else self._missing("env_setup")
+
+    def _handle_env_venv(self, p):
+        f = self._features.get("env_setup")
+        return f.generate_venv_script(p.get("project_path", "."), p.get("python", "python")) if f else self._missing("env_setup")
+
+    def _handle_env_compose(self, p):
+        f = self._features.get("env_setup")
+        return f.generate_docker_compose(p.get("project_path", "."), p.get("services", "")) if f else self._missing("env_setup")
+
+    def _handle_api_mock_generate(self, p):
+        f = self._features.get("api_mocker")
+        return f.generate_mock(p.get("description", "")) if f else self._missing("api_mocker")
+
+    def _handle_api_mock_data(self, p):
+        f = self._features.get("api_mocker")
+        return f.generate_mock_data(p.get("schema", "")) if f else self._missing("api_mocker")
+
+    # --- File Management ---
+    def _handle_backup_file(self, p):
+        f = self._features.get("backup_manager")
+        return f.backup_file(p.get("path", ""), p.get("destination")) if f else self._missing("backup_manager")
+
+    def _handle_backup_directory(self, p):
+        f = self._features.get("backup_manager")
+        return f.backup_directory(p.get("path", ""), p.get("destination")) if f else self._missing("backup_manager")
+
+    def _handle_backup_list(self, p):
+        f = self._features.get("backup_manager")
+        return f.list_backups(p.get("name_filter")) if f else self._missing("backup_manager")
+
+    def _handle_declutter_dups(self, p):
+        f = self._features.get("digital_declutter")
+        return f.find_duplicates(p.get("directory", "~")) if f else self._missing("digital_declutter")
+
+    def _handle_declutter_large(self, p):
+        f = self._features.get("digital_declutter")
+        return f.find_large_files(p.get("directory", "~"), float(p.get("threshold_mb", 100))) if f else self._missing("digital_declutter")
+
+    def _handle_declutter_old(self, p):
+        f = self._features.get("digital_declutter")
+        return f.find_old_files(p.get("directory", "~/Downloads"), int(p.get("days", 180))) if f else self._missing("digital_declutter")
+
+    def _handle_declutter_suggest(self, p):
+        f = self._features.get("digital_declutter")
+        return f.suggest_cleanup(p.get("directory", "~")) if f else self._missing("digital_declutter")
+
+    # --- Window & Process ---
+    def _handle_window_snap(self, p):
+        f = self._features.get("window_tiler")
+        return f.snap_window(p.get("layout", "left"), p.get("window_title", "")) if f else self._missing("window_tiler")
+
+    def _handle_window_tile_all(self, p):
+        f = self._features.get("window_tiler")
+        return f.tile_all() if f else self._missing("window_tiler")
+
+    def _handle_window_layouts(self, p):
+        f = self._features.get("window_tiler")
+        return f.list_layouts() if f else self._missing("window_tiler")
+
+    def _handle_process_analyze(self, p):
+        f = self._features.get("process_triage")
+        return f.analyze(int(p.get("top_n", 10))) if f else self._missing("process_triage")
+
+    def _handle_process_triage(self, p):
+        f = self._features.get("process_triage")
+        dry = p.get("dry_run", True)
+        if isinstance(dry, str):
+            dry = dry.lower() != "false"
+        return f.triage_for_app(p.get("app_name", ""), dry_run=dry) if f else self._missing("process_triage")
+
+    def _handle_process_suspend(self, p):
+        f = self._features.get("process_triage")
+        return f.suspend_process(p.get("name_or_pid", "")) if f else self._missing("process_triage")
+
+    def _handle_process_resume(self, p):
+        f = self._features.get("process_triage")
+        return f.resume_process(p.get("name_or_pid", "")) if f else self._missing("process_triage")
+
+    # --- Security & Privacy ---
+    def _handle_phishing_url(self, p):
+        f = self._features.get("phishing_detector")
+        return f.analyze_url(p.get("url", "")) if f else self._missing("phishing_detector")
+
+    def _handle_phishing_email(self, p):
+        f = self._features.get("phishing_detector")
+        return f.analyze_email(p.get("email_text", "")) if f else self._missing("phishing_detector")
+
+    def _handle_footprint_startup(self, p):
+        f = self._features.get("footprint_auditor")
+        return f.audit_startup() if f else self._missing("footprint_auditor")
+
+    def _handle_footprint_tasks(self, p):
+        f = self._features.get("footprint_auditor")
+        return f.audit_scheduled_tasks() if f else self._missing("footprint_auditor")
+
+    def _handle_footprint_privacy(self, p):
+        f = self._features.get("footprint_auditor")
+        return f.audit_privacy_settings() if f else self._missing("footprint_auditor")
+
+    def _handle_footprint_network(self, p):
+        f = self._features.get("footprint_auditor")
+        return f.audit_network_listeners() if f else self._missing("footprint_auditor")
+
+    def _handle_footprint_full(self, p):
+        f = self._features.get("footprint_auditor")
+        return f.full_audit() if f else self._missing("footprint_auditor")
+
+    # --- Knowledge Graph ---
+    def _handle_kg_ingest_file(self, p):
+        f = self._features.get("knowledge_graph")
+        return f.ingest_file(p.get("file_path", "")) if f else self._missing("knowledge_graph")
+
+    def _handle_kg_ingest_dir(self, p):
+        f = self._features.get("knowledge_graph")
+        return f.ingest_directory(p.get("directory", "")) if f else self._missing("knowledge_graph")
+
+    def _handle_kg_query(self, p):
+        f = self._features.get("knowledge_graph")
+        return f.query(p.get("question", "")) if f else self._missing("knowledge_graph")
+
+    def _handle_kg_connections(self, p):
+        f = self._features.get("knowledge_graph")
+        return f.find_connections(p.get("entity", "")) if f else self._missing("knowledge_graph")
+
+    def _handle_kg_stats(self, p):
+        f = self._features.get("knowledge_graph")
+        return f.get_stats() if f else self._missing("knowledge_graph")
+
+    # --- Browser History ---
+    def _handle_history_search(self, p):
+        f = self._features.get("browser_history")
+        return f.search(p.get("query", ""), p.get("browser", "auto"), int(p.get("days", 30))) if f else self._missing("browser_history")
+
+    def _handle_history_semantic(self, p):
+        f = self._features.get("browser_history")
+        return f.semantic_search(p.get("query", ""), p.get("browser", "auto"), int(p.get("days", 30))) if f else self._missing("browser_history")
+
+    def _handle_history_recent(self, p):
+        f = self._features.get("browser_history")
+        return f.recent(p.get("browser", "auto"), int(p.get("days", 1))) if f else self._missing("browser_history")
+
+    def _handle_history_stats(self, p):
+        f = self._features.get("browser_history")
+        return f.get_stats(p.get("browser", "auto")) if f else self._missing("browser_history")
+
+    # --- Meetings ---
+    def _handle_meeting_transcribe(self, p):
+        f = self._features.get("meeting_transcriber")
+        return f.transcribe(p.get("audio_path", ""), p.get("language", "en")) if f else self._missing("meeting_transcriber")
+
+    def _handle_meeting_minutes(self, p):
+        f = self._features.get("meeting_transcriber")
+        return f.generate_minutes(p.get("audio_path", ""), p.get("language", "en")) if f else self._missing("meeting_transcriber")
+
+    def _handle_meeting_action_items(self, p):
+        f = self._features.get("meeting_transcriber")
+        return f.extract_action_items(p.get("text_or_path", "")) if f else self._missing("meeting_transcriber")
+
+    def _handle_meeting_summarize(self, p):
+        f = self._features.get("meeting_transcriber")
+        return f.summarize_transcript(p.get("transcript", "")) if f else self._missing("meeting_transcriber")
 
     # --- Meta ---
     def _handle_undo(self, p):

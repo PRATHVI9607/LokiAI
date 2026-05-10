@@ -51,6 +51,33 @@ from loki.features.vault import Vault
 from loki.features.security_scanner import SecurityScanner
 from loki.features.file_organizer import FileOrganizer
 
+# Batch 1 features
+from loki.features.ghostwriter import GhostWriter
+from loki.features.grammar_polisher import GrammarPolisher
+from loki.features.citation_generator import CitationGenerator
+from loki.features.email_drafter import EmailDrafter
+from loki.features.daily_briefing import DailyBriefing
+from loki.features.fact_checker import FactChecker
+from loki.features.currency_converter import CurrencyConverter
+
+# Batch 2 features
+from loki.features.news_aggregator import NewsAggregator
+from loki.features.api_mocker import ApiMocker
+from loki.features.env_setup import EnvSetup
+from loki.features.media_converter import MediaConverter
+from loki.features.digital_declutter import DigitalDeclutter
+from loki.features.backup_manager import BackupManager
+from loki.features.software_updater import SoftwareUpdater
+
+# Batch 3 features
+from loki.features.window_tiler import WindowTiler
+from loki.features.process_triage import ProcessTriage
+from loki.features.phishing_detector import PhishingDetector
+from loki.features.knowledge_graph import KnowledgeGraph
+from loki.features.meeting_transcriber import MeetingTranscriber
+from loki.features.footprint_auditor import FootprintAuditor
+from loki.features.semantic_browser_history import SemanticBrowserHistory
+
 from loki.ui.server import create_loki_server
 
 LOKI_LOG = PROJECT_ROOT / "loki" / "loki.log"
@@ -277,6 +304,38 @@ class LokiApplication:
         self.security_scanner = SecurityScanner(scanner_cfg.get("patterns"))
         self.file_organizer = FileOrganizer(feat_cfg.get("file_organizer", {}))
 
+        # Batch 1 features
+        self.ghostwriter = GhostWriter(brain=self.brain)
+        self.grammar_polisher = GrammarPolisher(brain=self.brain)
+        self.citation_generator = CitationGenerator(brain=self.brain)
+        self.email_drafter = EmailDrafter(brain=self.brain)
+        self.fact_checker = FactChecker(brain=self.brain)
+        self.currency_converter = CurrencyConverter(brain=self.brain)
+
+        # Batch 2 features
+        self.news_aggregator = NewsAggregator(brain=self.brain)
+        self.daily_briefing = DailyBriefing(
+            brain=self.brain,
+            task_manager=self.task_manager,
+            system_monitor=self.sys_monitor,
+            news_aggregator=self.news_aggregator,
+        )
+        self.api_mocker = ApiMocker(brain=self.brain)
+        self.env_setup = EnvSetup(brain=self.brain)
+        self.media_converter = MediaConverter()
+        self.digital_declutter = DigitalDeclutter()
+        self.backup_manager = BackupManager()
+        self.software_updater = SoftwareUpdater()
+
+        # Batch 3 features
+        self.window_tiler = WindowTiler()
+        self.process_triage = ProcessTriage()
+        self.phishing_detector = PhishingDetector(brain=self.brain)
+        self.knowledge_graph = KnowledgeGraph(brain=self.brain)
+        self.meeting_transcriber = MeetingTranscriber(brain=self.brain)
+        self.footprint_auditor = FootprintAuditor()
+        self.browser_history = SemanticBrowserHistory(brain=self.brain)
+
         self.router = ActionRouter(self.undo_stack)
         self.router.register_action("file_ops", self.file_ops)
         self.router.register_action("shell_exec", self.shell)
@@ -296,6 +355,30 @@ class LokiApplication:
         self.router.register_feature("vault", self.vault)
         self.router.register_feature("security_scanner", self.security_scanner)
         self.router.register_feature("file_organizer", self.file_organizer)
+        # Batch 1
+        self.router.register_feature("ghostwriter", self.ghostwriter)
+        self.router.register_feature("grammar_polisher", self.grammar_polisher)
+        self.router.register_feature("citation_generator", self.citation_generator)
+        self.router.register_feature("email_drafter", self.email_drafter)
+        self.router.register_feature("fact_checker", self.fact_checker)
+        self.router.register_feature("currency_converter", self.currency_converter)
+        # Batch 2
+        self.router.register_feature("news_aggregator", self.news_aggregator)
+        self.router.register_feature("daily_briefing", self.daily_briefing)
+        self.router.register_feature("api_mocker", self.api_mocker)
+        self.router.register_feature("env_setup", self.env_setup)
+        self.router.register_feature("media_converter", self.media_converter)
+        self.router.register_feature("digital_declutter", self.digital_declutter)
+        self.router.register_feature("backup_manager", self.backup_manager)
+        self.router.register_feature("software_updater", self.software_updater)
+        # Batch 3
+        self.router.register_feature("window_tiler", self.window_tiler)
+        self.router.register_feature("process_triage", self.process_triage)
+        self.router.register_feature("phishing_detector", self.phishing_detector)
+        self.router.register_feature("knowledge_graph", self.knowledge_graph)
+        self.router.register_feature("meeting_transcriber", self.meeting_transcriber)
+        self.router.register_feature("footprint_auditor", self.footprint_auditor)
+        self.router.register_feature("browser_history", self.browser_history)
 
         self.conversation = ConversationManager(
             self.config, self.server, self.tts, self.brain, self.router, self.audit_log

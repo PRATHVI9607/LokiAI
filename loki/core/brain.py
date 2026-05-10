@@ -87,6 +87,83 @@ INTENTS (productivity):
 - vault_store: params={key, value}
 - vault_retrieve: params={key}
 
+INTENTS (writing & text):
+- text_expand: params={text}
+- text_continue: params={text}
+- text_bullets_to_prose: params={text}
+- text_polish: params={text}
+- text_change_tone: params={text, tone}
+- text_translate: params={text, language}
+- citation_from_url: params={url, style?}
+- citation_from_info: params={info, style?}
+- email_draft: params={to?, subject, context}
+- email_reply: params={original, intent?}
+- fact_check: params={claim}
+- daily_briefing: params={}
+
+INTENTS (data & conversion):
+- currency_convert: params={amount, from_currency, to_currency}
+- unit_convert: params={amount, from_unit, to_unit}
+- news_headlines: params={topic?, count?}
+- news_briefing: params={topics?}
+- media_convert: params={input_path, output_format, output_path?, quality?}
+- media_info: params={file_path}
+
+INTENTS (software & environment):
+- update_check: params={}
+- update_all: params={}
+- update_package: params={package_name}
+- install_package: params={package_name}
+- env_dockerfile: params={project_path?}
+- env_venv: params={project_path?, python?}
+- env_compose: params={project_path?, services?}
+- api_mock_generate: params={description}
+- api_mock_data: params={schema}
+
+INTENTS (file management):
+- backup_file: params={path, destination?}
+- backup_directory: params={path, destination?}
+- backup_list: params={name_filter?}
+- declutter_duplicates: params={directory?}
+- declutter_large: params={directory?, threshold_mb?}
+- declutter_old: params={directory?, days?}
+- declutter_suggest: params={directory?}
+
+INTENTS (window & process):
+- window_snap: params={layout, window_title?}
+- window_tile_all: params={}
+- window_layouts: params={}
+- process_analyze: params={top_n?}
+- process_triage: params={app_name, dry_run?}
+- process_suspend: params={name_or_pid}
+- process_resume: params={name_or_pid}
+
+INTENTS (security & privacy):
+- phishing_url: params={url}
+- phishing_email: params={email_text}
+- footprint_startup: params={}
+- footprint_tasks: params={}
+- footprint_privacy: params={}
+- footprint_network: params={}
+- footprint_full: params={}
+
+INTENTS (knowledge & history):
+- kg_ingest_file: params={file_path}
+- kg_ingest_dir: params={directory}
+- kg_query: params={question}
+- kg_connections: params={entity}
+- kg_stats: params={}
+- history_search: params={query, browser?, days?}
+- history_semantic: params={query, browser?, days?}
+- history_recent: params={browser?, days?}
+- history_stats: params={browser?}
+
+INTENTS (meetings):
+- meeting_transcribe: params={audio_path, language?}
+- meeting_minutes: params={audio_path, language?}
+- meeting_action_items: params={text_or_path}
+- meeting_summarize: params={transcript}
+
 INTENTS (misc):
 - undo: params={}
 - chat: params={}  (no action, pure conversation)
