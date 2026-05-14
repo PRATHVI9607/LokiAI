@@ -340,6 +340,9 @@ class LokiApplication:
         self.process_triage = ProcessTriage()
         self.phishing_detector = PhishingDetector(brain=self.brain)
         self.knowledge_graph = KnowledgeGraph(brain=self.brain)
+        # Wire KG into brain for context fusion — done after both are initialized
+        # (KG needs brain for LLM extraction; brain needs KG for retrieval-time entity lookup)
+        self.brain._knowledge_graph = self.knowledge_graph
         self.meeting_transcriber = MeetingTranscriber(brain=self.brain)
         self.footprint_auditor = FootprintAuditor()
         self.browser_history = SemanticBrowserHistory(brain=self.brain)

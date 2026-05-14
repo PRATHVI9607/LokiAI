@@ -196,6 +196,55 @@ class KnowledgeGraph:
         msg += "\n".join(f"  {t}: {c}" for t, c in sorted(types.items(), key=lambda x: -x[1]))
         return {"success": True, "message": msg, "data": {"nodes": len(self._nodes), "edges": len(self._edges), "types": types}}
 
+    def query_entities(self, text: str, max_nodes: int = 6) -> str:
+        """
+        Fast entity lookup for RAG context fusion — no LLM needed.
+        Finds nodes whose names appear in the query text, then returns
+        their type, sources, and direct relationships as a compact block.
+        Called by brain.py on every user message to inject structured
+        relational context alongside the ChromaDB semantic chunks.
+        """
+        if not self._nodes:
+            return ""
+
+        text_lower = text.lower()
+        matched: list[str] = []
+
+        # Direct name match
+        for key, node in self._nodes.items():
+            if key in text_lower or node["name"].lower() in text_lower:
+                matched.append(key)
+
+        # Fuzzy: check if any word in the node name appears in query
+        if len(matched) < 2:
+            for key, node in self._nodes.items():
+                if key in matched:
+                    continue
+                for word in node["name"].lower().split():
+                    if len(word) > 4 and word in text_lower:
+                        matched.append(key)
+                        break
+
+        if not matched:
+            return ""
+
+        matched = matched[:max_nodes]
+        lines = ["## Knowledge Graph — relevant entities:"]
+        for key in matched:
+            node = self._nodes[key]
+            lines.append(f"\n**{node['name']}** ({node.get('type', 'concept')})")
+            srcs = node.get("sources", [])[:2]
+            if srcs:
+                lines.append(f"  Sources: {', '.join(srcs)}")
+            # Direct edges for this node
+            edges = [e for e in self._edges if e["from"] == key or e["to"] == key][:5]
+            for e in edges:
+                other = e["to"] if e["from"] == key else e["from"]
+                other_name = self._nodes.get(other, {}).get("name", other)
+                lines.append(f"  → {e['relation']} → {other_name}")
+
+        return "\n".join(lines)
+
     def clear(self) -> dict:
         self._nodes = {}
         self._edges = []

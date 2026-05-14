@@ -6,11 +6,13 @@ assistant:
   personality: norse_trickster  # witty, sharp, helpful
 
 llm:
-  ollama_model: phi3:mini
+  # Provider priority: Kimi K2 → OpenRouter → Ollama
+  kimi_model: kimi-k2              # Moonshot API model (set KIMI_API_KEY in .env)
+  ollama_model: phi3:mini          # Local fallback (Ollama)
   fallback_model: mistralai/mistral-7b-instruct:free
   second_fallback_model: google/gemma-2-9b-it:free
-  max_tokens: 400
-  temperature: 0.75
+  max_tokens: 600
+  temperature: 0.70
 
 whisper:
   model: base.en
@@ -45,8 +47,8 @@ memory:
 audio:
   sample_rate: 16000
   channels: 1
-  vad_aggressiveness: 2
-  silence_duration: 1.5
+  vad_aggressiveness: 1    # 0-3; 1 catches more speech without false positives
+  silence_duration: 2.0    # seconds of silence before flushing to Whisper
   enable_audio_cues: true
   wakeword_chime: true
   error_sound: true

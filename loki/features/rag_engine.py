@@ -1,20 +1,19 @@
 """
-RAG engine — index uploaded files, query by semantic similarity.
+RAG engine — ChromaDB vector store with nomic-embed-text embeddings.
 
-Uses Ollama's nomic-embed-text for embeddings (fully local, no API key).
-Stores a lightweight JSON vector index — no ChromaDB dependency.
+Replaces the flat JSON/numpy store with ChromaDB for:
+- HNSW indexed queries (sub-ms regardless of corpus size)
+- Persistent collection — no re-index on restart
+- Metadata filtering by source, date, type
+- Cosine similarity via ChromaDB's built-in distance metric
 """
 
-import json
+import hashlib
 import logging
-import math
-import re
-import textwrap
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from datetime import datetime
 
-import numpy as np
 import requests
 
 logger = logging.getLogger(__name__)
@@ -26,67 +25,68 @@ SUPPORTED_EXTENSIONS = {
     ".html", ".css", ".sh", ".bat", ".ps1", ".sql",
 }
 
-CHUNK_SIZE = 400    # words per chunk
-CHUNK_OVERLAP = 40  # word overlap between chunks
-SIMILARITY_THRESHOLD = 0.45
+CHUNK_SIZE = 400
+CHUNK_OVERLAP = 40
+TOP_K = 8
+# ChromaDB cosine distance: 0=identical, 2=opposite → similarity = 1 - dist/2
+# 0.5 similarity = 0.5 cosine sim — good balance of precision vs recall
+SIMILARITY_THRESHOLD = 0.50
 
 
 class RagEngine:
     """
-    File RAG with Ollama nomic-embed-text embeddings.
-
-    Index: list of chunks stored as JSON. Each chunk has:
-      id, source (filename), chunk_idx, text, embedding (list of floats)
-
-    Querying: cosine similarity between query embedding and all stored embeddings.
+    File RAG with ChromaDB (HNSW) + Ollama nomic-embed-text embeddings.
+    One persistent collection: loki_rag.
     """
 
     def __init__(self, memory_dir: Path, ollama_url: str = "http://localhost:11434"):
         self._dir = Path(memory_dir)
         self._dir.mkdir(parents=True, exist_ok=True)
-        self._index_path = self._dir / "rag_index.json"
-        self._uploads_dir = self._dir / "uploads"
-        self._uploads_dir.mkdir(exist_ok=True)
         self._ollama_url = ollama_url.rstrip("/")
 
-        self._chunks: List[Dict[str, Any]] = []
-        self._available = False
-        self._load_index()
-        self._check_availability()
+        self._chroma_ok = False
+        self._embed_ok = False
+        self._client = None
+        self._collection = None
 
-    def _check_availability(self) -> None:
+        self._init_chroma()
+        self._check_embed()
+
+    # ─── Init ─────────────────────────────────────────────────────────────────
+
+    def _init_chroma(self) -> None:
+        try:
+            import chromadb
+            chroma_path = self._dir / "chroma"
+            chroma_path.mkdir(exist_ok=True)
+            self._client = chromadb.PersistentClient(path=str(chroma_path))
+            self._collection = self._client.get_or_create_collection(
+                name="loki_rag",
+                metadata={"hnsw:space": "cosine"},
+            )
+            self._chroma_ok = True
+            logger.info(f"ChromaDB ready — {self._collection.count()} chunks stored")
+        except ImportError:
+            logger.warning("chromadb not installed — run: pip install chromadb")
+        except Exception as e:
+            logger.error(f"ChromaDB init failed: {e}")
+
+    def _check_embed(self) -> None:
         try:
             resp = requests.get(f"{self._ollama_url}/api/tags", timeout=3)
             if resp.status_code == 200:
                 models = [m["name"] for m in resp.json().get("models", [])]
                 if any("nomic-embed-text" in m for m in models):
-                    self._available = True
-                    logger.info("RAG engine: nomic-embed-text available")
+                    self._embed_ok = True
+                    logger.info("RAG embeddings: nomic-embed-text available")
                 else:
-                    logger.warning("RAG engine: nomic-embed-text not pulled. Run: ollama pull nomic-embed-text")
+                    logger.warning("RAG: nomic-embed-text not pulled. Run: ollama pull nomic-embed-text")
         except Exception:
-            logger.warning("RAG engine: Ollama not reachable — file indexing disabled")
-
-    def _load_index(self) -> None:
-        if self._index_path.exists():
-            try:
-                with open(self._index_path, "r", encoding="utf-8") as f:
-                    self._chunks = json.load(f)
-                logger.info(f"RAG index loaded: {len(self._chunks)} chunks")
-            except Exception as e:
-                logger.error(f"RAG index load failed: {e}")
-                self._chunks = []
-
-    def _save_index(self) -> None:
-        try:
-            with open(self._index_path, "w", encoding="utf-8") as f:
-                json.dump(self._chunks, f, ensure_ascii=False)
-        except Exception as e:
-            logger.error(f"RAG index save failed: {e}")
+            logger.warning("RAG: Ollama not reachable — embeddings disabled")
 
     # ─── Embedding ────────────────────────────────────────────────────────────
 
-    def _embed(self, text: str) -> Optional[np.ndarray]:
+    def _embed(self, text: str) -> Optional[List[float]]:
         try:
             resp = requests.post(
                 f"{self._ollama_url}/api/embed",
@@ -94,155 +94,173 @@ class RagEngine:
                 timeout=30,
             )
             resp.raise_for_status()
-            data = resp.json()
-            emb = data.get("embeddings", [[]])[0]
-            if emb:
-                return np.array(emb, dtype=np.float32)
+            emb = resp.json().get("embeddings", [[]])[0]
+            return emb if emb else None
         except Exception as e:
             logger.error(f"Embedding error: {e}")
-        return None
+            return None
 
     # ─── Chunking ─────────────────────────────────────────────────────────────
 
     @staticmethod
-    def _chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> List[str]:
-        if chunk_size <= overlap:
-            raise ValueError(f"chunk_size ({chunk_size}) must be greater than overlap ({overlap})")
+    def _chunk_text(text: str) -> List[str]:
         words = text.split()
         if not words:
             return []
         chunks = []
         i = 0
         while i < len(words):
-            chunk_words = words[i:i + chunk_size]
-            chunks.append(" ".join(chunk_words))
-            i += chunk_size - overlap
+            chunks.append(" ".join(words[i:i + CHUNK_SIZE]))
+            i += CHUNK_SIZE - CHUNK_OVERLAP
         return chunks
 
     @staticmethod
     def _extract_text(path: Path) -> str:
-        suffix = path.suffix.lower()
         try:
-            if suffix == ".pdf":
+            if path.suffix.lower() == ".pdf":
                 try:
-                    import fitz  # PyMuPDF
+                    import fitz
                     with fitz.open(str(path)) as doc:
-                        return "\n".join(page.get_text() for page in doc)
+                        return "\n".join(p.get_text() for p in doc)
                 except ImportError:
-                    logger.warning("PyMuPDF not installed — PDF text extraction unavailable")
+                    logger.warning("PyMuPDF not installed — PDF extraction unavailable")
                     return ""
-            else:
-                return path.read_text(encoding="utf-8", errors="ignore")
+            return path.read_text(encoding="utf-8", errors="ignore")
         except Exception as e:
             logger.error(f"Text extraction failed for {path}: {e}")
             return ""
 
-    # ─── Public API ───────────────────────────────────────────────────────────
+    # ─── Properties ───────────────────────────────────────────────────────────
 
     @property
     def is_available(self) -> bool:
-        return self._available
+        return self._chroma_ok and self._embed_ok
 
     @property
     def indexed_files(self) -> List[str]:
-        seen = set()
-        files = []
-        for c in self._chunks:
-            src = c.get("source", "")
-            if src not in seen:
-                seen.add(src)
-                files.append(src)
-        return files
+        if not self._collection:
+            return []
+        try:
+            result = self._collection.get(include=["metadatas"])
+            seen: set = set()
+            files = []
+            for meta in result.get("metadatas", []):
+                src = meta.get("source", "")
+                if src and src not in seen:
+                    seen.add(src)
+                    files.append(src)
+            return files
+        except Exception:
+            return []
 
     @property
     def chunk_count(self) -> int:
-        return len(self._chunks)
+        if not self._collection:
+            return 0
+        try:
+            return self._collection.count()
+        except Exception:
+            return 0
+
+    # ─── Indexing ─────────────────────────────────────────────────────────────
 
     def index_file(self, file_path: Path) -> Dict[str, Any]:
-        """
-        Index a file: extract text, chunk, embed, store.
-        Returns {success, filename, chunk_count, message}.
-        """
-        if not self._available:
-            return {
-                "success": False,
-                "message": "RAG unavailable — run: ollama pull nomic-embed-text",
-            }
+        if not self.is_available:
+            return {"success": False, "message": "RAG unavailable — check Ollama + chromadb install"}
 
         path = Path(file_path)
         if not path.exists():
             return {"success": False, "message": f"File not found: {path}"}
-
         if path.suffix.lower() not in SUPPORTED_EXTENSIONS and path.suffix.lower() != ".pdf":
             return {"success": False, "message": f"Unsupported file type: {path.suffix}"}
 
-        # Remove existing chunks for this file
         filename = path.name
-        self._chunks = [c for c in self._chunks if c.get("source") != filename]
+
+        # Delete existing chunks for this file before re-indexing
+        try:
+            existing = self._collection.get(where={"source": filename})
+            if existing["ids"]:
+                self._collection.delete(ids=existing["ids"])
+        except Exception:
+            pass
 
         text = self._extract_text(path)
         if not text.strip():
             return {"success": False, "message": "File appears empty or unreadable."}
 
         chunks = self._chunk_text(text)
-        new_chunks = []
+        ids, embeddings, documents, metadatas = [], [], [], []
+
         for i, chunk in enumerate(chunks):
             emb = self._embed(chunk)
             if emb is None:
                 continue
-            new_chunks.append({
+            chunk_id = hashlib.md5(f"{filename}:{i}:{chunk[:50]}".encode()).hexdigest()
+            ids.append(chunk_id)
+            embeddings.append(emb)
+            documents.append(chunk)
+            metadatas.append({
                 "source": filename,
                 "chunk_idx": i,
-                "text": chunk,
-                "embedding": emb.tolist(),
                 "indexed_at": datetime.now().isoformat(),
             })
 
-        self._chunks.extend(new_chunks)
-        self._save_index()
+        if ids:
+            self._collection.upsert(
+                ids=ids,
+                embeddings=embeddings,
+                documents=documents,
+                metadatas=metadatas,
+            )
 
-        logger.info(f"Indexed {filename}: {len(new_chunks)} chunks")
+        logger.info(f"Indexed {filename}: {len(ids)} chunks → ChromaDB")
         return {
             "success": True,
             "filename": filename,
-            "chunk_count": len(new_chunks),
-            "message": f"Indexed {filename} — {len(new_chunks)} chunks ready.",
+            "chunk_count": len(ids),
+            "message": f"Indexed {filename} — {len(ids)} chunks ready.",
         }
 
-    def query(self, text: str, top_k: int = 5) -> List[Dict[str, Any]]:
-        """
-        Return top-K most semantically similar chunks.
-        Each result: {text, source, chunk_idx, score}.
-        """
-        if not self._available or not self._chunks:
+    # ─── Querying ─────────────────────────────────────────────────────────────
+
+    def query(self, text: str, top_k: int = TOP_K) -> List[Dict[str, Any]]:
+        if not self.is_available or self.chunk_count == 0:
             return []
 
         query_emb = self._embed(text)
         if query_emb is None:
             return []
 
-        embeddings = np.array([c["embedding"] for c in self._chunks], dtype=np.float32)
-        q_norm = np.linalg.norm(query_emb)
-        e_norms = np.linalg.norm(embeddings, axis=1)
-        scores = (embeddings @ query_emb) / (e_norms * q_norm + 1e-10)
+        try:
+            results = self._collection.query(
+                query_embeddings=[query_emb],
+                n_results=min(top_k, self.chunk_count),
+                include=["documents", "metadatas", "distances"],
+            )
+        except Exception as e:
+            logger.error(f"ChromaDB query failed: {e}")
+            return []
 
-        top_indices = np.argsort(scores)[::-1][:top_k]
-        results = []
-        for idx in top_indices:
-            score = float(scores[idx])
-            if score < SIMILARITY_THRESHOLD:
+        output = []
+        for doc, meta, dist in zip(
+            results["documents"][0],
+            results["metadatas"][0],
+            results["distances"][0],
+        ):
+            # cosine distance [0,2] → similarity [0,1]
+            similarity = 1.0 - (dist / 2.0)
+            if similarity < SIMILARITY_THRESHOLD:
                 continue
-            c = self._chunks[int(idx)]
-            results.append({
-                "text": c["text"],
-                "source": c["source"],
-                "chunk_idx": c["chunk_idx"],
-                "score": round(score, 3),
+            output.append({
+                "text": doc,
+                "source": meta.get("source", "unknown"),
+                "chunk_idx": meta.get("chunk_idx", 0),
+                "score": round(similarity, 3),
             })
-        return results
+
+        return output
 
     def format_context(self, results: List[Dict[str, Any]]) -> str:
-        """Format query results into a context block for the LLM."""
         if not results:
             return ""
         lines = ["## Context from your files:"]
@@ -251,15 +269,29 @@ class RagEngine:
             lines.append(r["text"])
         return "\n".join(lines)
 
+    # ─── Management ───────────────────────────────────────────────────────────
+
     def delete_file(self, filename: str) -> int:
-        """Remove all chunks for a file. Returns number of chunks removed."""
-        before = len(self._chunks)
-        self._chunks = [c for c in self._chunks if c.get("source") != filename]
-        removed = before - len(self._chunks)
-        if removed:
-            self._save_index()
-        return removed
+        if not self._collection:
+            return 0
+        try:
+            existing = self._collection.get(where={"source": filename})
+            if existing["ids"]:
+                self._collection.delete(ids=existing["ids"])
+                return len(existing["ids"])
+        except Exception as e:
+            logger.error(f"Delete failed: {e}")
+        return 0
 
     def clear_index(self) -> None:
-        self._chunks = []
-        self._save_index()
+        if not self._client:
+            return
+        try:
+            self._client.delete_collection("loki_rag")
+            self._collection = self._client.get_or_create_collection(
+                name="loki_rag",
+                metadata={"hnsw:space": "cosine"},
+            )
+            logger.info("RAG index cleared")
+        except Exception as e:
+            logger.error(f"Clear failed: {e}")

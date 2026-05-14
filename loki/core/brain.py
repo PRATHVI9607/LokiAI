@@ -1,18 +1,21 @@
 """
 Loki's brain — LLM integration with KORTEX-style context engineering.
 
-Context priority (from KORTEX PRD):
-  1. System prompt (personality + intent catalog)
-  2. Brain memory (key facts, decisions, session summaries)
-  3. RAG context (relevant chunks from uploaded files)
-  4. Recent chat history (last N turns)
-  5. User message
+LLM priority (in order):
+  1. Kimi K2  (Moonshot API — fastest, smartest primary)
+  2. OpenRouter (cloud fallback)
+  3. Ollama    (local fallback)
 
-Auto-compression: when history exceeds threshold, oldest turns are summarized
-by Ollama and stored in brain_memory as session summaries.
+Context layers (assembled every request):
+  1. System prompt — personality + intent catalog
+  2. Brain memory  — key facts, decisions, session summaries
+  3. Knowledge Graph — entity relationships matching the query (structured)
+  4. RAG context   — ChromaDB semantic chunks from indexed files
+  5. Chat history  — last N turns
+  6. User message
 
-Fact extraction: every 5 exchanges, Ollama scans the last exchange for
-memorable facts and appends them to brain_memory.key_facts.
+Auto-compression: oldest turns summarized and stored in brain_memory.
+Fact extraction: every 5 exchanges, facts extracted and persisted.
 """
 
 import os
@@ -29,7 +32,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-# ─── Personality-agnostic intent catalog (appended to any personality prompt) ─
+# ─── Intent catalog ───────────────────────────────────────────────────────────
 
 INTENT_CATALOG = """
 
@@ -241,24 +244,25 @@ DISMISSAL_MESSAGES = [
     "Gone, but never truly absent.",
 ]
 
-# Compress oldest turns when history exceeds this many messages
-COMPRESSION_THRESHOLD = 40  # 20 exchanges
-COMPRESSION_BATCH = 20       # compress this many at once
-FACT_EXTRACT_EVERY = 5       # extract facts every N exchanges
+COMPRESSION_THRESHOLD = 40
+COMPRESSION_BATCH = 20
+FACT_EXTRACT_EVERY = 5
 
 
 class LokiBrain:
     """
-    LLM integration with KORTEX-style context engineering, memory,
-    auto-compression, fact extraction, and personality modes.
+    LLM integration with KORTEX-style context engineering.
+    LLM priority: Kimi K2 → OpenRouter → Ollama.
+    Context layers: personality + brain memory + KG entities + RAG chunks + history.
     """
 
     def __init__(
         self,
         config: dict,
         memory_dir: Path,
-        brain_memory=None,   # BrainMemory instance (optional)
-        rag_engine=None,     # RagEngine instance (optional)
+        brain_memory=None,
+        rag_engine=None,
+        knowledge_graph=None,
     ):
         if OpenAI is None:
             raise ImportError("openai package required: pip install openai")
@@ -267,21 +271,63 @@ class LokiBrain:
         self._memory_dir = Path(memory_dir)
         self._brain_memory = brain_memory
         self._rag_engine = rag_engine
+        self._knowledge_graph = knowledge_graph
 
-        # ─── Ollama ───────────────────────────────────────────────────────────
-        self._ollama_probe_client: Optional[Any] = None
+        self._max_tokens = config.get("max_tokens", 600)
+        self._temperature = config.get("temperature", 0.70)
+        self._max_turns = config.get("max_turns", 20)
+
+        # ─── Provider 1: Kimi K2 (Moonshot API) ──────────────────────────────
+        self._kimi_client: Optional[Any] = None
+        self._kimi_model = config.get("kimi_model", "kimi-k2")
+        kimi_key = os.getenv("KIMI_API_KEY", "")
+        if kimi_key and kimi_key not in ("your_kimi_api_key_here", ""):
+            try:
+                self._kimi_client = OpenAI(
+                    base_url="https://api.moonshot.cn/v1",
+                    api_key=kimi_key,
+                    timeout=60.0,
+                    max_retries=0,
+                )
+                logger.info(f"Kimi K2 configured: {self._kimi_model}")
+            except Exception as e:
+                logger.warning(f"Kimi K2 init failed: {e}")
+        else:
+            logger.info("KIMI_API_KEY not set — Kimi K2 disabled")
+
+        # ─── Provider 2: OpenRouter ────────────────────────────────────────────
+        self._openrouter_client: Optional[Any] = None
+        or_key = os.getenv("OPENROUTER_API_KEY", "")
+        if or_key and or_key not in ("your_openrouter_api_key_here", ""):
+            try:
+                self._openrouter_client = OpenAI(
+                    base_url="https://openrouter.ai/api/v1",
+                    api_key=or_key,
+                    timeout=60.0,
+                )
+                logger.info("OpenRouter configured")
+            except Exception as e:
+                logger.warning(f"OpenRouter init failed: {e}")
+        else:
+            logger.warning("OPENROUTER_API_KEY not set")
+
+        self._fallback_models = [
+            config.get("fallback_model", "mistralai/mistral-7b-instruct:free"),
+            config.get("second_fallback_model", "google/gemma-2-9b-it:free"),
+        ]
+
+        # ─── Provider 3: Ollama (local) ────────────────────────────────────────
         self._ollama_infer_client: Optional[Any] = None
         self._ollama_model = config.get("ollama_model", "phi3:mini")
         self._ollama_available = False
-
         try:
-            self._ollama_probe_client = OpenAI(
+            probe = OpenAI(
                 base_url="http://localhost:11434/v1",
                 api_key="ollama",
                 timeout=3.0,
                 max_retries=0,
             )
-            self._ollama_probe_client.models.list()
+            probe.models.list()
             self._ollama_infer_client = OpenAI(
                 base_url="http://localhost:11434/v1",
                 api_key="ollama",
@@ -291,37 +337,20 @@ class LokiBrain:
             self._ollama_available = True
             logger.info(f"Ollama connected: {self._ollama_model}")
         except Exception:
-            logger.info("Ollama not running — using OpenRouter.")
-
-        # ─── OpenRouter ───────────────────────────────────────────────────────
-        self._openrouter_client: Optional[Any] = None
-        api_key = os.getenv("OPENROUTER_API_KEY", "")
-        if api_key and api_key != "your_openrouter_api_key_here":
-            self._openrouter_client = OpenAI(
-                base_url="https://openrouter.ai/api/v1",
-                api_key=api_key,
-            )
-            logger.info("OpenRouter configured")
-        else:
-            logger.warning("OPENROUTER_API_KEY not set")
-
-        self._fallback_models = [
-            config.get("fallback_model", "mistralai/mistral-7b-instruct:free"),
-            config.get("second_fallback_model", "google/gemma-2-9b-it:free"),
-        ]
-
-        self._max_tokens = config.get("max_tokens", 400)
-        self._temperature = config.get("temperature", 0.75)
-        self._max_turns = config.get("max_turns", 20)
+            logger.info("Ollama not running — local inference disabled")
 
         self._conversation_file = self._memory_dir / "conversation.json"
         self._conversation_history: List[Dict[str, str]] = []
-        self._exchange_count = 0  # tracks exchanges since last fact extraction
+        self._exchange_count = 0
 
         self._load_history()
-        logger.info("Loki brain initialized")
+        self._log_provider_status()
 
-    # ─── Memory loading ───────────────────────────────────────────────────────
+    def _log_provider_status(self) -> None:
+        primary = "Kimi K2" if self._kimi_client else ("OpenRouter" if self._openrouter_client else "Ollama")
+        logger.info(f"Brain active — primary provider: {primary}")
+
+    # ─── History ──────────────────────────────────────────────────────────────
 
     def _load_history(self) -> None:
         if self._conversation_file.exists():
@@ -337,12 +366,14 @@ class LokiBrain:
         self._memory_dir.mkdir(parents=True, exist_ok=True)
         try:
             with open(self._conversation_file, "w", encoding="utf-8") as f:
-                json.dump(self._conversation_history[-self._max_turns * 2:], f,
-                          indent=2, ensure_ascii=False)
+                json.dump(
+                    self._conversation_history[-(self._max_turns * 2):],
+                    f, indent=2, ensure_ascii=False,
+                )
         except Exception as e:
             logger.error(f"Failed to save conversation: {e}")
 
-    # ─── Context assembly (KORTEX priority model) ─────────────────────────────
+    # ─── Context assembly ─────────────────────────────────────────────────────
 
     def _build_system_prompt(self) -> str:
         if self._brain_memory:
@@ -360,57 +391,79 @@ class LokiBrain:
 
         return system
 
-    def _build_messages(self, user_message: str, rag_context: str = "") -> List[Dict[str, str]]:
+    def _get_kg_context(self, user_message: str) -> str:
+        """Layer 3: knowledge graph entity lookup — structured relational context."""
+        if not self._knowledge_graph:
+            return ""
+        try:
+            return self._knowledge_graph.query_entities(user_message)
+        except Exception as e:
+            logger.warning(f"KG context failed: {e}")
+            return ""
+
+    def _get_rag_context(self, user_message: str) -> str:
+        """Layer 4: ChromaDB semantic chunks from indexed files."""
+        if not self._rag_engine or not self._rag_engine.is_available:
+            return ""
+        results = self._rag_engine.query(user_message, top_k=6)
+        if not results:
+            return ""
+        return self._rag_engine.format_context(results)
+
+    def _build_messages(
+        self,
+        user_message: str,
+        kg_context: str = "",
+        rag_context: str = "",
+    ) -> List[Dict[str, str]]:
         """
-        Assemble context in KORTEX priority order:
-        1. System prompt + brain memory
-        2. RAG context (file knowledge) — as separate system message
-        3. Recent chat history
-        4. User message
+        Assemble context in priority order:
+        1. System prompt (personality + brain memory)
+        2. KG entities (structured relational context)
+        3. RAG chunks (semantic file context)
+        4. Chat history
+        5. User message
         """
         messages: List[Dict[str, str]] = [
             {"role": "system", "content": self._build_system_prompt()}
         ]
 
+        if kg_context:
+            messages.append({"role": "system", "content": kg_context})
+
         if rag_context:
             messages.append({"role": "system", "content": rag_context})
 
-        # Use last max_turns exchanges (each exchange = 2 messages)
         messages.extend(self._conversation_history[-(self._max_turns * 2):])
         messages.append({"role": "user", "content": user_message})
         return messages
-
-    def _get_rag_context(self, user_message: str) -> str:
-        if not self._rag_engine or not self._rag_engine.is_available:
-            return ""
-        results = self._rag_engine.query(user_message, top_k=5)
-        if not results:
-            return ""
-        return self._rag_engine.format_context(results)
 
     # ─── Inference ────────────────────────────────────────────────────────────
 
     def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
         mt = max_tokens or self._max_tokens
 
-        if self._ollama_available and self._ollama_infer_client:
+        # 1. Kimi K2
+        if self._kimi_client:
             try:
-                response = self._ollama_infer_client.chat.completions.create(
-                    model=self._ollama_model,
+                resp = self._kimi_client.chat.completions.create(
+                    model=self._kimi_model,
                     messages=messages,
                     max_tokens=mt,
                     temperature=self._temperature,
                 )
-                text = response.choices[0].message.content or ""
+                text = resp.choices[0].message.content or ""
                 if text.strip():
+                    logger.debug("Response from Kimi K2")
                     return text
             except Exception as e:
-                logger.warning(f"Ollama error: {e}")
+                logger.warning(f"Kimi K2 error: {e} — trying OpenRouter")
 
+        # 2. OpenRouter
         if self._openrouter_client:
             for model in self._fallback_models:
                 try:
-                    response = self._openrouter_client.chat.completions.create(
+                    resp = self._openrouter_client.chat.completions.create(
                         model=model,
                         messages=messages,
                         max_tokens=mt,
@@ -420,11 +473,28 @@ class LokiBrain:
                             "X-Title": "Loki",
                         },
                     )
-                    text = response.choices[0].message.content or ""
+                    text = resp.choices[0].message.content or ""
                     if text.strip():
+                        logger.debug(f"Response from OpenRouter ({model})")
                         return text
                 except Exception as e:
-                    logger.error(f"OpenRouter error ({model}): {e}")
+                    logger.warning(f"OpenRouter error ({model}): {e}")
+
+        # 3. Ollama (local)
+        if self._ollama_available and self._ollama_infer_client:
+            try:
+                resp = self._ollama_infer_client.chat.completions.create(
+                    model=self._ollama_model,
+                    messages=messages,
+                    max_tokens=mt,
+                    temperature=self._temperature,
+                )
+                text = resp.choices[0].message.content or ""
+                if text.strip():
+                    logger.debug(f"Response from Ollama ({self._ollama_model})")
+                    return text
+            except Exception as e:
+                logger.warning(f"Ollama error: {e}")
 
         return ""
 
@@ -437,16 +507,20 @@ class LokiBrain:
 
         logger.info(f"User: {user_message[:100]}")
 
-        # Priority 3: RAG context from uploaded files
+        # Gather all context layers in parallel (fast: KG is in-memory, RAG hits ChromaDB)
+        kg_context = self._get_kg_context(user_message)
         rag_context = self._get_rag_context(user_message)
+
+        if kg_context:
+            logger.info(f"KG: injecting {len(kg_context)} chars of entity context")
         if rag_context:
             logger.info(f"RAG: injecting {len(rag_context)} chars of file context")
 
-        messages = self._build_messages(user_message, rag_context)
+        messages = self._build_messages(user_message, kg_context, rag_context)
         response_text = self._call_llm(messages)
 
         if not response_text.strip():
-            response_text = "Apologies. My connection to the realms of knowledge is severed. Try again."
+            response_text = "All pathways to knowledge are severed. Check your API keys and try again."
             logger.error("All LLM backends failed")
 
         logger.info(f"Loki: {response_text[:80]}")
@@ -461,26 +535,18 @@ class LokiBrain:
         self._exchange_count += 1
         self._save_history()
 
-        # Auto-compress when history gets too long
         if len(self._conversation_history) > COMPRESSION_THRESHOLD:
             self._compress_old_turns()
 
-        # Periodically extract facts
         if self._exchange_count % FACT_EXTRACT_EVERY == 0:
             self._extract_facts(user_msg, assistant_msg)
 
     def _compress_old_turns(self) -> None:
-        """
-        Summarize the oldest COMPRESSION_BATCH messages via Ollama,
-        store summary in brain_memory, drop those messages from history.
-        History is only mutated after a successful LLM call.
-        """
         if not self._brain_memory:
             self._conversation_history = self._conversation_history[-self._max_turns * 2:]
             return
 
         to_compress = self._conversation_history[:COMPRESSION_BATCH]
-
         convo_text = "\n".join(
             f"{m['role'].upper()}: {m['content'][:300]}" for m in to_compress
         )
@@ -494,10 +560,9 @@ class LokiBrain:
         try:
             summary = self._call_llm(summary_prompt, max_tokens=150)
         except Exception as e:
-            logger.warning(f"Compression LLM call failed: {e} — history unchanged")
+            logger.warning(f"Compression failed: {e}")
             return
 
-        # Only mutate history after LLM succeeds
         self._conversation_history = self._conversation_history[COMPRESSION_BATCH:]
         if summary:
             self._brain_memory.add_session_summary(summary)
@@ -505,18 +570,13 @@ class LokiBrain:
         self._save_history()
 
     def _extract_facts(self, user_msg: str, assistant_msg: str) -> None:
-        """
-        Ask the LLM to extract memorable facts from the last exchange.
-        Facts are stored in brain_memory.key_facts.
-        """
         if not self._brain_memory:
             return
-
         prompt = [
             {"role": "system", "content": "You extract memorable facts from conversations."},
             {"role": "user", "content": (
-                f"From this exchange, extract 0-3 facts worth remembering long-term about the user, "
-                f"their system, preferences, or project. If nothing notable, reply 'NONE'.\n\n"
+                f"From this exchange, extract 0-3 facts worth remembering long-term. "
+                f"If nothing notable, reply 'NONE'.\n\n"
                 f"USER: {user_msg[:500]}\nASSISTANT: {assistant_msg[:500]}\n\n"
                 f"Reply with one fact per line, or 'NONE'."
             )},
@@ -542,7 +602,6 @@ class LokiBrain:
 
         if not (text.startswith("{") and text.endswith("}")):
             return None
-
         try:
             intent = json.loads(text)
             if "intent" not in intent:
