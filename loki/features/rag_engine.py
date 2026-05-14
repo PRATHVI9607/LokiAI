@@ -94,7 +94,11 @@ class RagEngine:
                 timeout=30,
             )
             resp.raise_for_status()
-            emb = resp.json().get("embeddings", [[]])[0]
+            embeds = resp.json().get("embeddings")
+            if not isinstance(embeds, list) or len(embeds) == 0:
+                logger.warning("Embedding API returned empty embeddings list")
+                return None
+            emb = embeds[0]
             return emb if emb else None
         except Exception as e:
             logger.error(f"Embedding error: {e}")
@@ -176,24 +180,23 @@ class RagEngine:
 
         filename = path.name
 
-        # Delete existing chunks for this file before re-indexing
-        try:
-            existing = self._collection.get(where={"source": filename})
-            if existing["ids"]:
-                self._collection.delete(ids=existing["ids"])
-        except Exception:
-            pass
-
         text = self._extract_text(path)
         if not text.strip():
             return {"success": False, "message": "File appears empty or unreadable."}
 
         chunks = self._chunk_text(text)
+
+        # Collect ALL embeddings before touching the index.
+        # If any embedding fails, we abort without deleting existing data,
+        # leaving the previous index for this file intact.
         ids, embeddings, documents, metadatas = [], [], [], []
+        failed: list[int] = []
+        now = datetime.now().isoformat()
 
         for i, chunk in enumerate(chunks):
             emb = self._embed(chunk)
             if emb is None:
+                failed.append(i)
                 continue
             chunk_id = hashlib.md5(f"{filename}:{i}:{chunk[:50]}".encode()).hexdigest()
             ids.append(chunk_id)
@@ -202,23 +205,38 @@ class RagEngine:
             metadatas.append({
                 "source": filename,
                 "chunk_idx": i,
-                "indexed_at": datetime.now().isoformat(),
+                "indexed_at": now,
             })
 
-        if ids:
-            self._collection.upsert(
-                ids=ids,
-                embeddings=embeddings,
-                documents=documents,
-                metadatas=metadatas,
-            )
+        if not ids:
+            return {"success": False, "message": "No chunks could be embedded — check Ollama/nomic-embed-text."}
+
+        if failed:
+            logger.warning(f"{filename}: {len(failed)} chunk(s) failed embedding (indices {failed[:5]}{'…' if len(failed) > 5 else ''})")
+
+        # All targeted embeddings done — now atomically swap old → new chunks
+        try:
+            existing = self._collection.get(where={"source": filename})
+            if existing["ids"]:
+                self._collection.delete(ids=existing["ids"])
+        except Exception:
+            pass
+
+        self._collection.upsert(
+            ids=ids,
+            embeddings=embeddings,
+            documents=documents,
+            metadatas=metadatas,
+        )
 
         logger.info(f"Indexed {filename}: {len(ids)} chunks → ChromaDB")
         return {
             "success": True,
             "filename": filename,
             "chunk_count": len(ids),
-            "message": f"Indexed {filename} — {len(ids)} chunks ready.",
+            "message": f"Indexed {filename} — {len(ids)} chunks ready." + (
+                f" ({len(failed)} chunk(s) skipped due to embedding errors)" if failed else ""
+            ),
         }
 
     # ─── Querying ─────────────────────────────────────────────────────────────
