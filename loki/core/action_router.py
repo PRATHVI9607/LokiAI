@@ -224,19 +224,21 @@ class ActionRouter:
         return self._missing("file_ops")
 
     def _handle_file_read(self, p):
-        import os
         from pathlib import Path
         raw = p.get("path", "")
-        try:
-            resolved = Path(raw).expanduser().resolve()
-            home = Path(os.path.expanduser("~")).resolve()
-            cwd = Path.cwd().resolve()
-            trusted = (home, cwd)
-            if not any(resolved.is_relative_to(root) for root in trusted):
+        # Delegate path validation to FileOps._safe so trusted roots are identical
+        # for reads, creates, deletes, and moves — no split-brain permissions
+        ops = self._actions.get("file_ops")
+        if ops:
+            safe, resolved = ops._safe(raw)
+            if not safe:
                 logger.warning(f"Blocked file_read outside trusted roots: {raw}")
                 return {"success": False, "message": "Access denied. Path is outside allowed directories."}
-        except Exception:
-            return {"success": False, "message": "Invalid path."}
+        else:
+            try:
+                resolved = Path(raw).expanduser().resolve()
+            except Exception:
+                return {"success": False, "message": "Invalid path."}
         if not resolved.exists():
             return {"success": False, "message": f"File not found: {resolved.name}"}
         try:

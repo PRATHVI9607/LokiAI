@@ -1,17 +1,15 @@
 """
-ClipboardSync — expose clipboard over local HTTP so any device on the same
-Wi-Fi can read or push clipboard content via a browser.
+ClipboardSync — expose clipboard over localhost HTTP for local browser access.
 
-Runs as a lightweight HTTP server on a configurable port (default 7778).
-Mobile users open http://<your-pc-ip>:7778 to see/set clipboard.
+Binds to 127.0.0.1 (loopback only). Open http://127.0.0.1:7778 in a local
+browser to read or push clipboard content. Not reachable from other devices.
 """
 
 import logging
-import socket
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Optional
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 import pyperclip
 
@@ -113,17 +111,6 @@ class _Handler(BaseHTTPRequestHandler):
             self.end_headers()
 
 
-def _get_local_ip() -> str:
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception:
-        return "127.0.0.1"
-
-
 class ClipboardSync:
     def __init__(self, port: int = DEFAULT_PORT):
         self._port = port
@@ -162,8 +149,7 @@ class ClipboardSync:
         """Return the sync URL if running."""
         if not self._server:
             return {"success": False, "message": "Clipboard sync is not running. Start it first."}
-        ip = _get_local_ip()
-        url = f"http://{ip}:{self._port}"
+        url = f"http://127.0.0.1:{self._port}"
         return {"success": True, "message": f"Clipboard sync URL: {url}", "data": {"url": url}}
 
     def is_running(self) -> bool:

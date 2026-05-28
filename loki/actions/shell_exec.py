@@ -6,8 +6,13 @@ import re
 import logging
 import subprocess
 import shlex
+import sys
 from pathlib import Path
 from typing import Dict, Any, List
+
+# shlex.split uses POSIX mode by default which treats backslashes as escape chars;
+# on Windows that would mangle paths like C:\Users\... → use posix=False there
+_SHLEX_POSIX = sys.platform != "win32"
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +76,7 @@ class ShellExec:
             return {"success": False, "message": f"Command not in allowlist. Add it to data/command_allowlist.txt to enable."}
 
         try:
-            argv = shlex.split(command)
+            argv = shlex.split(command, posix=_SHLEX_POSIX)
         except ValueError as e:
             return {"success": False, "message": f"Invalid command syntax: {e}"}
 
