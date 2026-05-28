@@ -1,0 +1,17 @@
+---
+source_file: "loki/features/phishing_detector.py"
+type: "code"
+community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+---
+
+# URL/Email Heuristic Engine
+
+## Connections
+- [[DeepfakeAI Media Detector]] - `conceptually_related_to` [INFERRED]
+- [[PhishingDetector_1]] - `implements` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat

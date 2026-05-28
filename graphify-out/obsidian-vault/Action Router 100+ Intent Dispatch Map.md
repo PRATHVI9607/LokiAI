@@ -1,0 +1,16 @@
+---
+source_file: "LokiPRD.md"
+type: "document"
+community: "RAG Engine Semantic Document Search / Brain LLM Engine"
+tags:
+  - graphify/document
+  - graphify/EXTRACTED
+  - community/RAG_Engine_Semantic_Document_Search_/_Brain_LLM_Engine
+---
+
+# Action Router 100+ Intent Dispatch Map
+
+## Connections
+- [[System Architecture (5 Layers)]] - `references` [EXTRACTED]
+
+#graphify/document #graphify/EXTRACTED #community/RAG_Engine_Semantic_Document_Search_/_Brain_LLM_Engine

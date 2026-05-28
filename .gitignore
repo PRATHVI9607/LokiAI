@@ -60,6 +60,9 @@ htmlcov/
 # Whisper model cache
 .cache/whisper/
 
+# Graphify runtime cache (graph outputs kept, cache is regenerated)
+graphify-out/cache/
+
 # Distribution
 *.whl
 *.tar.gz
