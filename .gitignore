@@ -41,6 +41,11 @@ loki/memory/vault.enc
 loki/memory/brain.json
 loki/memory/rag_index.json
 loki/memory/uploads/
+loki/memory/chroma/
+
+# Next.js build output
+loki-ui/out/
+loki-ui/.next/
 
 # Testing
 .pytest_cache/

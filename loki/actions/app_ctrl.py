@@ -2,7 +2,7 @@
 App control — open and close applications.
 """
 
-import subprocess
+import os
 import logging
 import psutil
 from typing import Dict, Any
@@ -54,10 +54,7 @@ class AppCtrl:
 
         exe = APP_MAP.get(name.lower().strip(), name.strip())
         try:
-            if exe.startswith("ms-"):
-                subprocess.Popen(["start", exe], shell=True)
-            else:
-                subprocess.Popen([exe], shell=True)
+            os.startfile(exe)
             logger.info(f"Opened: {exe}")
             return {"success": True, "message": f"Opening {name}."}
         except FileNotFoundError:

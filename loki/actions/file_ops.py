@@ -1,12 +1,12 @@
 """
 File operations — create, delete, move with security constraints and undo.
-All paths must be within user home directory.
+Paths must be within one of the configured trusted roots (home + extra_roots).
 """
 
 import os
 import shutil
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -15,21 +15,24 @@ logger = logging.getLogger(__name__)
 class FileOps:
     """Secure file/folder operations with undo support."""
 
-    def __init__(self, undo_stack):
+    def __init__(self, undo_stack, extra_roots: Optional[List[Path]] = None):
         self._undo = undo_stack
         self._home = Path(os.path.expanduser("~")).resolve()
+        self._trusted_roots: List[Path] = [self._home]
+        if extra_roots:
+            self._trusted_roots.extend(Path(r).resolve() for r in extra_roots)
 
     def _safe(self, path: str) -> tuple[bool, Path]:
-        """Returns (is_safe, resolved_path). Prevents path traversal."""
+        """Returns (is_safe, resolved_path). Prevents path traversal outside trusted roots."""
         if not path or not path.strip():
             return False, Path()
         try:
             resolved = Path(path).expanduser().resolve()
-            return resolved.is_relative_to(self._home), resolved
+            return any(resolved.is_relative_to(root) for root in self._trusted_roots), resolved
         except Exception:
             return False, Path()
 
-    def _deny(self, reason: str = "Access denied. Stay within your home directory.") -> Dict:
+    def _deny(self, reason: str = "Access denied. Path is outside allowed directories.") -> Dict:
         return {"success": False, "message": reason}
 
     def create_file(self, path: str, content: str = "") -> Dict[str, Any]:

@@ -27,6 +27,10 @@ BLOCKED_PATTERNS = [
     r"poweroff",
 ]
 
+# Shell metacharacters that enable injection — blocked even with shell=False
+# as defense-in-depth since the command string came from LLM/user input
+METACHAR_RE = re.compile(r'[&|;`$<>]|\$\(')
+
 
 class ShellExec:
     """Execute allowlisted shell commands safely."""
@@ -50,7 +54,12 @@ class ShellExec:
 
         command = command.strip()
 
-        # Block dangerous patterns first
+        # Block shell metacharacters before anything else
+        if METACHAR_RE.search(command):
+            logger.warning(f"Blocked metacharacter in command: {command[:80]}")
+            return {"success": False, "message": "Shell metacharacters are not permitted."}
+
+        # Block dangerous patterns
         for pattern in BLOCKED_PATTERNS:
             if re.search(pattern, command, re.IGNORECASE):
                 logger.warning(f"Blocked dangerous command: {command[:80]}")
@@ -62,9 +71,14 @@ class ShellExec:
             return {"success": False, "message": f"Command not in allowlist. Add it to data/command_allowlist.txt to enable."}
 
         try:
+            argv = shlex.split(command)
+        except ValueError as e:
+            return {"success": False, "message": f"Invalid command syntax: {e}"}
+
+        try:
             result = subprocess.run(
-                command,
-                shell=True,
+                argv,
+                shell=False,
                 capture_output=True,
                 text=True,
                 timeout=self._timeout,

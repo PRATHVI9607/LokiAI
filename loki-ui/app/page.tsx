@@ -11,13 +11,15 @@ const RuneCanvas = dynamic(() => import("@/components/RuneCanvas"), { ssr: false
 
 export default function Home() {
   const {
-    messages, status, transcript, isMuted,
+    messages, status, transcript, isMuted, isVisible,
     personality, indexedFiles, ragAvailable,
     sendMessage, toggleMute, requestUndo, clearMessages,
     uploadFile, deleteFile, setPersonality,
   } = useLoki();
 
   const [showFiles, setShowFiles] = useState(false);
+
+  if (!isVisible) return null;
 
   return (
     <div className="app-shell">

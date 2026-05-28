@@ -230,9 +230,11 @@ class ActionRouter:
         try:
             resolved = Path(raw).expanduser().resolve()
             home = Path(os.path.expanduser("~")).resolve()
-            if not resolved.is_relative_to(home):
-                logger.warning(f"Blocked file_read outside home: {raw}")
-                return {"success": False, "message": "Access denied. Path must be within your home directory."}
+            cwd = Path.cwd().resolve()
+            trusted = (home, cwd)
+            if not any(resolved.is_relative_to(root) for root in trusted):
+                logger.warning(f"Blocked file_read outside trusted roots: {raw}")
+                return {"success": False, "message": "Access denied. Path is outside allowed directories."}
         except Exception:
             return {"success": False, "message": "Invalid path."}
         if not resolved.exists():

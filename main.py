@@ -289,7 +289,7 @@ class LokiApplication:
         )
 
         actions_cfg = self.config.get("actions", {})
-        self.file_ops = FileOps(self.undo_stack)
+        self.file_ops = FileOps(self.undo_stack, extra_roots=[Path(__file__).parent])
         self.shell = ShellExec(actions_cfg, self.undo_stack)
         self.sys_ctrl = SystemCtrl(self.undo_stack)
         self.app_ctrl = AppCtrl()
@@ -503,7 +503,7 @@ class LokiApplication:
         threading.Thread(target=open_browser, daemon=True).start()
 
         try:
-            uvicorn.run(app, host="0.0.0.0", port=port, log_level="warning")
+            uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
         except KeyboardInterrupt:
             pass
         finally:

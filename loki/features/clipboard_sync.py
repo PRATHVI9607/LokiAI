@@ -93,7 +93,7 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == "/clip":
-            length = int(self.headers.get("Content-Length", 0))
+            length = min(int(self.headers.get("Content-Length", 0)), 1 << 20)  # cap at 1 MB
             body = self.rfile.read(length).decode("utf-8", errors="replace")
             try:
                 pyperclip.copy(body)
@@ -136,19 +136,18 @@ class ClipboardSync:
             return {"success": True, "message": f"Clipboard sync already running on port {self._port}."}
 
         try:
-            self._server = HTTPServer(("0.0.0.0", self._port), _Handler)
+            self._server = HTTPServer(("127.0.0.1", self._port), _Handler)
         except OSError as e:
             return {"success": False, "message": f"Could not start clipboard sync server: {e}"}
 
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True,
                                         name="loki-clipboard-sync")
         self._thread.start()
-        ip = _get_local_ip()
-        url = f"http://{ip}:{self._port}"
+        url = f"http://127.0.0.1:{self._port}"
         return {
             "success": True,
-            "message": f"Clipboard sync started. Open on your phone: {url}",
-            "data": {"url": url, "port": self._port, "ip": ip},
+            "message": f"Clipboard sync started on localhost: {url}",
+            "data": {"url": url, "port": self._port, "ip": "127.0.0.1"},
         }
 
     def stop(self) -> dict:
