@@ -14,6 +14,10 @@ from typing import Dict, Any, List
 # on Windows that would mangle paths like C:\Users\... → use posix=False there
 _SHLEX_POSIX = sys.platform != "win32"
 
+# Windows shell builtins — not real executables, need cmd /c to run.
+# Only builtins that are already in the allowlist and considered safe.
+_WINDOWS_BUILTINS = {"echo", "dir", "type", "ver", "cls"}
+
 logger = logging.getLogger(__name__)
 
 # Commands blocked regardless of allowlist
@@ -79,6 +83,11 @@ class ShellExec:
             argv = shlex.split(command, posix=_SHLEX_POSIX)
         except ValueError as e:
             return {"success": False, "message": f"Invalid command syntax: {e}"}
+
+        # On Windows, some allowlisted commands are shell builtins (no .exe).
+        # Wrap them with cmd /c — safe here since allowlist + metachar checks passed.
+        if sys.platform == "win32" and argv and argv[0].lower() in _WINDOWS_BUILTINS:
+            argv = ["cmd", "/c"] + argv
 
         try:
             result = subprocess.run(

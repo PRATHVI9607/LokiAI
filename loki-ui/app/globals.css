@@ -35,6 +35,11 @@ html, body, #__next {
   overflow: hidden;
 }
 
+/* Dormant state — component stays mounted (preserves WS/hooks) but renders nothing */
+.app-dormant {
+  display: none;
+}
+
 /* Background canvas sits behind everything */
 .app-bg {
   position: fixed;

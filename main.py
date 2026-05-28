@@ -472,8 +472,13 @@ class LokiApplication:
 
     def _on_conversation_ended(self) -> None:
         self.listener.stop_listening()
-        if not self.wakeword._running:
-            self.wakeword.start()
+        if not self.tts.is_speaking:
+            # TTS is idle — safe to restart wakeword immediately
+            if not self.wakeword._running:
+                self.wakeword.start()
+        # else: TTS is still playing the farewell; _on_speaking_stopped will
+        # restart the wakeword once audio finishes, preventing the wakeword
+        # from hearing Loki's own voice through the microphone
 
     def _on_browser_message(self, text: str) -> None:
         self.conversation.start_conversation()

@@ -179,7 +179,7 @@ export default function ChatPanel({
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.2 }}
               >
-                RAG · {indexedFiles.length}f
+                {indexedFiles.length} {indexedFiles.length === 1 ? "file" : "files"} indexed
               </motion.span>
             )}
             {isOffline && (

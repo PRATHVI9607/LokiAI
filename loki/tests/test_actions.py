@@ -10,9 +10,10 @@ def undo():
 
 
 @pytest.fixture
-def file_ops(undo):
-    # FileOps restricts paths to the real home dir; tmp_path is under home on all platforms
-    return FileOps(undo)
+def file_ops(undo, tmp_path):
+    # Pass tmp_path as an extra trusted root so test paths aren't blocked by the
+    # home-only guard (pytest tmp dirs live under %TEMP% / /tmp, not ~)
+    return FileOps(undo, extra_roots=[tmp_path])
 
 
 @pytest.fixture

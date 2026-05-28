@@ -46,6 +46,10 @@ loki/memory/chroma/
 # Next.js build output
 loki-ui/out/
 loki-ui/.next/
+*.tsbuildinfo
+
+# Pytest / runtime temp
+.tmp/
 
 # Testing
 .pytest_cache/

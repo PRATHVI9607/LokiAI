@@ -225,7 +225,7 @@ loki/
 
 | Component | Library |
 |-----------|---------|
-| UI | Next.js 14 (App Router) + FastAPI WebSocket |
+| UI | Next.js 15 (App Router) + FastAPI WebSocket |
 | LLM | Ollama (local) / OpenRouter (cloud) |
 | STT | OpenAI Whisper |
 | TTS | edge-tts (Microsoft Neural) |

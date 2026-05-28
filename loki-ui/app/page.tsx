@@ -19,7 +19,9 @@ export default function Home() {
 
   const [showFiles, setShowFiles] = useState(false);
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return <div className="app-dormant" aria-hidden="true" />;
+  }
 
   return (
     <div className="app-shell">

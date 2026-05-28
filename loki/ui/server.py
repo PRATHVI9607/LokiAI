@@ -141,7 +141,11 @@ class LokiServer:
             uploads_dir.mkdir(parents=True, exist_ok=True)
             dest = uploads_dir / safe_name
 
-            content = await file.read()
+            # Enforce server-side 10 MB cap — frontend also limits but can't be trusted
+            _MAX_UPLOAD = 10 * 1024 * 1024
+            content = await file.read(_MAX_UPLOAD + 1)
+            if len(content) > _MAX_UPLOAD:
+                raise HTTPException(413, "File too large — maximum 10 MB")
             await asyncio.to_thread(dest.write_bytes, content)
 
             result = await asyncio.to_thread(self._rag_engine.index_file, dest)

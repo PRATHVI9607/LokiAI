@@ -87,7 +87,7 @@ class SpeechListener:
 
     def stop_listening(self) -> None:
         self._listening = False
-        if self._thread:
+        if self._thread and threading.current_thread() is not self._thread:
             self._thread.join(timeout=3)
         if self.on_listening_stopped:
             self.on_listening_stopped()

@@ -70,7 +70,7 @@ class WakewordDetector:
 
     def stop(self) -> None:
         self._running = False
-        if self._thread:
+        if self._thread and threading.current_thread() is not self._thread:
             self._thread.join(timeout=3)
         logger.info("Wakeword detector stopped")
 

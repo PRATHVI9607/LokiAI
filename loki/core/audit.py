@@ -20,7 +20,7 @@ INTENT_TIERS = {
     # Tier 1 — read-only
     "chat": 1, "volume_get": 1, "brightness_get": 1, "system_monitor": 1,
     "process_list": 1, "task_list": 1, "clipboard_show": 1, "git_status": 1,
-    "file_search": 1, "vault_retrieve": 1,
+    "file_search": 1,
     # Tier 2 — state changes
     "file_create": 2, "file_move": 2, "folder_create": 2, "file_organize": 2,
     "volume_set": 2, "brightness_set": 2, "wifi_toggle": 2, "bluetooth_toggle": 2,
@@ -29,9 +29,10 @@ INTENT_TIERS = {
     "vault_store": 2, "focus_mode_enable": 2, "focus_mode_disable": 2,
     "undo": 2, "commit_message": 2, "readme_generate": 2, "regex_generate": 2,
     "sql_build": 2, "git_commit": 2, "code_analyze": 2, "code_convert": 2,
-    # Tier 3 — destructive / external
+    # Tier 3 — destructive / external / sensitive
     "file_delete": 3, "folder_delete": 3, "process_kill": 3, "shell": 3,
     "security_scan": 3, "web_summarize": 3, "pdf_chat": 3,
+    "vault_retrieve": 3,  # secret access — always logged; value is never echoed to chat
 }
 
 MAX_ENTRIES = 1000
