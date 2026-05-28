@@ -25,6 +25,7 @@ wakeword:
   chunk_duration: 2.0
   check_interval: 0.5
   porcupine_sensitivity: 0.5
+  rms_threshold: 0.006   # min audio energy — below this is silence (was 0.01, missed soft speech)
 
 tts:
   engine: edge         # "edge" | "pyttsx3" | "luxtts"
@@ -47,8 +48,11 @@ memory:
 audio:
   sample_rate: 16000
   channels: 1
-  vad_aggressiveness: 1    # 0-3; 1 catches more speech without false positives
-  silence_duration: 2.0    # seconds of silence before flushing to Whisper
+  vad_aggressiveness: 1      # 0-3; 1 catches more speech without false positives
+  silence_duration: 1.0      # seconds of silence before flushing to Whisper (was 2.0, felt laggy)
+  min_audio_seconds: 0.35    # minimum clip length sent to Whisper — shorter clips hallucinate
+  max_record_seconds: 15     # safety flush if speech never stops
+  no_speech_threshold: 0.35  # Whisper: treat segments below this prob as silence
   enable_audio_cues: true
   wakeword_chime: true
   error_sound: true

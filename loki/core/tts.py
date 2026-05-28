@@ -36,7 +36,11 @@ except Exception:
 
 
 class LokiTTS:
-    """Text-to-speech engine with edge-tts primary, pyttsx3 fallback."""
+    """Text-to-speech engine with edge-tts primary, pyttsx3 fallback.
+
+    Uses a queue so messages are never dropped — on_speaking_stopped fires
+    only when the queue fully drains, so the mic isn't returned prematurely.
+    """
 
     def __init__(self, config: dict):
         self._config = config
@@ -48,11 +52,17 @@ class LokiTTS:
         self._speaking = False
         self._lock = threading.Lock()
 
+        import queue
+        self._queue: queue.Queue = queue.Queue()
+
         self.on_speaking_started: Optional[Callable] = None
         self.on_speaking_stopped: Optional[Callable] = None
 
-        if self._engine_name == "pyttsx3" or not EDGE_TTS_AVAILABLE:
-            self._init_pyttsx3()
+        # Always initialize pyttsx3 so edge-tts failures have a working fallback
+        self._init_pyttsx3()
+
+        # Start the single-threaded queue worker
+        threading.Thread(target=self._queue_worker, daemon=True, name="loki-tts").start()
 
         logger.info(f"TTS initialized: {self._engine_name}")
 
@@ -72,33 +82,35 @@ class LokiTTS:
             logger.error(f"pyttsx3 init failed: {e}")
 
     def speak(self, text: str) -> None:
+        """Enqueue text for speaking. Never drops messages."""
         if not text or not text.strip():
             return
-        with self._lock:
-            if self._speaking:
-                return
-            self._speaking = True
+        self._queue.put(text)
 
-        if self.on_speaking_started:
-            self.on_speaking_started()
-        thread = threading.Thread(target=self._speak_thread, args=(text,), daemon=True)
-        thread.start()
-
-    def _speak_thread(self, text: str) -> None:
-        try:
-            if EDGE_TTS_AVAILABLE and self._engine_name == "edge":
-                self._speak_edge(text)
-            elif self._pyttsx3_engine:
-                self._speak_pyttsx3(text)
-            else:
-                logger.warning(f"TTS: no engine available. Text: {text[:50]}")
-        except Exception as e:
-            logger.error(f"TTS error: {e}", exc_info=True)
-        finally:
+    def _queue_worker(self) -> None:
+        """Single background thread — serializes all speech, signals when queue drains."""
+        while True:
+            text = self._queue.get()
             with self._lock:
-                self._speaking = False
-            if self.on_speaking_stopped:
-                self.on_speaking_stopped()
+                self._speaking = True
+            if self.on_speaking_started:
+                self.on_speaking_started()
+            try:
+                if EDGE_TTS_AVAILABLE and self._engine_name == "edge":
+                    self._speak_edge(text)
+                elif self._pyttsx3_engine:
+                    self._speak_pyttsx3(text)
+                else:
+                    logger.warning(f"TTS: no engine available. Text: {text[:50]}")
+            except Exception as e:
+                logger.error(f"TTS error: {e}", exc_info=True)
+            finally:
+                self._queue.task_done()
+                if self._queue.empty():
+                    with self._lock:
+                        self._speaking = False
+                    if self.on_speaking_stopped:
+                        self.on_speaking_stopped()
 
     def _speak_edge(self, text: str) -> None:
         async def _run():

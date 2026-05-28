@@ -12,6 +12,7 @@ import random
 import sys
 import threading
 from pathlib import Path
+from typing import Callable, Optional
 
 import uvicorn
 import yaml
@@ -127,13 +128,20 @@ class ConversationManager:
         self._audit = audit_log
         self._active = False
         self._timeout_sec = config.get("ui", {}).get("conversation_timeout_seconds", 30)
-        self._timeout_handle = None
+        self._timeout_handle: Optional[threading.Timer] = None
+
+        self.on_conversation_ended: Optional[Callable] = None
+
+    @property
+    def is_active(self) -> bool:
+        return self._active
 
     def _reset_timeout(self) -> None:
         if self._timeout_handle:
             self._timeout_handle.cancel()
-        loop = asyncio.get_event_loop()
-        self._timeout_handle = loop.call_later(self._timeout_sec, self._on_timeout)
+        self._timeout_handle = threading.Timer(self._timeout_sec, self._on_timeout)
+        self._timeout_handle.daemon = True
+        self._timeout_handle.start()
 
     def _on_timeout(self) -> None:
         if not self._active:
@@ -141,7 +149,7 @@ class ConversationManager:
         farewell = random.choice(DISMISSALS)
         self._server.add_loki_message(farewell)
         self._speak(farewell)
-        threading.Timer(3.0, self._end_conversation).start()
+        self._end_conversation()
 
     def start_conversation(self) -> None:
         if self._active:
@@ -157,6 +165,7 @@ class ConversationManager:
         if not text or not text.strip():
             return
 
+        self._reset_timeout()  # reset early so LLM + TTS latency don't eat the timeout
         self._server.add_user_message(text)
         self._server.set_status("thinking")
         self._server.clear_transcript()
@@ -213,8 +222,6 @@ class ConversationManager:
             self._server.add_loki_message(fallback)
             self._speak(fallback)
 
-        self._server.set_status("idle")
-
     def _speak(self, text: str) -> None:
         self._server.set_status("speaking")
         try:
@@ -230,6 +237,8 @@ class ConversationManager:
         self._server.set_status("idle")
         self._server.hide_window()
         logger.info("Conversation ended")
+        if self.on_conversation_ended:
+            self.on_conversation_ended()
 
 
 class LokiApplication:
@@ -423,12 +432,15 @@ class LokiApplication:
         self.wakeword.on_wakeword = self._on_wakeword
         self.wakeword.on_transcript = self.server.update_transcript
 
-        # Listener callbacks
-        self.listener.on_transcript = self.conversation.process_input
+        # Listener callbacks — stop mic first, process, then _on_speaking_stopped restarts
+        self.listener.on_transcript = self._on_voice_transcript
 
         # TTS callbacks
         self.tts.on_speaking_started = lambda: self.server.set_status("speaking")
-        self.tts.on_speaking_stopped = lambda: self.server.set_status("idle")
+        self.tts.on_speaking_stopped = self._on_speaking_stopped
+
+        # Conversation lifecycle
+        self.conversation.on_conversation_ended = self._on_conversation_ended
 
         # Server (browser UI) → Python callbacks
         self.server.on_user_message = self._on_browser_message
@@ -438,9 +450,30 @@ class LokiApplication:
         logger.info("Callbacks wired")
 
     def _on_wakeword(self) -> None:
+        self.wakeword.stop()  # release mic before command listener takes it
         self.conversation.start_conversation()
         self.listener.start_listening()
         self.server.clear_transcript()
+
+    def _on_voice_transcript(self, text: str) -> None:
+        self.listener.stop_listening()  # release mic while LLM thinks + TTS speaks
+        self.conversation.process_input(text)
+        # _on_speaking_stopped will restart listener once TTS finishes
+
+    def _on_speaking_stopped(self) -> None:
+        self.server.set_status("idle")
+        if self.conversation.is_active:
+            # Ready for next command in the same conversation
+            self.listener.start_listening()
+            self.server.set_status("listening")
+        elif not self.wakeword._running:
+            # Conversation ended — hand mic back to wakeword
+            self.wakeword.start()
+
+    def _on_conversation_ended(self) -> None:
+        self.listener.stop_listening()
+        if not self.wakeword._running:
+            self.wakeword.start()
 
     def _on_browser_message(self, text: str) -> None:
         self.conversation.start_conversation()

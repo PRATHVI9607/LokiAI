@@ -36,14 +36,16 @@ class WakewordDetector:
     SAMPLE_RATE = 16000
     CHUNK_SECONDS = 2.0
 
+    # "loki" alone removed — too broad, false-triggers on unrelated audio
     WAKEWORD_VARIANTS = {
         "hey loki", "hay loki", "hello loki", "ok loki", "okay loki",
-        "loki", "hey lolly", "hey lucky",
+        "hey lolly", "hey lucky",
     }
 
     def __init__(self, config: dict):
         self._config = config.get("wakeword", {})
         self._method = self._config.get("method", "whisper")
+        self._rms_threshold = self._config.get("rms_threshold", 0.006)
         self._running = False
         self._thread: Optional[threading.Thread] = None
         self._model = None
@@ -104,7 +106,7 @@ class WakewordDetector:
             return False
 
         rms = float(np.sqrt(np.mean(audio_np ** 2)))
-        if rms < 0.01:
+        if rms < self._rms_threshold:
             return False
 
         try:

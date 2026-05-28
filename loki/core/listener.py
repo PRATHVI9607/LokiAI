@@ -41,12 +41,6 @@ except ImportError:
     logger.warning("openai-whisper not available — pip install openai-whisper")
 
 
-# Minimum valid audio before sending to Whisper (0.5 seconds at 16kHz)
-MIN_AUDIO_SAMPLES = 8_000
-# Maximum seconds to record before force-flushing (prevents infinite accumulation)
-MAX_RECORD_SEC = 30
-
-
 class SpeechListener:
     """Listens to microphone, detects speech via VAD, transcribes with Whisper."""
 
@@ -59,9 +53,11 @@ class SpeechListener:
         audio_cfg = config.get("audio", {})
         whisper_cfg = config.get("whisper", {})
 
-        # Use aggressiveness 1 — level 2 filters too aggressively and misses soft speech
         self._vad_level = audio_cfg.get("vad_aggressiveness", 1)
-        self._silence_sec = audio_cfg.get("silence_duration", 2.0)
+        self._silence_sec = audio_cfg.get("silence_duration", 1.0)
+        self._min_audio_samples = int(audio_cfg.get("min_audio_seconds", 0.35) * self.SAMPLE_RATE)
+        self._max_record_sec = audio_cfg.get("max_record_seconds", 15)
+        self._no_speech_threshold = audio_cfg.get("no_speech_threshold", 0.35)
         self._listening = False
         self._thread: Optional[threading.Thread] = None
         self._model = None
@@ -106,7 +102,7 @@ class SpeechListener:
         frames: list[bytes] = []
         silence_frames = 0
         max_silence = int(self._silence_sec * 1000 / self.FRAME_MS)
-        max_record_frames = int(MAX_RECORD_SEC * 1000 / self.FRAME_MS)
+        max_record_frames = int(self._max_record_sec * 1000 / self.FRAME_MS)
         triggered = False
 
         # PCM remainder buffer for handling partial frames from sounddevice
@@ -181,8 +177,7 @@ class SpeechListener:
             audio_bytes = b"".join(frames)
             audio_np = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
 
-            # Skip clips shorter than 0.5 seconds — Whisper hallucinates on micro-clips
-            if len(audio_np) < MIN_AUDIO_SAMPLES:
+            if len(audio_np) < self._min_audio_samples:
                 logger.debug(f"Audio too short ({len(audio_np)} samples) — skipped")
                 return
 
@@ -190,13 +185,9 @@ class SpeechListener:
                 audio_np,
                 language="en",
                 fp16=False,
-                # temperature=0 → deterministic, no creative hallucination
                 temperature=0,
-                # Don't condition on previous transcript — prevents runaway repetition
                 condition_on_previous_text=False,
-                # Threshold below which segment is treated as silence (lower = more permissive)
-                no_speech_threshold=0.5,
-                # Allow lower confidence transcriptions through
+                no_speech_threshold=self._no_speech_threshold,
                 logprob_threshold=-1.0,
             )
 
