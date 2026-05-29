@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 162"
+community: "ExpenseTracker Feature (email/EML p"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_162
+  - community/ExpenseTracker_Feature_email/EML_p
 ---
 
 # ExpenseTracker Feature (email/EML parsing + CSV ledger)
 
-#graphify/document #graphify/EXTRACTED #community/Community_162
+#graphify/document #graphify/EXTRACTED #community/ExpenseTracker_Feature_email/EML_p

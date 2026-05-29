@@ -1,11 +1,11 @@
 ---
 source_file: "loki-ui/components/MessageBubble.tsx"
 type: "concept"
-community: "MessageBubble Component / useMemo Caching for renderMarkdown"
+community: "MessageBubble Component / renderMarkdown (block-level: fenced / useMemo Caching for renderMarkdown"
 tags:
   - graphify/concept
   - graphify/EXTRACTED
-  - community/MessageBubble_Component_/_useMemo_Caching_for_renderMarkdown
+  - community/MessageBubble_Component_/_renderMarkdown_block-level_fenced_/_useMemo_Caching_for_renderMarkdown
 ---
 
 # useMemo Caching for renderMarkdown
@@ -15,4 +15,4 @@ tags:
 - [[MessageBubble Component]] - `implements` [EXTRACTED]
 - [[renderMarkdown (block-level fenced code, lists, paragraphs)]] - `references` [EXTRACTED]
 
-#graphify/concept #graphify/EXTRACTED #community/MessageBubble_Component_/_useMemo_Caching_for_renderMarkdown
+#graphify/concept #graphify/EXTRACTED #community/MessageBubble_Component_/_renderMarkdown_block-level_fenced_/_useMemo_Caching_for_renderMarkdown

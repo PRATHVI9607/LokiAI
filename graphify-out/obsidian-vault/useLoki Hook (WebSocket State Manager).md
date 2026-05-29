@@ -1,11 +1,11 @@
 ---
 source_file: "loki-ui/hooks/useLoki.ts"
 type: "code"
-community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manager)"
+community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manag / Status Type (idle/listening/thinkin"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager
+  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manag_/_Status_Type_idle/listening/thinkin
 ---
 
 # useLoki Hook (WebSocket State Manager)
@@ -21,4 +21,4 @@ tags:
 - [[setPersonality (HTTP POST brainpersonality)]] - `implements` [EXTRACTED]
 - [[uploadFile (HTTP POST upload)]] - `implements` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager
+#graphify/code #graphify/EXTRACTED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manag_/_Status_Type_idle/listening/thinkin

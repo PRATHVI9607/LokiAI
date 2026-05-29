@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "code"
-community: "FakeTTS / ConvState / TestClipboardSyncToken"
+community: "FakeTTS / test_voice_and_security.py / .drain_and_fire()"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/FakeTTS_/_ConvState_/_TestClipboardSyncToken
+  - community/FakeTTS_/_test_voice_and_securitypy_/_drain_and_fire
 ---
 
 # test_voice_and_security.py
@@ -24,4 +24,4 @@ tags:
 - [[is_idle()_1]] - `contains` [EXTRACTED]
 - [[is_speaking()_1]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/FakeTTS_/_ConvState_/_TestClipboardSyncToken
+#graphify/code #graphify/EXTRACTED #community/FakeTTS_/_test_voice_and_securitypy_/_drain_and_fire

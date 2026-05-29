@@ -6,11 +6,23 @@ assistant:
   personality: norse_trickster  # witty, sharp, helpful
 
 llm:
-  # Provider priority: Kimi K2 → OpenRouter → Ollama
-  kimi_model: kimi-k2              # Moonshot API model (set KIMI_API_KEY in .env)
-  ollama_model: phi3:mini          # Local fallback (Ollama)
-  fallback_model: google/gemma-4-31b-it:free
-  second_fallback_model: deepseek/deepseek-v4-flash:free
+  # Provider priority (speed-first): OpenRouter → NVIDIA NIM → Kimi → Ollama
+  # Set OPENROUTER_API_KEY and/or NVIDIA_API_KEY in loki/.env
+
+  # OpenRouter free models — ordered by quality/speed balance (benchmarked)
+  fast_model:           google/gemma-4-31b-it:free         # ~5.6s, good quality ✓
+  fallback_model:       openai/gpt-oss-120b:free           # ~10s, high quality
+  second_fallback_model: liquid/lfm-2.5-1.2b-instruct:free # ~1.1s, tiny emergency fallback
+
+  # NVIDIA NIM — Kimi K2.6 (set NVIDIA_API_KEY in .env to enable)
+  nvidia_thinking: false  # true = deep reasoning but slow (30-90s); false = fast mode
+
+  # Kimi Moonshot direct (set KIMI_API_KEY in .env to enable)
+  kimi_model: kimi-k2
+
+  # Ollama local fallback (run: ollama serve && ollama pull phi3:mini)
+  ollama_model: phi3:mini
+
   max_tokens: 600
   temperature: 0.70
 

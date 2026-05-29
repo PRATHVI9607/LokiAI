@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/meeting_transcriber.py"
 type: "code"
-community: "LokiBrain / test_brain.py / .ask()"
+community: "MeetingTranscriber / Whisper Model (shared)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/MeetingTranscriber_/_Whisper_Model_shared
 ---
 
 # Whisper Model (shared)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[MeetingTranscriber_1]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/code #graphify/EXTRACTED #community/MeetingTranscriber_/_Whisper_Model_shared

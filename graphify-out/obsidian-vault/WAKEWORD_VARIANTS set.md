@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/wakeword.py"
 type: "code"
-community: "SpeechListener / VoicePipeline / SpeechListener._transcribe_worker"
+community: "SpeechListener / SpeechListener._transcribe_worker / VoicePipeline._handle_wakeword"
 location: "WAKEWORD_VARIANTS"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SpeechListener_/_VoicePipeline_/_SpeechListener_transcribe_worker
+  - community/SpeechListener_/_SpeechListener_transcribe_worker_/_VoicePipeline_handle_wakeword
 ---
 
 # WAKEWORD_VARIANTS set
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[WakewordDetector._is_wakeword]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_VoicePipeline_/_SpeechListener_transcribe_worker
+#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_SpeechListener_transcribe_worker_/_VoicePipeline_handle_wakeword

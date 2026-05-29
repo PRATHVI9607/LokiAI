@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/env_setup.py"
 type: "concept"
-community: "Community 21"
+community: "Preview-First Pattern (pending_writ / WatchJob (polling thread, snapshot  / No auto git add -A (only staged fil"
 tags:
   - graphify/concept
   - graphify/EXTRACTED
-  - community/Community_21
+  - community/Preview-First_Pattern_pending_writ_/_WatchJob_polling_thread_snapshot__/_No_auto_git_add_-A_only_staged_fil
 ---
 
 # Preview-First Pattern (pending_write flag, no auto-write)
@@ -18,4 +18,4 @@ tags:
 - [[No -y Flag (auto unique filename on collision)]] - `semantically_similar_to` [INFERRED]
 - [[No auto git add -A (only staged files committed)]] - `semantically_similar_to` [INFERRED]
 
-#graphify/concept #graphify/EXTRACTED #community/Community_21
+#graphify/concept #graphify/EXTRACTED #community/Preview-First_Pattern_pending_writ_/_WatchJob_polling_thread_snapshot__/_No_auto_git_add_-A_only_staged_fil

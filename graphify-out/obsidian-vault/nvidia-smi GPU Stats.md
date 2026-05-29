@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/system_monitor.py"
 type: "code"
-community: "SystemMonitor / ProcessTriage / Safe-to-Kill Process List"
+community: "SystemMonitor / ProcessTriage / ProcessManager"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SystemMonitor_/_ProcessTriage_/_Safe-to-Kill_Process_List
+  - community/SystemMonitor_/_ProcessTriage_/_ProcessManager
 ---
 
 # nvidia-smi GPU Stats
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[SystemMonitor_1]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SystemMonitor_/_ProcessTriage_/_Safe-to-Kill_Process_List
+#graphify/code #graphify/EXTRACTED #community/SystemMonitor_/_ProcessTriage_/_ProcessManager

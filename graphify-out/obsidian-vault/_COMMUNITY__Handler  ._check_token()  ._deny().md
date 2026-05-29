@@ -27,7 +27,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_ClipboardSync  .start()  clipboard_sync.py]]
+- 1 edge to [[_COMMUNITY_ClipboardSync  TestClipboardSyncToken  .stop()]]
 
 ## Top bridge nodes
 - [[_Handler]] - degree 8, connects to 1 community

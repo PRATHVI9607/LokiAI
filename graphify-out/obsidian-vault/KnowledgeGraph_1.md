@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/knowledge_graph.py"
 type: "code"
-community: "LokiBrain / test_brain.py / .ask()"
+community: "LokiBrain / DailyBriefing / CodeAssistant"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/LokiBrain_/_DailyBriefing_/_CodeAssistant
 ---
 
 # KnowledgeGraph
@@ -14,4 +14,4 @@ tags:
 - [[FileSearch_1]] - `semantically_similar_to` [INFERRED]
 - [[LokiBrain]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_DailyBriefing_/_CodeAssistant

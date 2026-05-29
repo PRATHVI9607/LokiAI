@@ -1,7 +1,7 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Security Scanner (13 regex patterns)"
+community: "Security Scanner (13 regex patterns"
 tags:
   - graphify/document
   - graphify/EXTRACTED

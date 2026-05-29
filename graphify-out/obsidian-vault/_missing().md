@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "_missing() / ._handle_agent_run() / ._handle_api_mock_data()"
+community: "_missing() / ._handle_agent_cancel() / ._handle_agent_run()"
 location: "L893"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/_missing_/__handle_agent_run_/__handle_api_mock_data
+  - community/_missing_/__handle_agent_cancel_/__handle_agent_run
 ---
 
 # _missing()
@@ -153,4 +153,4 @@ tags:
 - [[._handle_window_tile_all()]] - `calls` [EXTRACTED]
 - [[action_router.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/_missing_/__handle_agent_run_/__handle_api_mock_data
+#graphify/code #graphify/EXTRACTED #community/_missing_/__handle_agent_cancel_/__handle_agent_run

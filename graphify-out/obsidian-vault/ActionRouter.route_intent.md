@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "ActionRouter.route_intent / AutoAgent._execute_task / _DESTRUCTIVE_INTENTS Frozenset"
+community: "AutoAgent._execute_task / ActionRouter.route_intent / PendingActionStore"
 location: "def route_intent"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ActionRouterroute_intent_/_AutoAgent_execute_task_/__DESTRUCTIVE_INTENTS_Frozenset
+  - community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore
 ---
 
 # ActionRouter.route_intent
@@ -14,8 +14,7 @@ tags:
 ## Connections
 - [[AutoAgent._execute_task]] - `calls` [EXTRACTED]
 - [[ConversationStateMachine._handle_intent]] - `calls` [EXTRACTED]
-- [[INTENT_CATALOG (system prompt intent list)]] - `conceptually_related_to` [INFERRED]
 - [[PendingActionStore_1]] - `calls` [EXTRACTED]
 - [[_DESTRUCTIVE_INTENTS Frozenset]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ActionRouterroute_intent_/_AutoAgent_execute_task_/__DESTRUCTIVE_INTENTS_Frozenset
+#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore

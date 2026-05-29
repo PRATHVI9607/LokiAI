@@ -1,7 +1,8 @@
-# Secrets
+# Secrets — keep .env.example tracked, ignore everything else
 .env
-*.env
-!.env.example
+loki/.env
+!*.env.example
+!loki/.env.example
 
 # Python artifacts
 __pycache__/

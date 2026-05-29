@@ -1,11 +1,11 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "test"
-community: "Community 116"
+community: "TestClipboardSyncToken (token auth  / TestSSRFProtection (localhost/priva"
 tags:
   - graphify/test
   - graphify/INFERRED
-  - community/Community_116
+  - community/TestClipboardSyncToken_token_auth__/_TestSSRFProtection_localhost/priva
 ---
 
 # TestClipboardSyncToken (token auth in URL)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[TestSSRFProtection (localhostprivate IPfile scheme blocked)]] - `conceptually_related_to` [INFERRED]
 
-#graphify/test #graphify/INFERRED #community/Community_116
+#graphify/test #graphify/INFERRED #community/TestClipboardSyncToken_token_auth__/_TestSSRFProtection_localhost/priva

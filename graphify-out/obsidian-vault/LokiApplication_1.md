@@ -1,18 +1,19 @@
 ---
 source_file: "main.py"
 type: "code"
-community: "LokiApplication._init_all / LokiApplication._wire_callbacks / ConversationStateMachine"
-location: "class LokiApplication"
+community: "LokiBrain / _call_llm (Provider Cascade) / OpenRouter Provider (Primary)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine
+  - community/LokiBrain_/__call_llm_Provider_Cascade_/_OpenRouter_Provider_Primary
 ---
 
 # LokiApplication
 
 ## Connections
-- [[LokiApplication._init_all]] - `calls` [EXTRACTED]
-- [[LokiApplication._wire_callbacks]] - `calls` [EXTRACTED]
+- [[ConversationStateMachine_1]] - `calls` [EXTRACTED]
+- [[LokiBrain_1]] - `calls` [EXTRACTED]
+- [[LokiTTS_1]] - `calls` [EXTRACTED]
+- [[VoicePipeline_1]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/__call_llm_Provider_Cascade_/_OpenRouter_Provider_Primary

@@ -34,8 +34,8 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
+- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
 - [[MeetingTranscriber]] - degree 11, connects to 3 communities

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_brain.py"
 type: "code"
-community: "LokiBrain / test_brain.py / .ask()"
+community: "test_brain.py / brain() / test_clear_conversation()"
 location: "L7"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/test_brainpy_/_brain_/_test_clear_conversation
 ---
 
 # brain()
@@ -15,4 +15,4 @@ tags:
 - [[LokiBrain]] - `calls` [INFERRED]
 - [[test_brain.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/code #graphify/EXTRACTED #community/test_brainpy_/_brain_/_test_clear_conversation

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/wakeword.py"
 type: "rationale"
-community: "WakewordDetector / wakeword.py / ._detect_loop()"
+community: "SpeechListener / WakewordDetector / ._transcribe_worker()"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/WakewordDetector_/_wakewordpy_/__detect_loop
+  - community/SpeechListener_/_WakewordDetector_/__transcribe_worker
 ---
 
 # Wakeword detector — Whisper-based "Hey Loki" detection. Porcupine is optional i
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[wakeword.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/WakewordDetector_/_wakewordpy_/__detect_loop
+#graphify/rationale #graphify/EXTRACTED #community/SpeechListener_/_WakewordDetector_/__transcribe_worker

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/brain.py"
 type: "rationale"
-community: "LokiBrain / test_brain.py / .ask()"
-location: "L406"
+community: ".ask() / ._build_messages() / ._get_kg_context()"
+location: "L445"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/ask_/__build_messages_/__get_kg_context
 ---
 
 # Layer 3: knowledge graph entity lookup — structured relational context.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[._get_kg_context()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/rationale #graphify/EXTRACTED #community/ask_/__build_messages_/__get_kg_context

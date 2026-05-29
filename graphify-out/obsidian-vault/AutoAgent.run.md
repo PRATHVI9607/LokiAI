@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/auto_agent.py"
 type: "code"
-community: "ActionRouter.route_intent / AutoAgent._execute_task / _DESTRUCTIVE_INTENTS Frozenset"
+community: "AutoAgent._execute_task / ActionRouter.route_intent / PendingActionStore"
 location: "def run"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ActionRouterroute_intent_/_AutoAgent_execute_task_/__DESTRUCTIVE_INTENTS_Frozenset
+  - community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore
 ---
 
 # AutoAgent.run
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[AutoAgent._execute_task]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ActionRouterroute_intent_/_AutoAgent_execute_task_/__DESTRUCTIVE_INTENTS_Frozenset
+#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore

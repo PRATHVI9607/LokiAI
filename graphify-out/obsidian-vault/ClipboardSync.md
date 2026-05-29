@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/clipboard_sync.py"
 type: "code"
-community: "ClipboardSync / .start() / clipboard_sync.py"
+community: "ClipboardSync / TestClipboardSyncToken / .stop()"
 location: "L147"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/ClipboardSync_/_start_/_clipboard_syncpy
+  - community/ClipboardSync_/_TestClipboardSyncToken_/_stop
 ---
 
 # ClipboardSync
@@ -34,4 +34,4 @@ tags:
 - [[TestVoicePipeline]] - `uses` [INFERRED]
 - [[clipboard_sync.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/ClipboardSync_/_start_/_clipboard_syncpy
+#graphify/code #graphify/INFERRED #community/ClipboardSync_/_TestClipboardSyncToken_/_stop

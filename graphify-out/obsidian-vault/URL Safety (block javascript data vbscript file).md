@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 90"
+community: "Security Decision Flow (Tier Check  / Path Sandboxing via FileOps._safe() / Protected Processes List (system-cr"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_90
+  - community/Security_Decision_Flow_Tier_Check__/_Path_Sandboxing_via_FileOps_safe_/_Protected_Processes_List_system-cr
 ---
 
 # URL Safety (block javascript:// data:// vbscript:// file://)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Security Decision Flow (Tier Check â†’ Confirm â†’ Path â†’ Shell â†’ Process)]] - `references` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_90
+#graphify/document #graphify/EXTRACTED #community/Security_Decision_Flow_Tier_Check__/_Path_Sandboxing_via_FileOps_safe_/_Protected_Processes_List_system-cr

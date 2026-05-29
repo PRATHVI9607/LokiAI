@@ -1,0 +1,1 @@
+{"ts": "2026-05-29T11:00:01.289772", "intent": "file_delete", "tier": 3, "tier_label": "restricted", "params": {"path": "C:/Windows/test.txt"}, "success": true, "result": "⚠ Confirm: Delete file 'C:/Windows/test.txt'\nSay 'confirm ddfb72' or just 'yes' to proceed, 'cancel' to abort."}

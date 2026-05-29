@@ -1,11 +1,11 @@
 ---
 source_file: "loki-ui/components/FilePanel.tsx"
 type: "code"
-community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manager)"
+community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manag / Status Type (idle/listening/thinkin"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager
+  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manag_/_Status_Type_idle/listening/thinkin
 ---
 
 # FilePanel (RAG File Upload Sidebar)
@@ -17,4 +17,4 @@ tags:
 - [[deleteFile (HTTP DELETE uploadfilename)]] - `calls` [EXTRACTED]
 - [[uploadFile (HTTP POST upload)]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager
+#graphify/code #graphify/EXTRACTED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manag_/_Status_Type_idle/listening/thinkin

@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 159"
+community: "KnowledgeGraph Feature (entity/rela"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_159
+  - community/KnowledgeGraph_Feature_entity/rela
 ---
 
 # KnowledgeGraph Feature (entity/relation extraction)
 
-#graphify/document #graphify/EXTRACTED #community/Community_159
+#graphify/document #graphify/EXTRACTED #community/KnowledgeGraph_Feature_entity/rela

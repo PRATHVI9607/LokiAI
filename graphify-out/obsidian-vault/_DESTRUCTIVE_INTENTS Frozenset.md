@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "ActionRouter.route_intent / AutoAgent._execute_task / _DESTRUCTIVE_INTENTS Frozenset"
+community: "AutoAgent._execute_task / ActionRouter.route_intent / PendingActionStore"
 location: "_DESTRUCTIVE_INTENTS"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/ActionRouterroute_intent_/_AutoAgent_execute_task_/__DESTRUCTIVE_INTENTS_Frozenset
+  - community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore
 ---
 
 # _DESTRUCTIVE_INTENTS Frozenset
@@ -16,4 +16,4 @@ tags:
 - [[AutoAgent.SAFE_INTENTS whitelist]] - `semantically_similar_to` [INFERRED]
 - [[ProcessManager.kill]] - `conceptually_related_to` [INFERRED]
 
-#graphify/code #graphify/INFERRED #community/ActionRouterroute_intent_/_AutoAgent_execute_task_/__DESTRUCTIVE_INTENTS_Frozenset
+#graphify/code #graphify/INFERRED #community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore

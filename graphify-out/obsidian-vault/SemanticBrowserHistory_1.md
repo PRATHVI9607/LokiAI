@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/semantic_browser_history.py"
 type: "code"
-community: "LokiBrain / test_brain.py / .ask()"
+community: "ScreenshotSearch / SemanticBrowserHistory / Tesseract OCR (pytesseract fallback"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/ScreenshotSearch_/_SemanticBrowserHistory_/_Tesseract_OCR_pytesseract_fallback
 ---
 
 # SemanticBrowserHistory
@@ -15,4 +15,4 @@ tags:
 - [[SQLite Browser History Reader]] - `implements` [EXTRACTED]
 - [[ScreenshotSearch_1]] - `semantically_similar_to` [INFERRED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/code #graphify/EXTRACTED #community/ScreenshotSearch_/_SemanticBrowserHistory_/_Tesseract_OCR_pytesseract_fallback

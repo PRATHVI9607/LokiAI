@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/brain.py"
 type: "rationale"
-community: "LokiBrain / test_brain.py / .ask()"
-location: "L430"
+community: ".ask() / ._build_messages() / ._get_kg_context()"
+location: "L469"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/ask_/__build_messages_/__get_kg_context
 ---
 
 # Assemble context in priority order:         1. System prompt (personality + brai
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[._build_messages()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/rationale #graphify/EXTRACTED #community/ask_/__build_messages_/__get_kg_context

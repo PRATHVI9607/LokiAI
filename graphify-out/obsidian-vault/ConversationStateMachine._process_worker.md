@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/conversation_sm.py"
 type: "code"
-community: "ConversationStateMachine.on_tts_done / ConversationStateMachine._arm_timeout"
+community: "AutoAgent._execute_task / ActionRouter.route_intent / PendingActionStore"
 location: "def _process_worker"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ConversationStateMachineon_tts_done_/_ConversationStateMachine_arm_timeout
+  - community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore
 ---
 
 # ConversationStateMachine._process_worker
@@ -14,7 +14,5 @@ tags:
 ## Connections
 - [[ConversationStateMachine._handle_intent]] - `calls` [EXTRACTED]
 - [[ConversationStateMachine.process_input]] - `calls` [EXTRACTED]
-- [[LokiBrain.ask]] - `calls` [EXTRACTED]
-- [[LokiBrain.parse_intent]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ConversationStateMachineon_tts_done_/_ConversationStateMachine_arm_timeout
+#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore

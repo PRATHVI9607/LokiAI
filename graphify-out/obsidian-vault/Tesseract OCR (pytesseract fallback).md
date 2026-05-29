@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/screenshot_search.py"
 type: "code"
-community: "LokiBrain / test_brain.py / .ask()"
+community: "ScreenshotSearch / SemanticBrowserHistory / Tesseract OCR (pytesseract fallback"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/ScreenshotSearch_/_SemanticBrowserHistory_/_Tesseract_OCR_pytesseract_fallback
 ---
 
 # Tesseract OCR (pytesseract fallback)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[ScreenshotSearch_1]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/code #graphify/EXTRACTED #community/ScreenshotSearch_/_SemanticBrowserHistory_/_Tesseract_OCR_pytesseract_fallback

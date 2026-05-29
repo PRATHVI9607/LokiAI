@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "code"
-community: "FakeTTS / ConvState / TestClipboardSyncToken"
+community: "ClipboardSync / TestClipboardSyncToken / .stop()"
 location: "L265"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/FakeTTS_/_ConvState_/_TestClipboardSyncToken
+  - community/ClipboardSync_/_TestClipboardSyncToken_/_stop
 ---
 
 # TestClipboardSyncToken
@@ -26,4 +26,4 @@ tags:
 - [[WebSummarizer]] - `uses` [INFERRED]
 - [[test_voice_and_security.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/FakeTTS_/_ConvState_/_TestClipboardSyncToken
+#graphify/code #graphify/INFERRED #community/ClipboardSync_/_TestClipboardSyncToken_/_stop

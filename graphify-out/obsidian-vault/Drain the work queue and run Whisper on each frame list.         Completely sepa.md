@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/listener.py"
 type: "rationale"
-community: "SpeechListener / ._transcribe_worker() / listener.py"
+community: "SpeechListener / WakewordDetector / ._transcribe_worker()"
 location: "L193"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/SpeechListener_/__transcribe_worker_/_listenerpy
+  - community/SpeechListener_/_WakewordDetector_/__transcribe_worker
 ---
 
 # Drain the work queue and run Whisper on each frame list.         Completely sepa
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[._transcribe_worker()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/SpeechListener_/__transcribe_worker_/_listenerpy
+#graphify/rationale #graphify/EXTRACTED #community/SpeechListener_/_WakewordDetector_/__transcribe_worker

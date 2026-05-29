@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/daily_briefing.py"
 type: "code"
-community: "._init_all() / DailyBriefing / .generate()"
+community: "._init_all() / BrowserCtrl / DailyBriefing"
 location: "L15"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/_init_all_/_DailyBriefing_/_generate
+  - community/_init_all_/_BrowserCtrl_/_DailyBriefing
 ---
 
 # DailyBriefing
@@ -19,4 +19,4 @@ tags:
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[daily_briefing.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/_init_all_/_DailyBriefing_/_generate
+#graphify/code #graphify/EXTRACTED #community/_init_all_/_BrowserCtrl_/_DailyBriefing

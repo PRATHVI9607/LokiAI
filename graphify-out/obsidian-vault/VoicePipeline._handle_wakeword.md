@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/voice_pipeline.py"
 type: "code"
-community: "SpeechListener / VoicePipeline / SpeechListener._transcribe_worker"
+community: "SpeechListener / SpeechListener._transcribe_worker / VoicePipeline._handle_wakeword"
 location: "def _handle_wakeword"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SpeechListener_/_VoicePipeline_/_SpeechListener_transcribe_worker
+  - community/SpeechListener_/_SpeechListener_transcribe_worker_/_VoicePipeline_handle_wakeword
 ---
 
 # VoicePipeline._handle_wakeword
@@ -16,4 +16,4 @@ tags:
 - [[WakewordDetector_1]] - `calls` [EXTRACTED]
 - [[WakewordDetector._detect_loop]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_VoicePipeline_/_SpeechListener_transcribe_worker
+#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_SpeechListener_transcribe_worker_/_VoicePipeline_handle_wakeword

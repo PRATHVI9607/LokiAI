@@ -1,13 +1,13 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "test"
-community: "Community 195"
+community: "TestProcessManagerExactMatch (no su"
 tags:
   - graphify/test
   - graphify/EXTRACTED
-  - community/Community_195
+  - community/TestProcessManagerExactMatch_no_su
 ---
 
 # TestProcessManagerExactMatch (no substring kill)
 
-#graphify/test #graphify/EXTRACTED #community/Community_195
+#graphify/test #graphify/EXTRACTED #community/TestProcessManagerExactMatch_no_su

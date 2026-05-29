@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 155"
+community: "DigitalDeclutter Feature (MD5 dupli"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_155
+  - community/DigitalDeclutter_Feature_MD5_dupli
 ---
 
 # DigitalDeclutter Feature (MD5 duplicates + large/old files)
 
-#graphify/document #graphify/EXTRACTED #community/Community_155
+#graphify/document #graphify/EXTRACTED #community/DigitalDeclutter_Feature_MD5_dupli

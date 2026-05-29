@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 143"
+community: "Browser Control with URL Scheme Val"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_143
+  - community/Browser_Control_with_URL_Scheme_Val
 ---
 
 # Browser Control with URL Scheme Validation
 
-#graphify/document #graphify/EXTRACTED #community/Community_143
+#graphify/document #graphify/EXTRACTED #community/Browser_Control_with_URL_Scheme_Val

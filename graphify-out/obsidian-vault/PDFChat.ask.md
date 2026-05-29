@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/pdf_chat.py"
 type: "code"
-community: "MessageBubble Component / useMemo Caching for renderMarkdown"
+community: "MessageBubble Component / renderMarkdown (block-level: fenced / useMemo Caching for renderMarkdown"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/MessageBubble_Component_/_useMemo_Caching_for_renderMarkdown
+  - community/MessageBubble_Component_/_renderMarkdown_block-level_fenced_/_useMemo_Caching_for_renderMarkdown
 ---
 
 # PDFChat.ask
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[PDFChat._extract_text]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/MessageBubble_Component_/_useMemo_Caching_for_renderMarkdown
+#graphify/code #graphify/EXTRACTED #community/MessageBubble_Component_/_renderMarkdown_block-level_fenced_/_useMemo_Caching_for_renderMarkdown

@@ -1,11 +1,11 @@
 ---
 source_file: "loki/core/audit.py"
 type: "code"
-community: "PendingActionStore / ActionRouter / INTENT_TIERS Security Classification"
+community: "AutoAgent._execute_task / ActionRouter.route_intent / PendingActionStore"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/PendingActionStore_/_ActionRouter_/_INTENT_TIERS_Security_Classification
+  - community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore
 ---
 
 # INTENT_TIERS Security Classification
@@ -14,4 +14,4 @@ tags:
 - [[ActionRouter_1]] - `rationale_for` [INFERRED]
 - [[AuditLog_1]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/PendingActionStore_/_ActionRouter_/_INTENT_TIERS_Security_Classification
+#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_ActionRouterroute_intent_/_PendingActionStore

@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 147"
+community: "GhostWriter Feature (expand/continu"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_147
+  - community/GhostWriter_Feature_expand/continu
 ---
 
 # GhostWriter Feature (expand/continue/bullets-to-prose)
 
-#graphify/document #graphify/EXTRACTED #community/Community_147
+#graphify/document #graphify/EXTRACTED #community/GhostWriter_Feature_expand/continu

@@ -1,13 +1,13 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "test"
-community: "Community 196"
+community: "TestVoicePipeline (activate/deactiv"
 tags:
   - graphify/test
   - graphify/EXTRACTED
-  - community/Community_196
+  - community/TestVoicePipeline_activate/deactiv
 ---
 
 # TestVoicePipeline (activate/deactivate/mute/wakeword callbacks)
 
-#graphify/test #graphify/EXTRACTED #community/Community_196
+#graphify/test #graphify/EXTRACTED #community/TestVoicePipeline_activate/deactiv

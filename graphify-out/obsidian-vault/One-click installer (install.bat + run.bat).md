@@ -1,13 +1,13 @@
 ---
 source_file: "README.md"
 type: "document"
-community: "Community 167"
+community: "One-click installer (install.bat + "
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_167
+  - community/One-click_installer_installbat__
 ---
 
 # One-click installer (install.bat + run.bat)
 
-#graphify/document #graphify/EXTRACTED #community/Community_167
+#graphify/document #graphify/EXTRACTED #community/One-click_installer_installbat__

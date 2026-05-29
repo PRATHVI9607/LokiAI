@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/daily_briefing.py"
 type: "code"
-community: "._init_all() / DailyBriefing / .generate()"
+community: "._init_all() / BrowserCtrl / DailyBriefing"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/_init_all_/_DailyBriefing_/_generate
+  - community/_init_all_/_BrowserCtrl_/_DailyBriefing
 ---
 
 # daily_briefing.py
@@ -15,4 +15,4 @@ tags:
 - [[DailyBriefing]] - `contains` [EXTRACTED]
 - [[DailyBriefing — morning brief combining tasks, system health, datetime, and new]] - `rationale_for` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/_init_all_/_DailyBriefing_/_generate
+#graphify/code #graphify/EXTRACTED #community/_init_all_/_BrowserCtrl_/_DailyBriefing

@@ -26,7 +26,7 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_._init_all()  AppCtrl  DailyBriefing]]
 
 ## Top bridge nodes
 - [[BrowserCtrl]] - degree 6, connects to 2 communities

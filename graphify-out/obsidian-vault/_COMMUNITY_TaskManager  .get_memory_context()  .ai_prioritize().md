@@ -34,7 +34,7 @@ SORT file.name ASC
 ## Connections to other communities
 - 2 edges to [[_COMMUNITY_TestTaskManager  test_features.py  memory_mgr()]]
 - 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
 - 1 edge to [[_COMMUNITY_BrainMemory  ._save_unlocked()  ._add_fact_unlocked()]]
 - 1 edge to [[_COMMUNITY_MemoryManager  ._save_json()  .add_task()]]
 - 1 edge to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]

@@ -48,7 +48,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
 
 ## Top bridge nodes
 - [[create_loki_server()]] - degree 3, connects to 1 community

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/conversation_sm.py"
 type: "rationale"
-community: "FakeTTS / ConvState / TestClipboardSyncToken"
+community: "ConvState / conversation_sm.py / Enum"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/FakeTTS_/_ConvState_/_TestClipboardSyncToken
+  - community/ConvState_/_conversation_smpy_/_Enum
 ---
 
 # ConversationStateMachine — replaces the monolithic ConversationManager.  States:
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[conversation_sm.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/FakeTTS_/_ConvState_/_TestClipboardSyncToken
+#graphify/rationale #graphify/EXTRACTED #community/ConvState_/_conversation_smpy_/_Enum

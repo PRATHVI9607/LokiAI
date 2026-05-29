@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/citation_generator.py"
 type: "code"
-community: "LokiBrain / test_brain.py / .ask()"
+community: "LokiBrain / DailyBriefing / CodeAssistant"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/LokiBrain_/_DailyBriefing_/_CodeAssistant
 ---
 
 # CitationGenerator
@@ -14,4 +14,4 @@ tags:
 - [[FactChecker_1]] - `shares_data_with` [INFERRED]
 - [[LokiBrain]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_DailyBriefing_/_CodeAssistant

@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 156"
+community: "ProcessTriage Feature (resource opt"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_156
+  - community/ProcessTriage_Feature_resource_opt
 ---
 
 # ProcessTriage Feature (resource optimization)
 
-#graphify/document #graphify/EXTRACTED #community/Community_156
+#graphify/document #graphify/EXTRACTED #community/ProcessTriage_Feature_resource_opt

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/brain.py"
 type: "code"
-community: "LokiBrain / test_brain.py / .ask()"
+community: "LokiBrain / DailyBriefing / CodeAssistant"
 location: "L263"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_test_brainpy_/_ask
+  - community/LokiBrain_/_DailyBriefing_/_CodeAssistant
 ---
 
 # LokiBrain
@@ -60,7 +60,7 @@ tags:
 - [[GrammarPolisher_1]] - `references` [EXTRACTED]
 - [[KnowledgeGraph]] - `uses` [INFERRED]
 - [[KnowledgeGraph_1]] - `calls` [EXTRACTED]
-- [[LLM integration with KORTEX-style context engineering.     LLM priority Kimi K2]] - `rationale_for` [EXTRACTED]
+- [[LLM integration with KORTEX-style context engineering.      Provider priority (s]] - `rationale_for` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[MeetingTranscriber]] - `uses` [INFERRED]
 - [[MeetingTranscriber_1]] - `calls` [EXTRACTED]
@@ -77,4 +77,4 @@ tags:
 - [[brain()]] - `calls` [INFERRED]
 - [[brain.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_DailyBriefing_/_CodeAssistant

@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 150"
+community: "FactChecker Feature (DuckDuckGo + L"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_150
+  - community/FactChecker_Feature_DuckDuckGo__L
 ---
 
 # FactChecker Feature (DuckDuckGo + LLM verdict)
 
-#graphify/document #graphify/EXTRACTED #community/Community_150
+#graphify/document #graphify/EXTRACTED #community/FactChecker_Feature_DuckDuckGo__L

@@ -32,13 +32,12 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 3 edges to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 4 edges to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_SpeechListener  WakewordDetector  ._transcribe_worker()]]
 - 2 edges to [[_COMMUNITY_FileOps  ShellExec  TestFileOps]]
-- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 - 1 edge to [[_COMMUNITY_BrainMemory  ._save_unlocked()  ._add_fact_unlocked()]]
-- 1 edge to [[_COMMUNITY_SpeechListener  ._transcribe_worker()  listener.py]]
-- 1 edge to [[_COMMUNITY_WakewordDetector  wakeword.py  ._detect_loop()]]
-- 1 edge to [[_COMMUNITY_ActionRouter  ._handle_agent_cancel()  ._handle_agent_status()]]
+- 1 edge to [[_COMMUNITY_ActionRouter  ._handle_api_mock_data()  ._handle_api_mock_generate()]]
 - 1 edge to [[_COMMUNITY_UndoStack  ._builtin_undo()  undo_stack.py]]
 - 1 edge to [[_COMMUNITY_MemoryManager  ._save_json()  .add_task()]]
 - 1 edge to [[_COMMUNITY_AuditLog  .log()  ._rotate_if_needed()]]
@@ -47,7 +46,6 @@ SORT file.name ASC
 - 1 edge to [[_COMMUNITY_RagEngine  rag_engine.py  .index_file()]]
 - 1 edge to [[_COMMUNITY_SystemCtrl  .get_brightness()  .set_brightness()]]
 - 1 edge to [[_COMMUNITY_AppCtrl  app_ctrl.py  .close_app()]]
-- 1 edge to [[_COMMUNITY_BrowserCtrl  browser_ctrl.py  .open_url()]]
 - 1 edge to [[_COMMUNITY_FileSearch  ._scan()  .search()]]
 - 1 edge to [[_COMMUNITY_SystemMonitor  ._get_gpu_stats()  .get_stats()]]
 - 1 edge to [[_COMMUNITY_ProcessManager  TestProcessManagerExactMatch  process_manager.py]]
@@ -86,9 +84,9 @@ SORT file.name ASC
 - 1 edge to [[_COMMUNITY_ExpenseTracker  .extract_from_text()  .extract_from_file()]]
 - 1 edge to [[_COMMUNITY_DynamicUI  .apply_time_theme()  dynamic_ui.py]]
 - 1 edge to [[_COMMUNITY_FileWatcher  WatchJob  .watch_custom()]]
-- 1 edge to [[_COMMUNITY_ClipboardSync  .start()  clipboard_sync.py]]
+- 1 edge to [[_COMMUNITY_ClipboardSync  TestClipboardSyncToken  .stop()]]
 - 1 edge to [[_COMMUNITY_AutoAgent  ._plan()  .cancel()]]
 
 ## Top bridge nodes
-- [[LokiApplication]] - degree 69, connects to 56 communities
+- [[LokiApplication]] - degree 69, connects to 54 communities
 - [[.__init__()]] - degree 4, connects to 1 community

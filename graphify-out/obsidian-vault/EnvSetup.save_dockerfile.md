@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/env_setup.py"
 type: "code"
-community: "Community 21"
+community: "Preview-First Pattern (pending_writ / WatchJob (polling thread, snapshot  / No auto git add -A (only staged fil"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/Community_21
+  - community/Preview-First_Pattern_pending_writ_/_WatchJob_polling_thread_snapshot__/_No_auto_git_add_-A_only_staged_fil
 ---
 
 # EnvSetup.save_dockerfile
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[EnvSetup.generate_dockerfile]] - `shares_data_with` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/Community_21
+#graphify/code #graphify/EXTRACTED #community/Preview-First_Pattern_pending_writ_/_WatchJob_polling_thread_snapshot__/_No_auto_git_add_-A_only_staged_fil

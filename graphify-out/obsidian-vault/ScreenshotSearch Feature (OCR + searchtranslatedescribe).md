@@ -1,13 +1,13 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 161"
+community: "ScreenshotSearch Feature (OCR + sea"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_161
+  - community/ScreenshotSearch_Feature_OCR__sea
 ---
 
 # ScreenshotSearch Feature (OCR + search/translate/describe)
 
-#graphify/document #graphify/EXTRACTED #community/Community_161
+#graphify/document #graphify/EXTRACTED #community/ScreenshotSearch_Feature_OCR__sea
