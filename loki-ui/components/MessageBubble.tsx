@@ -97,6 +97,11 @@ function renderMarkdown(text: string): React.ReactNode {
 }
 
 export default function MessageBubble({ msg }: { msg: ChatMessage }) {
+  // Hooks must run unconditionally on every render — keep this ABOVE any early
+  // return, or React crashes with a hook-count mismatch (client-side exception).
+  const isUser = msg.type === "user_message";
+  const rendered = useMemo(() => renderMarkdown(msg.text), [msg.text]);
+
   if (msg.type === "system_message") {
     return (
       <motion.div
@@ -109,9 +114,6 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
       </motion.div>
     );
   }
-
-  const isUser = msg.type === "user_message";
-  const rendered = useMemo(() => renderMarkdown(msg.text), [msg.text]);
 
   return (
     <motion.div
