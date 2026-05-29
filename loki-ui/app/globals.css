@@ -879,7 +879,9 @@ html, body, #__next {
   background: linear-gradient(130deg, #00E5FF, #8B5CF6 45%, #FF2E97 90%);
   background-size: 200% 200%;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   opacity: 0.55;
   animation: border-flow 6s ease infinite;
   z-index: -1;
