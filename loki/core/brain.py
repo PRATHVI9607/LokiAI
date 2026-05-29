@@ -22,6 +22,9 @@ import os
 import json
 import logging
 import random
+import re
+import threading
+import time
 from typing import Dict, Any, List, Optional, Generator
 from pathlib import Path
 
@@ -331,7 +334,7 @@ class LokiBrain:
                 self._nvidia_client = OpenAI(
                     base_url=self.NVIDIA_NIM_URL,
                     api_key=nvidia_key,
-                    timeout=60.0,   # without thinking: 60s; with thinking: use 180s
+                    timeout=18.0,   # fail-fast to OpenRouter if NIM is slow/unreachable
                     max_retries=0,
                 )
                 mode = "thinking ON" if self._nvidia_thinking else "thinking OFF (fast mode)"
@@ -385,6 +388,8 @@ class LokiBrain:
         self._conversation_file = self._memory_dir / "conversation.json"
         self._conversation_history: List[Dict[str, str]] = []
         self._exchange_count = 0
+        self._history_lock = threading.Lock()  # guards _conversation_history mutations
+        self._maint_running = False            # prevents overlapping maintenance runs
 
         self._load_history()
         self._log_provider_status()
@@ -414,12 +419,11 @@ class LokiBrain:
 
     def _save_history(self) -> None:
         self._memory_dir.mkdir(parents=True, exist_ok=True)
+        with self._history_lock:
+            snapshot = list(self._conversation_history[-(self._max_turns * 2):])
         try:
             with open(self._conversation_file, "w", encoding="utf-8") as f:
-                json.dump(
-                    self._conversation_history[-(self._max_turns * 2):],
-                    f, indent=2, ensure_ascii=False,
-                )
+                json.dump(snapshot, f, indent=2, ensure_ascii=False)
         except Exception as e:
             logger.error(f"Failed to save conversation: {e}")
 
@@ -488,14 +492,15 @@ class LokiBrain:
         if rag_context:
             messages.append({"role": "system", "content": rag_context})
 
-        messages.extend(self._conversation_history[-(self._max_turns * 2):])
+        with self._history_lock:
+            recent = list(self._conversation_history[-(self._max_turns * 2):])
+        messages.extend(recent)
         messages.append({"role": "user", "content": user_message})
         return messages
 
     # ─── Inference ────────────────────────────────────────────────────────────
 
     def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
-        import re as _re
         mt = max_tokens or self._max_tokens
 
         # ── 1. NVIDIA NIM — Kimi K2.6 (PRIMARY — your key is set) ──────────────
@@ -523,7 +528,7 @@ class LokiBrain:
                     chunks.append(delta)
                 text = "".join(chunks)
                 # Remove <think>…</think> reasoning traces
-                text = _re.sub(r"<think>[\s\S]*?</think>", "", text, flags=_re.DOTALL).strip()
+                text = re.sub(r"<think>[\s\S]*?</think>", "", text, flags=re.DOTALL).strip()
                 if text:
                     mode = "thinking" if self._nvidia_thinking else "fast"
                     logger.debug(f"Response from NVIDIA NIM ({mode})")
@@ -605,10 +610,9 @@ class LokiBrain:
             logger.debug(f"context: {', '.join(ctx_bits)}")
 
         messages = self._build_messages(user_message, kg_context, rag_context)
-        import time as _t
-        _start = _t.time()
+        _start = time.time()
         response_text = self._call_llm(messages)
-        logger.debug(f"LLM responded in {_t.time() - _start:.1f}s")
+        logger.debug(f"LLM responded in {time.time() - _start:.1f}s")
 
         if not response_text.strip():
             response_text = "All pathways to knowledge are severed. Check your API keys and try again."
@@ -620,23 +624,48 @@ class LokiBrain:
     # ─── Memory maintenance ───────────────────────────────────────────────────
 
     def _store_turn(self, user_msg: str, assistant_msg: str) -> None:
-        self._conversation_history.append({"role": "user", "content": user_msg})
-        self._conversation_history.append({"role": "assistant", "content": assistant_msg})
-        self._exchange_count += 1
+        # Append + persist immediately (fast — just a JSON write)
+        with self._history_lock:
+            self._conversation_history.append({"role": "user", "content": user_msg})
+            self._conversation_history.append({"role": "assistant", "content": assistant_msg})
+            self._exchange_count += 1
+            need_compress = len(self._conversation_history) > COMPRESSION_THRESHOLD
+            need_facts = self._exchange_count % FACT_EXTRACT_EVERY == 0
         self._save_history()
 
-        if len(self._conversation_history) > COMPRESSION_THRESHOLD:
-            self._compress_old_turns()
+        # Heavy LLM-based maintenance (compression, fact extraction) runs on a
+        # background thread so it NEVER delays the spoken response. Previously these
+        # blocking calls ran inline, adding 5-60s latency every few turns.
+        if (need_compress or need_facts) and not self._maint_running:
+            self._maint_running = True
+            threading.Thread(
+                target=self._run_maintenance,
+                args=(user_msg, assistant_msg, need_compress, need_facts),
+                daemon=True,
+                name="loki-memory-maint",
+            ).start()
 
-        if self._exchange_count % FACT_EXTRACT_EVERY == 0:
-            self._extract_facts(user_msg, assistant_msg)
+    def _run_maintenance(self, user_msg: str, assistant_msg: str,
+                         do_compress: bool, do_facts: bool) -> None:
+        try:
+            if do_compress:
+                self._compress_old_turns()
+            if do_facts:
+                self._extract_facts(user_msg, assistant_msg)
+        except Exception as e:
+            logger.warning(f"Memory maintenance error: {e}")
+        finally:
+            self._maint_running = False
 
     def _compress_old_turns(self) -> None:
         if not self._brain_memory:
-            self._conversation_history = self._conversation_history[-self._max_turns * 2:]
+            with self._history_lock:
+                self._conversation_history = self._conversation_history[-self._max_turns * 2:]
             return
 
-        to_compress = self._conversation_history[:COMPRESSION_BATCH]
+        # Snapshot the batch to compress (under lock), run LLM (no lock), then trim (lock)
+        with self._history_lock:
+            to_compress = list(self._conversation_history[:COMPRESSION_BATCH])
         convo_text = "\n".join(
             f"{m['role'].upper()}: {m['content'][:300]}" for m in to_compress
         )
@@ -647,13 +676,10 @@ class LokiBrain:
                 f"capturing key decisions, facts learned, and tasks discussed:\n\n{convo_text}"
             )},
         ]
-        try:
-            summary = self._call_llm(summary_prompt, max_tokens=150)
-        except Exception as e:
-            logger.warning(f"Compression failed: {e}")
-            return
+        summary = self._call_llm(summary_prompt, max_tokens=150)
 
-        self._conversation_history = self._conversation_history[COMPRESSION_BATCH:]
+        with self._history_lock:
+            self._conversation_history = self._conversation_history[COMPRESSION_BATCH:]
         if summary:
             self._brain_memory.add_session_summary(summary)
             logger.info(f"Compressed {len(to_compress)} messages → session summary")
@@ -681,20 +707,40 @@ class LokiBrain:
 
     def parse_intent(self, response_text: str) -> Optional[Dict[str, Any]]:
         text = response_text.strip()
+
+        # Unwrap fenced code blocks if present
         if "```json" in text:
             start = text.find("```json") + 7
             end = text.find("```", start)
-            text = text[start:end].strip()
+            text = text[start:end].strip() if end != -1 else text[start:].strip()
         elif "```" in text:
             start = text.find("```") + 3
             end = text.find("```", start)
-            text = text[start:end].strip()
+            text = text[start:end].strip() if end != -1 else text[start:].strip()
 
-        if not (text.startswith("{") and text.endswith("}")):
+        # Fast path: whole thing is a JSON object
+        candidate = text if (text.startswith("{") and text.endswith("}")) else None
+
+        # Otherwise extract the first balanced {...} block (handles prose around JSON)
+        if candidate is None:
+            depth = 0
+            obj_start = -1
+            for idx, ch in enumerate(text):
+                if ch == "{":
+                    if depth == 0:
+                        obj_start = idx
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0 and obj_start != -1:
+                        candidate = text[obj_start:idx + 1]
+                        break
+
+        if not candidate:
             return None
         try:
-            intent = json.loads(text)
-            if "intent" not in intent:
+            intent = json.loads(candidate)
+            if not isinstance(intent, dict) or "intent" not in intent:
                 return None
             return intent
         except json.JSONDecodeError:
@@ -706,7 +752,8 @@ class LokiBrain:
         return random.choice(DISMISSAL_MESSAGES)
 
     def clear_conversation(self) -> None:
-        self._conversation_history.clear()
+        with self._history_lock:
+            self._conversation_history.clear()
         self._save_history()
 
     def get_user_name(self) -> str:

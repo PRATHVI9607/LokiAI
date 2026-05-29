@@ -87,21 +87,31 @@ class RagEngine:
     # ─── Embedding ────────────────────────────────────────────────────────────
 
     def _embed(self, text: str) -> Optional[List[float]]:
+        result = self._embed_batch([text])
+        return result[0] if result and result[0] else None
+
+    def _embed_batch(self, texts: List[str]) -> Optional[List[Optional[List[float]]]]:
+        """Embed multiple texts in ONE request. nomic-embed-text accepts a list input —
+        batching turns N round-trips into 1, hugely speeding up file indexing."""
+        if not texts:
+            return []
         try:
             resp = requests.post(
                 f"{self._ollama_url}/api/embed",
-                json={"model": "nomic-embed-text", "input": text},
-                timeout=30,
+                json={"model": "nomic-embed-text", "input": texts},
+                timeout=60,
             )
             resp.raise_for_status()
             embeds = resp.json().get("embeddings")
-            if not isinstance(embeds, list) or len(embeds) == 0:
-                logger.warning("Embedding API returned empty embeddings list")
+            if not isinstance(embeds, list) or len(embeds) != len(texts):
+                logger.warning(
+                    f"Embedding API returned {len(embeds) if isinstance(embeds, list) else 0} "
+                    f"vectors for {len(texts)} inputs"
+                )
                 return None
-            emb = embeds[0]
-            return emb if emb else None
+            return embeds
         except Exception as e:
-            logger.error(f"Embedding error: {e}")
+            logger.error(f"Batch embedding error: {e}")
             return None
 
     # ─── Chunking ─────────────────────────────────────────────────────────────
@@ -186,27 +196,31 @@ class RagEngine:
 
         chunks = self._chunk_text(text)
 
-        # Collect ALL embeddings before touching the index.
-        # If any embedding fails, we abort without deleting existing data,
-        # leaving the previous index for this file intact.
+        # Batch-embed in groups (one HTTP call per group instead of one per chunk).
+        # If a batch fails entirely, those chunks are marked failed but we keep going.
         ids, embeddings, documents, metadatas = [], [], [], []
         failed: list[int] = []
         now = datetime.now().isoformat()
+        BATCH = 32
 
-        for i, chunk in enumerate(chunks):
-            emb = self._embed(chunk)
-            if emb is None:
-                failed.append(i)
-                continue
-            chunk_id = hashlib.md5(f"{filename}:{i}:{chunk[:50]}".encode()).hexdigest()
-            ids.append(chunk_id)
-            embeddings.append(emb)
-            documents.append(chunk)
-            metadatas.append({
-                "source": filename,
-                "chunk_idx": i,
-                "indexed_at": now,
-            })
+        for start in range(0, len(chunks), BATCH):
+            batch = chunks[start:start + BATCH]
+            vectors = self._embed_batch(batch)
+            for j, chunk in enumerate(batch):
+                i = start + j
+                emb = vectors[j] if vectors and j < len(vectors) else None
+                if not emb:
+                    failed.append(i)
+                    continue
+                chunk_id = hashlib.md5(f"{filename}:{i}:{chunk[:50]}".encode()).hexdigest()
+                ids.append(chunk_id)
+                embeddings.append(emb)
+                documents.append(chunk)
+                metadatas.append({
+                    "source": filename,
+                    "chunk_idx": i,
+                    "indexed_at": now,
+                })
 
         if not ids:
             return {"success": False, "message": "No chunks could be embedded — check Ollama/nomic-embed-text."}

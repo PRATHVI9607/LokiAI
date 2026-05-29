@@ -49,6 +49,26 @@ def test_parse_intent_missing_intent_key(brain):
     assert result is None
 
 
+def test_parse_intent_prose_around_json(brain):
+    # JSON embedded in prose — the balanced-brace extractor should find it
+    result = brain.parse_intent('Sure thing: {"intent": "file_delete", "params": {"path": "x"}} done!')
+    assert result is not None
+    assert result["intent"] == "file_delete"
+
+
+def test_parse_intent_nested_braces(brain):
+    result = brain.parse_intent('{"intent": "x", "params": {"a": {"b": 1}}}')
+    assert result is not None
+    assert result["intent"] == "x"
+
+
+def test_parse_intent_unterminated_fence(brain):
+    # Fenced block with no closing fence shouldn't crash
+    result = brain.parse_intent('```json\n{"intent": "task_add"}')
+    assert result is not None
+    assert result["intent"] == "task_add"
+
+
 def test_store_turn(brain):
     brain._store_turn("what is the weather", "I have no idea, I am indoors.")
     assert len(brain._conversation_history) == 2
