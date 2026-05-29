@@ -390,10 +390,10 @@ class LokiBrain:
         self._log_provider_status()
 
     def _log_provider_status(self) -> None:
-        if self._openrouter_client:
+        if self._nvidia_client:
+            primary = f"NVIDIA NIM / Kimi K2.6 ({self.NVIDIA_MODEL})"
+        elif self._openrouter_client:
             primary = f"OpenRouter ({self._fast_models[0]})"
-        elif self._nvidia_client:
-            primary = f"NVIDIA NIM ({self.NVIDIA_MODEL})"
         elif self._kimi_client:
             primary = f"Kimi Moonshot ({self._kimi_model})"
         else:
@@ -498,28 +498,7 @@ class LokiBrain:
         import re as _re
         mt = max_tokens or self._max_tokens
 
-        # ── 1. OpenRouter (PRIMARY — fast free models, ~1-3s) ─────────────────
-        if self._openrouter_client:
-            for model in self._fast_models:
-                try:
-                    resp = self._openrouter_client.chat.completions.create(
-                        model=model,
-                        messages=messages,
-                        max_tokens=mt,
-                        temperature=self._temperature,
-                        extra_headers={
-                            "HTTP-Referer": "loki-desktop-assistant",
-                            "X-Title": "Loki",
-                        },
-                    )
-                    text = resp.choices[0].message.content or ""
-                    if text.strip():
-                        logger.debug(f"Response from OpenRouter ({model})")
-                        return text
-                except Exception as e:
-                    logger.warning(f"OpenRouter {model}: {e}")
-
-        # ── 2. NVIDIA NIM — Kimi K2.6 (thinking OFF by default for speed) ────
+        # ── 1. NVIDIA NIM — Kimi K2.6 (PRIMARY — your key is set) ──────────────
         if self._nvidia_client:
             try:
                 extra: dict = {}
@@ -551,6 +530,24 @@ class LokiBrain:
                     return text
             except Exception as e:
                 logger.warning(f"NVIDIA NIM: {e}")
+
+        # ── 2. OpenRouter (fallback — free models) ────────────────────────────
+        if self._openrouter_client:
+            for model in self._fast_models:
+                try:
+                    resp = self._openrouter_client.chat.completions.create(
+                        model=model,
+                        messages=messages,
+                        max_tokens=mt,
+                        temperature=self._temperature,
+                        extra_headers={"HTTP-Referer": "loki-desktop-assistant", "X-Title": "Loki"},
+                    )
+                    text = resp.choices[0].message.content or ""
+                    if text.strip():
+                        logger.debug(f"Response from OpenRouter ({model})")
+                        return text
+                except Exception as e:
+                    logger.warning(f"OpenRouter {model}: {e}")
 
         # ── 3. Kimi Moonshot direct API ───────────────────────────────────────
         if self._kimi_client:
