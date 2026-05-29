@@ -1048,3 +1048,70 @@ html, body, #__next {
 
 /* Give the chat a faint dark scrim ONLY behind text columns for readability
    over the bright orb core — via the message cards' own blur (already set). */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v3.2 — UI STRUCTURE: centered conversation column, cleaner header
+══════════════════════════════════════════════════════════════════════════ */
+
+/* Header: remove the harsh seam line, pure floating glass */
+.app-header {
+  border-bottom: 1px solid rgba(22,245,138,0.08);
+  background: linear-gradient(180deg, rgba(4,10,8,0.5), rgba(4,10,8,0.0));
+}
+.loki-logo {
+  background: linear-gradient(110deg, #16F58A 0%, #9DFFC6 35%, #00E5FF 75%, #16F58A 100%);
+  background-size: 300% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 8px rgba(22,245,138,0.4));
+}
+.header-divider { background: linear-gradient(180deg, transparent, rgba(22,245,138,0.4), transparent); }
+
+/* Conversation = a centered column floating over the planet */
+.messages-area {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 34px 20px 16px;
+}
+
+/* Input dock: same centered column width, floating capsule */
+.input-bar {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 12px 20px 20px;
+  background: transparent;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* Empty-state hint feel: when no messages, the column is empty and the planet
+   shows through — keep messages readable with their glass cards (already set). */
+
+/* Personality dot + status accents → green to match the planet */
+.personality-btn-dot { background: #16F58A; box-shadow: 0 0 6px #16F58A; }
+
+/* Message Loki border flow → green→cyan to match planet */
+.msg-bubble-loki::before {
+  background: linear-gradient(130deg, #16F58A, #00E5FF 50%, #16F58A 90%);
+  background-size: 200% 200%;
+}
+.msg-bubble-loki { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 24px rgba(22,245,138,0.06); }
+
+/* Avatar → green plasma */
+.msg-avatar {
+  background: radial-gradient(circle at 35% 30%, #9DFFC6 0%, #16F58A 40%, #00E5FF 80%);
+  box-shadow: 0 0 16px rgba(22,245,138,0.55), 0 0 8px rgba(0,229,255,0.35);
+}
+
+/* Send button → green→cyan */
+.send-btn { background: linear-gradient(135deg, #16F58A, #00E5FF 60%, #16F58A); background-size: 180% auto; }
+.send-btn:hover:not(:disabled) { box-shadow: 0 6px 28px rgba(22,245,138,0.4); }
+
+/* Input capsule focus → green */
+.input-row { border-color: rgba(22,245,138,0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 30px rgba(22,245,138,0.05); }
+
+/* thinking dots → green spectrum */
+.thinking-dot:nth-child(1){ background:#16F58A; }
+.thinking-dot:nth-child(2){ background:#9DFFC6; }
+.thinking-dot:nth-child(3){ background:#00E5FF; }
