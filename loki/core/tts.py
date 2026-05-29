@@ -89,8 +89,14 @@ class LokiTTS:
 
     def _queue_worker(self) -> None:
         """Single background thread — serializes all speech, signals when queue drains.
-        pyttsx3 is initialized here (same-thread requirement for COM on Windows)."""
+        pyttsx3 is initialized here (same-thread requirement for COM on Windows).
+        pythoncom.CoInitialize() must be called first so COM is available in this thread."""
         if PYTTSX3_AVAILABLE and not self._pyttsx3_ready:
+            try:
+                import pythoncom
+                pythoncom.CoInitialize()
+            except Exception:
+                pass  # non-Windows or pythoncom not installed — pyttsx3 may still work
             self._init_pyttsx3()
             self._pyttsx3_ready = True
 

@@ -199,7 +199,7 @@ class LokiApplication:
         self.currency_converter = CurrencyConverter(brain=self.brain)
 
         # Batch 2 features
-        self.news_aggregator = NewsAggregator(brain=self.brain)
+        self.news_aggregator = NewsAggregator()
         self.daily_briefing = DailyBriefing(
             brain=self.brain,
             task_manager=self.task_manager,

@@ -9,8 +9,8 @@ llm:
   # Provider priority: Kimi K2 → OpenRouter → Ollama
   kimi_model: kimi-k2              # Moonshot API model (set KIMI_API_KEY in .env)
   ollama_model: phi3:mini          # Local fallback (Ollama)
-  fallback_model: mistralai/mistral-7b-instruct:free
-  second_fallback_model: google/gemma-2-9b-it:free
+  fallback_model: google/gemma-4-31b-it:free
+  second_fallback_model: deepseek/deepseek-v4-flash:free
   max_tokens: 600
   temperature: 0.70
 
