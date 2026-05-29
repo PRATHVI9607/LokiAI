@@ -137,12 +137,18 @@ class ConversationManager:
     def is_active(self) -> bool:
         return self._active
 
-    def _reset_timeout(self) -> None:
-        if self._timeout_handle:
-            self._timeout_handle.cancel()
+    def _arm_timeout(self) -> None:
+        """Start/restart the inactivity timer. Only call when waiting for user input."""
+        self._cancel_timeout()
         self._timeout_handle = threading.Timer(self._timeout_sec, self._on_timeout)
         self._timeout_handle.daemon = True
         self._timeout_handle.start()
+
+    def _cancel_timeout(self) -> None:
+        """Disarm the timer — call during thinking and speaking so we don't time out mid-process."""
+        if self._timeout_handle:
+            self._timeout_handle.cancel()
+            self._timeout_handle = None
 
     def _on_timeout(self) -> None:
         if not self._active:
@@ -154,19 +160,26 @@ class ConversationManager:
 
     def start_conversation(self) -> None:
         if self._active:
-            self._reset_timeout()
+            self._arm_timeout()
             return
         self._active = True
         self._server.show_window()
         self._server.set_status("listening")
-        self._reset_timeout()
+        self._arm_timeout()
         logger.info("Conversation started")
+
+    def arm_listening_timeout(self) -> None:
+        """Re-arm the timeout after TTS finishes and we return to listening state."""
+        if self._active:
+            self._arm_timeout()
 
     def process_input(self, text: str) -> None:
         if not text or not text.strip():
             return
 
-        self._reset_timeout()  # reset early so LLM + TTS latency don't eat the timeout
+        # Cancel timeout while LLM + action + TTS are running — we must not
+        # time out mid-processing and end the conversation prematurely.
+        self._cancel_timeout()
         self._server.add_user_message(text)
         self._server.set_status("thinking")
         self._server.clear_transcript()
@@ -191,8 +204,7 @@ class ConversationManager:
             err_msg = "Something went awry. Even gods have bad days."
             self._server.add_loki_message(err_msg)
             self._speak(err_msg)
-        finally:
-            self._reset_timeout()
+        # Do NOT re-arm timeout here — _on_speaking_stopped will arm it once TTS finishes
 
     def _handle_intent(self, intent: dict) -> None:
         loki_msg = intent.get("message", "")
@@ -473,24 +485,22 @@ class LokiApplication:
     def _on_speaking_stopped(self) -> None:
         self.server.set_status("idle")
         if self.conversation.is_active:
-            # Ready for next command in the same conversation
+            # Back to listening — arm the inactivity timeout now
             self.listener.start_listening()
             self.server.set_status("listening")
-        elif not self.wakeword._running:
-            # Conversation ended — hand mic back to wakeword
+            self.conversation.arm_listening_timeout()
+        elif not self.wakeword.is_running:
+            # Conversation ended and TTS queue is now fully drained —
+            # safe to restart wakeword (it won't hear our own voice)
             self.wakeword.start()
 
     def _on_conversation_ended(self) -> None:
         self.listener.stop_listening()
-        # Check both is_speaking AND queue empty — there's a race window between
-        # speak() putting to queue and the worker thread setting _speaking=True.
-        tts_truly_idle = not self.tts.is_speaking and self.tts._queue.empty()
-        if tts_truly_idle:
-            if not self.wakeword._running:
+        # Use public is_idle which checks both is_speaking and queue.empty()
+        if self.tts.is_idle:
+            if not self.wakeword.is_running:
                 self.wakeword.start()
-        # else: TTS still has audio queued or playing; _on_speaking_stopped will
-        # restart wakeword once the queue fully drains (preventing wakeword from
-        # hearing Loki's own farewell through the microphone)
+        # else: TTS still has audio queued; _on_speaking_stopped fires when done
 
     def _on_browser_message(self, text: str) -> None:
         self.conversation.start_conversation()
@@ -501,7 +511,8 @@ class LokiApplication:
             self.wakeword.stop()
             self.listener.stop_listening()
         else:
-            self.wakeword.start()
+            if not self.wakeword.is_running:
+                self.wakeword.start()
             self.server.set_status("idle")
 
     def _on_undo(self) -> None:

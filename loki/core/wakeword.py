@@ -60,6 +60,10 @@ class WakewordDetector:
             except Exception as e:
                 logger.error(f"Wakeword Whisper load failed: {e}")
 
+    @property
+    def is_running(self) -> bool:
+        return self._running
+
     def start(self) -> None:
         if self._running:
             return

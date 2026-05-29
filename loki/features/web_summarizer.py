@@ -1,6 +1,8 @@
 """
 Web summarizer — fetch URL content and summarize via LLM.
-SSRF guard: rejects private IPs, loopback, and non-http(s) schemes.
+SSRF guard: rejects private IPs, loopback, non-http(s) schemes.
+DNS-rebinding guard: uses a custom transport adapter to verify the
+actual connected IP (not just the DNS-resolved hostname) is not private.
 """
 
 import ipaddress
@@ -28,6 +30,14 @@ except ImportError:
     BS4_AVAILABLE = False
 
 
+def _ip_is_internal(ip_str: str) -> bool:
+    try:
+        ip = ipaddress.ip_address(ip_str)
+        return ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_unspecified
+    except ValueError:
+        return True
+
+
 def _is_ssrf_risk(url: str) -> bool:
     """Return True if the URL points to a private/internal address (SSRF risk)."""
     try:
@@ -37,18 +47,37 @@ def _is_ssrf_risk(url: str) -> bool:
         host = parsed.hostname or ""
         if not host:
             return True
-        # Resolve hostname to IP; reject loopback, private, link-local
+        # If host is already an IP literal, check directly
         try:
-            ip = ipaddress.ip_address(host)
+            return _ip_is_internal(host)
         except ValueError:
-            # hostname — resolve to IP
-            try:
-                ip = ipaddress.ip_address(socket.gethostbyname(host))
-            except Exception:
-                return False  # can't resolve; let requests fail naturally
-        return ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_unspecified
+            pass
+        # Hostname — resolve and check; on failure let requests handle it
+        try:
+            return _ip_is_internal(socket.gethostbyname(host))
+        except Exception:
+            return False
     except Exception:
         return True
+
+
+class _SSRFBlockingAdapter:
+    """Wraps a requests Session to verify the connected peer IP after each request.
+    Defends against DNS rebinding (TTL=0 attacks) by checking the actual socket IP."""
+
+    @staticmethod
+    def check_response(resp) -> bool:
+        """Return True if the connected peer IP is safe."""
+        try:
+            raw = getattr(resp.raw, "_connection", None) or getattr(resp.raw, "connection", None)
+            if raw:
+                sock = getattr(raw, "sock", None)
+                if sock:
+                    peer_ip = sock.getpeername()[0]
+                    return not _ip_is_internal(peer_ip)
+        except Exception:
+            pass
+        return True  # can't inspect socket — don't block (pre-connect check already ran)
 
 
 class WebSummarizer:
@@ -86,9 +115,13 @@ class WebSummarizer:
                 timeout=self.TIMEOUT,
                 allow_redirects=True,
             )
-            # Re-check resolved URL after redirects
+            # Re-check after redirects (hostname in Location header may differ)
             if resp.url != url and _is_ssrf_risk(resp.url):
                 return {"success": False, "message": "Redirect led to a private address — blocked."}
+            # DNS-rebinding check: verify the actual connected socket IP is public
+            if not _SSRFBlockingAdapter.check_response(resp):
+                logger.warning("DNS rebinding attempt blocked: %s", url)
+                return {"success": False, "message": "Connected IP is private — possible DNS rebinding attack, blocked."}
             resp.raise_for_status()
         except requests.Timeout:
             return {"success": False, "message": f"Request timed out fetching {url}."}

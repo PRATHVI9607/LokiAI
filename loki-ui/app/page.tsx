@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLoki } from "@/hooks/useLoki";
 import ChatPanel from "@/components/ChatPanel";
 import FilePanel from "@/components/FilePanel";
@@ -18,16 +18,20 @@ export default function Home() {
   } = useLoki();
 
   const [showFiles, setShowFiles] = useState(false);
+  const layerRef = useRef<HTMLDivElement>(null);
 
-  if (!isVisible) {
-    return <div className="app-dormant" aria-hidden="true" />;
-  }
+  // Set aria-hidden imperatively — JSX {expression} in ARIA attrs is flagged by axe
+  useEffect(() => {
+    layerRef.current?.setAttribute("aria-hidden", isVisible ? "false" : "true");
+  }, [isVisible]);
 
+  // Always render the shell — hiding the component entirely unmounts it, losing
+  // WebSocket state and scroll position. When dormant, show an idle overlay instead.
   return (
     <div className="app-shell">
-      {/* Animated rune particle background */}
+      {/* Animated rune particle background — always present */}
       <div className="app-bg">
-        <RuneCanvas status={status} />
+        <RuneCanvas status={isVisible ? status : "offline"} />
       </div>
 
       {/* Depth vignette over canvas */}
@@ -39,8 +43,29 @@ export default function Home() {
       <div className="rune-glow fixed top-12 right-12 text-3xl pointer-events-none select-none z-[2]" aria-hidden="true">ᚱ</div>
       <div className="rune-glow fixed bottom-16 left-12 text-3xl pointer-events-none select-none z-[2]" aria-hidden="true">ᛁ</div>
 
-      {/* Full-height UI layer: sidebar + chat */}
-      <div className="app-layer">
+      {/* Dormant overlay — shown when Loki is in background/idle */}
+      <AnimatePresence>
+        {!isVisible && (
+          <motion.div
+            className="dormant-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            aria-label="Loki is dormant — say Hey Loki to wake"
+          >
+            <div className="dormant-rune" aria-hidden="true">ᚠ</div>
+            <p className="dormant-label">Dormant</p>
+            <p className="dormant-hint">Say &ldquo;Hey Loki&rdquo; to wake</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full-height UI layer — kept mounted, CSS class controls visibility */}
+      <div
+        ref={layerRef}
+        className={`app-layer${isVisible ? "" : " app-layer--dormant"}`}
+      >
         <AnimatePresence>
           {showFiles && (
             <FilePanel

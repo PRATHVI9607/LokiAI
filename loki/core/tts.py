@@ -5,6 +5,7 @@ Callback-based; no Qt dependency.
 
 import asyncio
 import logging
+import queue as _queue_module
 import tempfile
 import threading
 import time
@@ -51,9 +52,9 @@ class LokiTTS:
         self._pyttsx3_engine: Optional[Any] = None
         self._speaking = False
         self._lock = threading.Lock()
+        self._stopped = False  # set True on stop() to skip remaining items
 
-        import queue
-        self._queue: queue.Queue = queue.Queue()
+        self._queue: _queue_module.Queue = _queue_module.Queue()
 
         self.on_speaking_started: Optional[Callable] = None
         self.on_speaking_stopped: Optional[Callable] = None
@@ -91,26 +92,31 @@ class LokiTTS:
         """Single background thread — serializes all speech, signals when queue drains."""
         while True:
             text = self._queue.get()
+            skip = False
             with self._lock:
-                self._speaking = True
-            if self.on_speaking_started:
-                self.on_speaking_started()
-            try:
-                if EDGE_TTS_AVAILABLE and self._engine_name == "edge":
-                    self._speak_edge(text)
-                elif self._pyttsx3_engine:
-                    self._speak_pyttsx3(text)
+                if self._stopped:
+                    skip = True
                 else:
-                    logger.warning(f"TTS: no engine available. Text: {text[:50]}")
-            except Exception as e:
-                logger.error(f"TTS error: {e}", exc_info=True)
-            finally:
-                self._queue.task_done()
-                if self._queue.empty():
-                    with self._lock:
-                        self._speaking = False
-                    if self.on_speaking_stopped:
-                        self.on_speaking_stopped()
+                    self._speaking = True
+            if not skip:
+                if self.on_speaking_started:
+                    self.on_speaking_started()
+                try:
+                    if EDGE_TTS_AVAILABLE and self._engine_name == "edge":
+                        self._speak_edge(text)
+                    elif self._pyttsx3_engine:
+                        self._speak_pyttsx3(text)
+                    else:
+                        logger.warning(f"TTS: no engine available. Text: {text[:50]}")
+                except Exception as e:
+                    logger.error(f"TTS error: {e}", exc_info=True)
+            self._queue.task_done()
+            if self._queue.empty():
+                with self._lock:
+                    self._speaking = False
+                    self._stopped = False  # ready for next use
+                if not skip and self.on_speaking_stopped:
+                    self.on_speaking_stopped()
 
     def _speak_edge(self, text: str) -> None:
         async def _run():
@@ -177,17 +183,40 @@ class LokiTTS:
             pass
 
     def stop(self) -> None:
+        """Stop current playback and drain all queued speech."""
+        with self._lock:
+            self._stopped = True
+            self._speaking = False
+
+        # Drain queued items so they are not spoken after stop()
+        try:
+            while True:
+                self._queue.get_nowait()
+                self._queue.task_done()
+        except _queue_module.Empty:
+            pass
+
         if PYGAME_AVAILABLE:
             try:
                 pygame.mixer.music.stop()
             except Exception:
                 pass
-        with self._lock:
-            self._speaking = False
+
+        # Best-effort stop of pyttsx3 runAndWait loop
+        if self._pyttsx3_engine:
+            try:
+                self._pyttsx3_engine.stop()
+            except Exception:
+                pass
 
     @property
     def is_speaking(self) -> bool:
         return self._speaking
+
+    @property
+    def is_idle(self) -> bool:
+        """True when neither speaking nor queued."""
+        return not self._speaking and self._queue.empty()
 
 
 def create_tts_engine(config: dict) -> LokiTTS:

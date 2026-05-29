@@ -1,17 +1,19 @@
 """
 Speech listener — microphone + VAD + Whisper STT.
 
-Key fixes over the original:
-- VAD aggressiveness 1 (was 2) — catches softer speech without missing words
-- Minimum audio guard — skips < 0.5s clips that produce garbage transcriptions
-- Buffer accumulation fallback — if speech detected but silence never triggers,
-  flush after max_record_sec to avoid infinite accumulation
-- Whisper params tuned: temperature=0, condition_on_previous_text=False,
-  no_speech_threshold=0.5, logprob_threshold=-1.0 — far more reliable
-- PCM frame size validation before passing to webrtcvad
+Key design:
+- Audio callback is NON-BLOCKING: it only buffers raw PCM frames into a Queue.
+- A dedicated worker thread drains the queue and runs Whisper transcription.
+  This prevents Whisper (100-600ms) from stalling the sounddevice callback
+  which must return in < one audio block or the driver drops frames.
+- VAD aggressiveness 1 — catches softer speech without missing words.
+- Minimum audio guard — skips < 0.35s clips that produce garbage transcriptions.
+- Buffer flush — if speech starts but silence never triggers, flush after max_record_sec.
+- Whisper params: temperature=0, condition_on_previous_text=False — more reliable.
 """
 
 import logging
+import queue
 import threading
 import time
 import numpy as np
@@ -62,6 +64,13 @@ class SpeechListener:
         self._thread: Optional[threading.Thread] = None
         self._model = None
 
+        # Worker queue: callback puts completed frame-lists here; worker runs Whisper
+        self._work_queue: queue.Queue = queue.Queue(maxsize=8)
+        self._worker: threading.Thread = threading.Thread(
+            target=self._transcribe_worker, daemon=True, name="loki-stt-worker"
+        )
+        self._worker.start()
+
         self.on_transcript: Optional[Callable[[str], None]] = None
         self.on_listening_started: Optional[Callable] = None
         self.on_listening_stopped: Optional[Callable] = None
@@ -74,6 +83,12 @@ class SpeechListener:
                 logger.info("Whisper model loaded successfully")
             except Exception as e:
                 logger.error(f"Whisper load failed: {e}")
+
+    # ── Public interface ────────────────────────────────────────────────
+
+    @property
+    def is_listening(self) -> bool:
+        return self._listening
 
     def start_listening(self) -> None:
         if self._listening:
@@ -93,6 +108,8 @@ class SpeechListener:
             self.on_listening_stopped()
         logger.info("Listening stopped")
 
+    # ── Audio capture loop (runs on its own thread) ─────────────────────
+
     def _listen_loop(self) -> None:
         if not SD_AVAILABLE or not VAD_AVAILABLE or not self._model:
             logger.error("Required audio libraries not available — cannot start listener")
@@ -104,8 +121,6 @@ class SpeechListener:
         max_silence = int(self._silence_sec * 1000 / self.FRAME_MS)
         max_record_frames = int(self._max_record_sec * 1000 / self.FRAME_MS)
         triggered = False
-
-        # PCM remainder buffer for handling partial frames from sounddevice
         pcm_buffer = b""
 
         def callback(indata, frame_count, time_info, status):
@@ -117,11 +132,9 @@ class SpeechListener:
             if status:
                 logger.debug(f"Audio status: {status}")
 
-            # Convert float32 → int16 PCM bytes
             pcm_chunk = (indata[:, 0] * 32767).astype(np.int16).tobytes()
             pcm_buffer += pcm_chunk
 
-            # Process complete 30ms frames from the buffer
             while len(pcm_buffer) >= self.FRAME_BYTES:
                 frame = pcm_buffer[:self.FRAME_BYTES]
                 pcm_buffer = pcm_buffer[self.FRAME_BYTES:]
@@ -141,17 +154,22 @@ class SpeechListener:
                     frames.append(frame)
                     silence_frames += 1
 
-                    # Silence threshold reached → flush to Whisper
                     if silence_frames >= max_silence:
-                        self._transcribe(frames[:])
+                        # Enqueue for worker; never block the callback
+                        try:
+                            self._work_queue.put_nowait(frames[:])
+                        except queue.Full:
+                            logger.warning("STT work queue full — dropping audio clip")
                         frames.clear()
                         silence_frames = 0
                         triggered = False
 
-                # Safety: flush if recording has gone on too long
                 if len(frames) >= max_record_frames:
                     logger.warning("Max record duration hit — force flushing audio")
-                    self._transcribe(frames[:])
+                    try:
+                        self._work_queue.put_nowait(frames[:])
+                    except queue.Full:
+                        logger.warning("STT work queue full — dropping long clip")
                     frames.clear()
                     silence_frames = 0
                     triggered = False
@@ -168,6 +186,23 @@ class SpeechListener:
                     time.sleep(0.1)
         except Exception as e:
             logger.error(f"Audio stream error: {e}")
+
+    # ── Transcription worker (runs on its own daemon thread) ────────────
+
+    def _transcribe_worker(self) -> None:
+        """Drain the work queue and run Whisper on each frame list.
+        Completely separate from the audio capture thread — no callback blocking."""
+        while True:
+            try:
+                frames = self._work_queue.get(timeout=1.0)
+            except queue.Empty:
+                continue
+            try:
+                self._transcribe(frames)
+            except Exception as e:
+                logger.error(f"Transcription worker error: {e}", exc_info=True)
+            finally:
+                self._work_queue.task_done()
 
     def _transcribe(self, frames: list[bytes]) -> None:
         if not frames or not self._model:
@@ -193,7 +228,6 @@ class SpeechListener:
 
             text = result.get("text", "").strip()
 
-            # Reject single-word garbage and common Whisper hallucinations
             if text and len(text) > 2 and text.lower() not in {
                 "you", ".", "thank you.", "thanks.", "bye.", "okay.",
                 "hmm.", "uh.", "um.", "ah.", "oh.", "huh.",
