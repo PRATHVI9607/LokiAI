@@ -7,7 +7,7 @@ import { useLoki } from "@/hooks/useLoki";
 import ChatPanel from "@/components/ChatPanel";
 import FilePanel from "@/components/FilePanel";
 
-const RuneCanvas = dynamic(() => import("@/components/RuneCanvas"), { ssr: false });
+const PlasmaOrb = dynamic(() => import("@/components/PlasmaOrb"), { ssr: false });
 
 export default function Home() {
   const {
@@ -29,9 +29,9 @@ export default function Home() {
   // WebSocket state and scroll position. When dormant, show an idle overlay instead.
   return (
     <div className="app-shell">
-      {/* Animated rune particle background — always present */}
+      {/* 3D plasma orb centerpiece — always present, reacts to voice state */}
       <div className="app-bg">
-        <RuneCanvas status={isVisible ? status : "offline"} />
+        <PlasmaOrb status={isVisible ? status : "offline"} />
       </div>
 
       {/* Depth vignette over canvas */}

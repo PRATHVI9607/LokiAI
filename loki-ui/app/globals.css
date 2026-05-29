@@ -2,15 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;700;900&display=swap");
 
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body, #__next {
   height: 100%;
-  background: #050B18;
-  color: #F1F5F9;
+  /* Neon cyber: deep indigo void with a faint radial glow */
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 40%, #14082e 0%, #0a0a1f 55%, #06060f 100%);
+  color: #EAF2FF;
   font-family: "Inter", system-ui, sans-serif;
   overflow: hidden;
 }
@@ -796,3 +798,185 @@ html, body, #__next {
   0%,100% { opacity: 1; }
   50%      { opacity: 0.3; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v3 — NEON ANIME CYBER  (overrides the gold/Norse theme above)
+   palette: indigo void · electric cyan #00E5FF · hot magenta #FF2E97
+══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --neon-cyan:   #00E5FF;
+  --neon-mag:    #FF2E97;
+  --neon-violet: #8B5CF6;
+  --neon-ink:    #EAF2FF;
+}
+
+::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.35); }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,229,255,0.6); }
+::selection { background: rgba(255,46,151,0.35); color: #fff; }
+
+.app-vignette {
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 42%, transparent 0%, transparent 38%, rgba(6,6,15,0.55) 100%),
+    radial-gradient(ellipse 80% 60% at 50% 0%,  rgba(0,229,255,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(255,46,151,0.08) 0%, transparent 55%);
+}
+
+/* Header → frosted cyber bar */
+.app-header {
+  background: linear-gradient(180deg, rgba(10,10,31,0.82), rgba(10,10,31,0.55));
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  border-bottom: 1px solid rgba(0,229,255,0.16);
+  box-shadow: 0 1px 0 rgba(0,229,255,0.10), 0 8px 32px rgba(0,0,0,0.5);
+}
+.loki-logo {
+  font-family: "Orbitron", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  background: linear-gradient(110deg, #00E5FF 0%, #7DF9FF 30%, #FF2E97 70%, #00E5FF 100%);
+  background-size: 300% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: cyber-shimmer 4s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(0,229,255,0.45));
+}
+@keyframes cyber-shimmer { to { background-position: 300% center; } }
+.header-divider { background: linear-gradient(180deg, transparent, rgba(0,229,255,0.4), transparent); }
+
+/* Chat body lets the orb show through */
+.chat-body { background: transparent; }
+.messages-area { padding: 26px 0 10px; gap: 16px; }
+
+/* IMMERSIVE GLASS MESSAGE CARDS */
+.msg-bubble {
+  position: relative;
+  max-width: min(80%, 820px);
+  padding: 13px 18px;
+  border-radius: 18px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  isolation: isolate;
+  animation: msg-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes msg-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.msg-bubble-loki {
+  background: linear-gradient(155deg, rgba(16,22,52,0.72), rgba(10,12,32,0.66));
+  border: 1px solid transparent;
+  color: #EAF2FF;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.45), 0 0 24px rgba(0,229,255,0.06);
+}
+.msg-bubble-loki::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 18px; padding: 1px;
+  background: linear-gradient(130deg, #00E5FF, #8B5CF6 45%, #FF2E97 90%);
+  background-size: 200% 200%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0.55;
+  animation: border-flow 6s ease infinite;
+  z-index: -1;
+}
+@keyframes border-flow { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+.msg-bubble-user {
+  background: linear-gradient(135deg, rgba(255,46,151,0.16), rgba(108,77,255,0.12));
+  border: 1px solid rgba(255,46,151,0.32);
+  color: #FFFFFF;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.4), 0 0 20px rgba(255,46,151,0.08);
+}
+
+.msg-avatar {
+  width: 32px; height: 32px;
+  background: radial-gradient(circle at 35% 30%, #7DF9FF 0%, #00E5FF 35%, #8B5CF6 70%, #FF2E97 100%);
+  box-shadow: 0 0 18px rgba(0,229,255,0.55), 0 0 8px rgba(255,46,151,0.4);
+  animation: avatar-pulse 3s ease-in-out infinite;
+}
+@keyframes avatar-pulse {
+  0%,100% { box-shadow: 0 0 14px rgba(0,229,255,0.45), 0 0 6px rgba(255,46,151,0.3); }
+  50%     { box-shadow: 0 0 24px rgba(0,229,255,0.7), 0 0 12px rgba(255,46,151,0.55); }
+}
+
+.msg-system {
+  color: #9FB6D6;
+  background: rgba(0,229,255,0.06);
+  border: 1px solid rgba(0,229,255,0.18);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+
+.msg-inline-code { background: rgba(0,229,255,0.12); border-color: rgba(0,229,255,0.3); color: #7DF9FF; }
+.msg-code-block { background: rgba(6,8,22,0.9); border-color: rgba(0,229,255,0.18); border-left: 3px solid var(--neon-cyan); }
+.msg-code-lang { color: rgba(0,229,255,0.6); }
+.msg-link { color: #00E5FF; } .msg-link:hover { color: #7DF9FF; }
+
+.thinking-dot { box-shadow: 0 0 8px currentColor; }
+.thinking-dot:nth-child(1){ background:#00E5FF; }
+.thinking-dot:nth-child(2){ background:#8B5CF6; }
+.thinking-dot:nth-child(3){ background:#FF2E97; }
+
+/* Input bar → cyber dock */
+.input-bar {
+  background: linear-gradient(0deg, rgba(8,8,24,0.85), rgba(8,8,24,0.5));
+  -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px);
+  border-top: 1px solid rgba(0,229,255,0.14);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
+}
+.input-field {
+  background: rgba(10,14,36,0.7);
+  border: 1px solid rgba(0,229,255,0.22);
+  color: #EAF2FF;
+  border-radius: 14px;
+}
+.input-field::placeholder { color: #5b6b96; }
+.input-field:focus {
+  border-color: rgba(0,229,255,0.6);
+  background: rgba(14,20,48,0.9);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.1), 0 0 20px rgba(0,229,255,0.12), inset 0 0 14px rgba(0,229,255,0.04);
+}
+.send-btn {
+  background: linear-gradient(135deg, #00E5FF, #6C4DFF 55%, #FF2E97);
+  background-size: 180% auto;
+  color: #05060f; font-weight: 800;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0,229,255,0.35);
+  transition: background-position 0.4s, box-shadow 0.2s, transform 0.1s;
+}
+.send-btn:hover:not(:disabled) { background-position: right center; box-shadow: 0 6px 28px rgba(255,46,151,0.45); }
+.send-btn:active:not(:disabled) { transform: scale(0.95); }
+
+.action-btn { background: rgba(10,14,36,0.5); border-color: rgba(0,229,255,0.2); color: #8aa0c6; }
+.action-btn:hover { border-color: rgba(0,229,255,0.45); color: #00E5FF; box-shadow: 0 0 12px rgba(0,229,255,0.15); }
+.action-btn-gold { border-color: rgba(0,229,255,0.3); background: rgba(0,229,255,0.08); color: #00E5FF; }
+.action-btn-red:hover { border-color: rgba(255,46,151,0.5); color: #FF2E97; box-shadow: 0 0 12px rgba(255,46,151,0.18); }
+
+.personality-btn { background: rgba(0,229,255,0.07); border-color: rgba(0,229,255,0.25); }
+.personality-btn:hover { box-shadow: 0 0 0 2px rgba(0,229,255,0.15); }
+.status-pill { background: rgba(10,14,36,0.6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+.rag-pill { border-color: rgba(0,229,255,0.3); background: rgba(0,229,255,0.1); color: #7DF9FF; box-shadow: 0 0 10px rgba(0,229,255,0.12); }
+
+.file-sidebar {
+  background: rgba(8,10,28,0.78);
+  -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px);
+  border-right: 1px solid rgba(0,229,255,0.14);
+  box-shadow: 2px 0 40px rgba(0,0,0,0.45);
+}
+.dropzone { border-color: rgba(0,229,255,0.28); }
+.dropzone:hover, .dropzone-active { border-color: rgba(0,229,255,0.65); background: rgba(0,229,255,0.06); }
+
+.transcript-strip {
+  background: rgba(0,229,255,0.06);
+  border: 1px dashed rgba(0,229,255,0.3);
+  color: #9FB6D6;
+}
+
+.rune-glow { text-shadow: 0 0 14px rgba(0,229,255,0.4), 0 0 36px rgba(255,46,151,0.15); color: rgba(0,229,255,0.18); }
+.dormant-rune { color: rgba(0,229,255,0.3); }
+.dormant-label { color: rgba(0,229,255,0.4); }
