@@ -7,6 +7,7 @@ FastAPI + Next.js UI, voice interface, 50+ features, comprehensive PC control.
 
 import asyncio
 import logging
+import socket
 import sys
 import threading
 from pathlib import Path
@@ -108,6 +109,21 @@ def setup_logging(config: dict) -> None:
 
 
 logger = logging.getLogger("loki.main")
+
+
+def _free_port(port: int) -> None:
+    """Kill any process holding the given port so re-runs never fail with EADDRINUSE."""
+    try:
+        import psutil
+        for conn in psutil.net_connections(kind="inet"):
+            if conn.laddr.port == port and conn.status == "LISTEN":
+                try:
+                    psutil.Process(conn.pid).terminate()
+                    logger.info(f"Freed port {port} (killed PID {conn.pid})")
+                except Exception:
+                    pass
+    except Exception:
+        pass  # psutil unavailable or permission denied — uvicorn will surface the real error
 
 
 class LokiApplication:
@@ -398,6 +414,7 @@ class LokiApplication:
 
         threading.Thread(target=open_browser, daemon=True).start()
 
+        _free_port(port)  # kill any stale Loki instance before binding
         try:
             uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
         except KeyboardInterrupt:
