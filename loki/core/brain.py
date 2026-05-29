@@ -263,9 +263,12 @@ FACT_EXTRACT_EVERY = 5
 class LokiBrain:
     """
     LLM integration with KORTEX-style context engineering.
-    LLM priority: Kimi K2 → OpenRouter → Ollama.
+    LLM priority: NVIDIA NIM (Kimi K2.6) → Kimi Moonshot → OpenRouter → Ollama.
     Context layers: personality + brain memory + KG entities + RAG chunks + history.
     """
+
+    NVIDIA_NIM_URL = "https://integrate.api.nvidia.com/v1"
+    NVIDIA_MODEL   = "moonshotai/kimi-k2.6"
 
     def __init__(
         self,
@@ -288,6 +291,23 @@ class LokiBrain:
         self._temperature = config.get("temperature", 0.70)
         self._max_turns = config.get("max_turns", 20)
 
+        # ─── Provider 0: NVIDIA NIM — Kimi K2.6 with extended thinking ────────
+        self._nvidia_client: Optional[Any] = None
+        nvidia_key = os.getenv("NVIDIA_API_KEY", "")
+        if nvidia_key and not nvidia_key.startswith("your_"):
+            try:
+                self._nvidia_client = OpenAI(
+                    base_url=self.NVIDIA_NIM_URL,
+                    api_key=nvidia_key,
+                    timeout=180.0,   # thinking mode: allow up to 3 min
+                    max_retries=0,
+                )
+                logger.info(f"NVIDIA NIM configured: {self.NVIDIA_MODEL} (thinking enabled)")
+            except Exception as e:
+                logger.warning(f"NVIDIA NIM init failed: {e}")
+        else:
+            logger.info("NVIDIA_API_KEY not set — NVIDIA NIM disabled")
+
         # ─── Provider 1: Kimi K2 (Moonshot API) ──────────────────────────────
         self._kimi_client: Optional[Any] = None
         self._kimi_model = config.get("kimi_model", "kimi-k2")
@@ -300,11 +320,11 @@ class LokiBrain:
                     timeout=60.0,
                     max_retries=0,
                 )
-                logger.info(f"Kimi K2 configured: {self._kimi_model}")
+                logger.info(f"Kimi K2 (Moonshot) configured: {self._kimi_model}")
             except Exception as e:
                 logger.warning(f"Kimi K2 init failed: {e}")
         else:
-            logger.info("KIMI_API_KEY not set — Kimi K2 disabled")
+            logger.info("KIMI_API_KEY not set — Kimi Moonshot disabled")
 
         # ─── Provider 2: OpenRouter ────────────────────────────────────────────
         self._openrouter_client: Optional[Any] = None
@@ -358,7 +378,14 @@ class LokiBrain:
         self._log_provider_status()
 
     def _log_provider_status(self) -> None:
-        primary = "Kimi K2" if self._kimi_client else ("OpenRouter" if self._openrouter_client else "Ollama")
+        if self._nvidia_client:
+            primary = f"NVIDIA NIM ({self.NVIDIA_MODEL})"
+        elif self._kimi_client:
+            primary = f"Kimi Moonshot ({self._kimi_model})"
+        elif self._openrouter_client:
+            primary = "OpenRouter"
+        else:
+            primary = "Ollama (local)"
         logger.info(f"Brain active — primary provider: {primary}")
 
     # ─── History ──────────────────────────────────────────────────────────────
@@ -470,7 +497,37 @@ class LokiBrain:
             except Exception as e:
                 logger.warning(f"Kimi K2 error: {e} — trying OpenRouter")
 
-        # 2. OpenRouter
+        # 0. NVIDIA NIM — Kimi K2.6 with extended thinking (highest priority)
+        # Uses streaming so first-token latency is visible even during long think cycles.
+        if self._nvidia_client:
+            try:
+                import re as _re
+                chunks = []
+                stream = self._nvidia_client.chat.completions.create(
+                    model=self.NVIDIA_MODEL,
+                    messages=messages,
+                    max_tokens=max(mt, 4096),   # NIM supports up to 16384
+                    temperature=self._temperature,
+                    top_p=1.0,
+                    stream=True,
+                    extra_body={"chat_template_kwargs": {"thinking": True}},
+                )
+                for chunk in stream:
+                    delta = chunk.choices[0].delta.content or "" if chunk.choices else ""
+                    chunks.append(delta)
+                text = "".join(chunks)
+                # Strip <think>…</think> reasoning traces from the final answer
+                text = _re.sub(r"<think>[\s\S]*?</think>", "", text, flags=_re.DOTALL).strip()
+                if text:
+                    logger.debug(f"Response from NVIDIA NIM ({self.NVIDIA_MODEL})")
+                    return text
+            except Exception as e:
+                logger.warning(f"NVIDIA NIM error: {e} — trying next provider")
+
+        # 1. Kimi Moonshot (direct API)
+        # (already attempted above as provider 0 via NVIDIA NIM if key was set)
+
+        # 3. OpenRouter
         if self._openrouter_client:
             for model in self._fallback_models:
                 try:
