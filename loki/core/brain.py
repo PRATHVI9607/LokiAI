@@ -391,14 +391,14 @@ class LokiBrain:
 
     def _log_provider_status(self) -> None:
         if self._nvidia_client:
-            primary = f"NVIDIA NIM / Kimi K2.6 ({self.NVIDIA_MODEL})"
+            primary = f"NVIDIA NIM Kimi K2.6 → fallback: OpenRouter ({self._fast_models[0]})"
         elif self._openrouter_client:
-            primary = f"OpenRouter ({self._fast_models[0]})"
+            primary = f"OpenRouter → {self._fast_models[0]}"
         elif self._kimi_client:
             primary = f"Kimi Moonshot ({self._kimi_model})"
         else:
             primary = "Ollama (local)"
-        logger.info(f"Brain active — primary provider: {primary}")
+        logger.info(f"Brain active — {primary}")
 
     # ─── History ──────────────────────────────────────────────────────────────
 

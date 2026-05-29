@@ -6,17 +6,21 @@ Only one component can hold the mic at a time:
   LISTENING mode → SpeechListener captures a command utterance
 
 State transitions fire callbacks rather than reaching into other modules.
-This eliminates the scattered _running checks and thread-join guards in main.py.
 """
 
 import logging
 import threading
+import time
 from typing import Callable, Optional
 
 from loki.core.wakeword import WakewordDetector
 from loki.core.listener import SpeechListener
 
 logger = logging.getLogger(__name__)
+
+# Delay between TTS finishing and mic resuming — prevents the listener from
+# picking up soundcard echo/reverb of Loki's own voice as a new command.
+_MIC_RESUME_DELAY = 0.45  # seconds
 
 
 class VoicePipeline:
@@ -26,7 +30,7 @@ class VoicePipeline:
         self._wakeword = wakeword
         self._listener = listener
         self._lock = threading.Lock()
-        self._active = False   # pipeline is running at all
+        self._active = False
         self._muted = False
 
         # Outbound callbacks
@@ -62,10 +66,17 @@ class VoicePipeline:
         logger.info("VoicePipeline deactivated")
 
     def resume_listening(self) -> None:
-        """After TTS finishes mid-conversation: start listener for next utterance."""
+        """After TTS finishes mid-conversation: start listener for next utterance.
+        Applies a short delay so soundcard echo of Loki's voice drains before
+        the mic opens — prevents Loki hearing its own responses as new commands."""
         if self._muted or not self._active:
             return
-        if not self._listener.is_listening:
+        # Use a timer so the calling thread (TTS worker) is not blocked
+        threading.Timer(_MIC_RESUME_DELAY, self._start_listener_safe).start()
+
+    def _start_listener_safe(self) -> None:
+        """Timer callback — only starts listener if still active and not already running."""
+        if self._active and not self._muted and not self._listener.is_listening:
             self._listener.start_listening()
 
     def return_to_wakeword(self) -> None:
@@ -92,12 +103,13 @@ class VoicePipeline:
     def _handle_wakeword(self) -> None:
         """Wakeword detected: release wakeword mic, hand to listener."""
         self._wakeword.stop()
+        # Brief delay so wakeword audio drains before listener opens
+        time.sleep(0.15)
         self._listener.start_listening()
         if self.on_wakeword:
             self.on_wakeword()
 
     def _handle_partial(self, text: str) -> None:
-        """Partial wakeword transcript (for live transcript display)."""
         if self.on_transcript_partial:
             self.on_transcript_partial(text)
 

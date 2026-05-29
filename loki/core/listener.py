@@ -191,14 +191,20 @@ class SpeechListener:
 
     def _transcribe_worker(self) -> None:
         """Drain the work queue and run Whisper on each frame list.
-        Completely separate from the audio capture thread — no callback blocking."""
+        Completely separate from the audio capture thread — no callback blocking.
+        Stale frames queued before stop_listening() are silently dropped."""
         while True:
             try:
                 frames = self._work_queue.get(timeout=1.0)
             except queue.Empty:
                 continue
             try:
-                self._transcribe(frames)
+                # Drop if we stopped listening before this frame was picked up —
+                # prevents stale audio firing on_transcript after conversation ends
+                if self._listening:
+                    self._transcribe(frames)
+                else:
+                    logger.debug("Dropped stale audio frame (not listening)")
             except Exception as e:
                 logger.error(f"Transcription worker error: {e}", exc_info=True)
             finally:
@@ -233,8 +239,12 @@ class SpeechListener:
                 "hmm.", "uh.", "um.", "ah.", "oh.", "huh.",
             }:
                 logger.info(f"Transcribed: {text}")
-                if self.on_transcript:
+                # Double-check: only fire if still listening at point of callback
+                # (stop_listening may have been called while Whisper was running)
+                if self._listening and self.on_transcript:
                     self.on_transcript(text)
+                elif not self._listening:
+                    logger.debug(f"Transcript discarded — listener stopped: {text!r}")
             else:
                 logger.debug(f"Transcript filtered out: {text!r}")
 

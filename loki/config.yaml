@@ -9,10 +9,10 @@ llm:
   # Provider priority (speed-first): OpenRouter → NVIDIA NIM → Kimi → Ollama
   # Set OPENROUTER_API_KEY and/or NVIDIA_API_KEY in loki/.env
 
-  # OpenRouter free models — ordered by quality/speed balance (benchmarked)
-  fast_model:           google/gemma-4-31b-it:free         # ~5.6s, good quality ✓
-  fallback_model:       openai/gpt-oss-120b:free           # ~10s, high quality
-  second_fallback_model: liquid/lfm-2.5-1.2b-instruct:free # ~1.1s, tiny emergency fallback
+  # OpenRouter models — Kimi K2.6 free first, then quality fallbacks
+  fast_model:           moonshotai/kimi-k2.6:free          # Kimi K2.6 FREE via OpenRouter ✓
+  fallback_model:       google/gemma-4-31b-it:free         # ~5.6s quality fallback
+  second_fallback_model: openai/gpt-oss-120b:free          # high quality backup
 
   # NVIDIA NIM — Kimi K2.6 (set NVIDIA_API_KEY in .env to enable)
   nvidia_thinking: false  # true = deep reasoning but slow (30-90s); false = fast mode
