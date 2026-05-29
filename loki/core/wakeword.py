@@ -134,7 +134,7 @@ class WakewordDetector:
                         continue  # silence — skip Whisper entirely
 
                     if self._is_wakeword(snap):
-                        logger.info("Wakeword detected!")
+                        logger.info("✦ 'Hey Loki' detected — waking up")
                         if self.on_wakeword:
                             self.on_wakeword()
 
@@ -163,7 +163,8 @@ class WakewordDetector:
             if raw and self.on_transcript:
                 self.on_transcript(raw)
 
-            logger.debug(f"Wakeword candidate: {repr(clean)}")
+            if clean:
+                logger.debug(f"heard: {repr(clean)}")
 
             for variant in self.WAKEWORD_VARIANTS:
                 if variant in clean:

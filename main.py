@@ -30,6 +30,7 @@ from loki.core.memory import MemoryManager
 from loki.core.audit import AuditLog
 from loki.core.voice_pipeline import VoicePipeline
 from loki.core.conversation_sm import ConversationStateMachine
+from loki.core.log_setup import setup_logging, banner as log_banner, flow as log_flow
 from loki.features.rag_engine import RagEngine
 
 from loki.actions.file_ops import FileOps
@@ -92,22 +93,6 @@ from loki.ui.server import create_loki_server
 
 LOKI_LOG = PROJECT_ROOT / "loki" / "loki.log"
 
-
-def setup_logging(config: dict) -> None:
-    log_cfg = config.get("logging", {})
-    level = getattr(logging, log_cfg.get("level", "INFO"), logging.INFO)
-    fmt = log_cfg.get("format", "%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-    LOKI_LOG.parent.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        level=level,
-        format=fmt,
-        handlers=[
-            logging.FileHandler(LOKI_LOG, encoding="utf-8"),
-            logging.StreamHandler(sys.stdout),
-        ],
-    )
-
-
 logger = logging.getLogger("loki.main")
 
 
@@ -138,10 +123,8 @@ class LokiApplication:
         if env_path.exists():
             load_dotenv(env_path)
 
-        setup_logging(self.config)
-        logger.info("=" * 60)
-        logger.info("  LOKI AI DESKTOP ASSISTANT — Starting up")
-        logger.info("=" * 60)
+        setup_logging(self.config, LOKI_LOG)
+        log_banner("  LOKI AI DESKTOP ASSISTANT — Starting up")
 
         self._init_all()
         self._wire_callbacks()
@@ -424,8 +407,14 @@ class LokiApplication:
 
 
 def main() -> None:
+    # --debug / -d flag flips terminal logging to DEBUG (shows wakeword candidates,
+    # audio frames, LLM timing, context injection — everything)
+    debug = "--debug" in sys.argv or "-d" in sys.argv
     try:
         app = LokiApplication()
+        if debug:
+            logging.getLogger().handlers[0].setLevel(logging.DEBUG)  # terminal handler
+            logger.info("🔍 DEBUG logging enabled — verbose terminal output")
         app.run()
     except KeyboardInterrupt:
         logger.info("Interrupted by user")

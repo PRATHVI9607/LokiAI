@@ -590,25 +590,30 @@ class LokiBrain:
             yield random.choice(WAKEWORD_RESPONSES)
             return
 
-        logger.info(f"User: {user_message[:100]}")
+        logger.debug(f"User message: {user_message[:100]}")
 
         # Gather all context layers in parallel (fast: KG is in-memory, RAG hits ChromaDB)
         kg_context = self._get_kg_context(user_message)
         rag_context = self._get_rag_context(user_message)
 
+        ctx_bits = []
         if kg_context:
-            logger.info(f"KG: injecting {len(kg_context)} chars of entity context")
+            ctx_bits.append(f"KG +{len(kg_context)}c")
         if rag_context:
-            logger.info(f"RAG: injecting {len(rag_context)} chars of file context")
+            ctx_bits.append(f"RAG +{len(rag_context)}c")
+        if ctx_bits:
+            logger.debug(f"context: {', '.join(ctx_bits)}")
 
         messages = self._build_messages(user_message, kg_context, rag_context)
+        import time as _t
+        _start = _t.time()
         response_text = self._call_llm(messages)
+        logger.debug(f"LLM responded in {_t.time() - _start:.1f}s")
 
         if not response_text.strip():
             response_text = "All pathways to knowledge are severed. Check your API keys and try again."
-            logger.error("All LLM backends failed")
+            logger.error("all LLM providers failed — check API keys / network")
 
-        logger.info(f"Loki: {response_text[:80]}")
         yield response_text
         self._store_turn(user_message, response_text)
 

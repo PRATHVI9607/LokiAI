@@ -101,7 +101,7 @@ class ConversationStateMachine:
         self._server.show_window()
         self._server.set_status("listening")
         self._arm_timeout()
-        logger.info("Conversation started → LISTENING")
+        logger.info("● conversation started [LISTENING]")
 
     def process_input(self, text: str) -> None:
         if not text or not text.strip():
@@ -115,6 +115,7 @@ class ConversationStateMachine:
         self._server.add_user_message(text)
         self._server.set_status("thinking")
         self._server.clear_transcript()
+        logger.info("🧠 thinking… [THINKING]")
 
         # Run LLM + action on a worker thread so the voice pipeline stays responsive
         self._process_thread = threading.Thread(
@@ -132,7 +133,7 @@ class ConversationStateMachine:
         self._cancel_timeout()
         self._server.set_status("idle")
         self._server.hide_window()
-        logger.info("Conversation ended → IDLE")
+        logger.info("○ conversation ended [IDLE]")
         if self.on_ended:
             self.on_ended()
 
@@ -151,12 +152,13 @@ class ConversationStateMachine:
         if do_end:
             self._server.set_status("idle")
             self._server.hide_window()
-            logger.info("Farewell complete → IDLE")
+            logger.info("○ farewell done [IDLE] — back to wakeword")
             if self.on_ended:
                 self.on_ended()
         else:
             self._server.set_status("listening")
             self._arm_timeout()
+            logger.info("● ready for next [LISTENING]")
             if self.on_ready_for_next:
                 self.on_ready_for_next()
 
@@ -171,7 +173,7 @@ class ConversationStateMachine:
         self._server.add_loki_message(farewell)
         self._server.set_status("speaking")
         self._tts.speak(farewell)
-        logger.info("Timeout → ENDING (farewell queued)")
+        logger.info("⏱ timeout — saying farewell [ENDING]")
 
     def _arm_timeout(self) -> None:
         self._cancel_timeout()
@@ -245,6 +247,7 @@ class ConversationStateMachine:
             with self._lock:
                 self._state = ConvState.SPEAKING
             self._server.set_status("speaking")
+            logger.info(f"💬 Loki: \"{text[:80]}{'…' if len(text) > 80 else ''}\" [SPEAKING]")
             self._tts.speak(text)
         else:
             # No TTS — transition back to LISTENING directly

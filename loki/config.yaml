@@ -118,6 +118,8 @@ features:
     # Override here only if needed — regex strings with quotes are tricky in YAML
 
 logging:
-  level: INFO
-  file: loki.log
-  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  level: INFO          # DEBUG = verbose (see every wakeword candidate, audio frame)
+                       # INFO  = normal (clean flow view) — recommended
+                       # WARNING = quiet (errors only)
+  color: true          # color-coded terminal output (auto-off if not a TTY)
+  file: loki.log       # full DEBUG detail always written here regardless of level

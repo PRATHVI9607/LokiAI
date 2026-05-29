@@ -98,15 +98,17 @@ class SpeechListener:
         self._thread.start()
         if self.on_listening_started:
             self.on_listening_started()
-        logger.info("Listening started")
+        logger.info("🎤 mic open — listening for your command")
 
     def stop_listening(self) -> None:
+        was_listening = self._listening
         self._listening = False
         if self._thread and threading.current_thread() is not self._thread:
             self._thread.join(timeout=3)
         if self.on_listening_stopped:
             self.on_listening_stopped()
-        logger.info("Listening stopped")
+        if was_listening:
+            logger.info("🎤 mic closed")
 
     # ── Audio capture loop (runs on its own thread) ─────────────────────
 
@@ -238,13 +240,13 @@ class SpeechListener:
                 "you", ".", "thank you.", "thanks.", "bye.", "okay.",
                 "hmm.", "uh.", "um.", "ah.", "oh.", "huh.",
             }:
-                logger.info(f"Transcribed: {text}")
                 # Double-check: only fire if still listening at point of callback
                 # (stop_listening may have been called while Whisper was running)
                 if self._listening and self.on_transcript:
+                    logger.info(f"📝 you said: \"{text}\"")
                     self.on_transcript(text)
                 elif not self._listening:
-                    logger.debug(f"Transcript discarded — listener stopped: {text!r}")
+                    logger.debug(f"discarded (mic closed): {text!r}")
             else:
                 logger.debug(f"Transcript filtered out: {text!r}")
 
