@@ -12,7 +12,7 @@ tags:
 # CodeAssistant
 
 ## Connections
-- [[.__init__()_20]] - `method` [EXTRACTED]
+- [[.__init__()_23]] - `method` [EXTRACTED]
 - [[._ask()_2]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._require_brain()]] - `method` [EXTRACTED]
@@ -22,7 +22,6 @@ tags:
 - [[.generate_readme()]] - `method` [EXTRACTED]
 - [[.generate_regex()]] - `method` [EXTRACTED]
 - [[.refactor()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LLM-powered code analysis and generation.]] - `rationale_for` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]

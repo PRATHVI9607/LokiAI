@@ -1,17 +1,16 @@
 ---
 source_file: "loki/features/news_aggregator.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "NewsAggregator / RSS Feed Sources"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/NewsAggregator_/_RSS_Feed_Sources
 ---
 
 # NewsAggregator
 
 ## Connections
 - [[RSS Feed Sources]] - `references` [EXTRACTED]
-- [[WebSummarizer_1]] - `semantically_similar_to` [INFERRED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/NewsAggregator_/_RSS_Feed_Sources

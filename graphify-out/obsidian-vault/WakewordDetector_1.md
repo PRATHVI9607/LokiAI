@@ -1,18 +1,18 @@
 ---
 source_file: "loki/core/wakeword.py"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "SpeechListener / VoicePipeline / SpeechListener._transcribe_worker"
+location: "class WakewordDetector"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/SpeechListener_/_VoicePipeline_/_SpeechListener_transcribe_worker
 ---
 
 # WakewordDetector
 
 ## Connections
-- [[LokiApplication_1]] - `calls` [EXTRACTED]
-- [[Porcupine Wakeword Detection]] - `calls` [INFERRED]
-- [[Whisper Wakeword Detection]] - `calls` [EXTRACTED]
+- [[VoicePipeline_1]] - `calls` [EXTRACTED]
+- [[VoicePipeline._handle_wakeword]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_VoicePipeline_/_SpeechListener_transcribe_worker

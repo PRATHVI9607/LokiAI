@@ -16,7 +16,6 @@ tags:
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.get_briefing()]] - `method` [EXTRACTED]
 - [[.get_headlines()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[news_aggregator.py]] - `contains` [EXTRACTED]
 

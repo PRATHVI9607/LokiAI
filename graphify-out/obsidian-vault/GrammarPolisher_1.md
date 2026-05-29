@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/grammar_polisher.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "LokiBrain / test_brain.py / .ask()"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/LokiBrain_/_test_brainpy_/_ask
 ---
 
 # GrammarPolisher
@@ -13,6 +13,6 @@ tags:
 ## Connections
 - [[EmailDrafter_1]] - `semantically_similar_to` [INFERRED]
 - [[GhostWriter_1]] - `semantically_similar_to` [INFERRED]
-- [[LokiBrain (core dependency)]] - `references` [EXTRACTED]
+- [[LokiBrain]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/INFERRED #community/LokiBrain_/_test_brainpy_/_ask

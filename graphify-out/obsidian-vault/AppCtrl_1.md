@@ -1,18 +1,16 @@
 ---
 source_file: "loki/actions/app_ctrl.py"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "APP_MAP Application Name Registry / AppCtrl"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/APP_MAP_Application_Name_Registry_/_AppCtrl
 ---
 
 # AppCtrl
 
 ## Connections
 - [[APP_MAP Application Name Registry]] - `references` [EXTRACTED]
-- [[ActionRouter_1]] - `calls` [EXTRACTED]
-- [[LokiApplication_1]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/APP_MAP_Application_Name_Registry_/_AppCtrl

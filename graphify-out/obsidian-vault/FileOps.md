@@ -5,14 +5,14 @@ community: "FileOps / ShellExec / TestFileOps"
 location: "L15"
 tags:
   - graphify/code
-  - graphify/EXTRACTED
+  - graphify/INFERRED
   - community/FileOps_/_ShellExec_/_TestFileOps
 ---
 
 # FileOps
 
 ## Connections
-- [[.__init__()_2]] - `method` [EXTRACTED]
+- [[.__init__()_1]] - `method` [EXTRACTED]
 - [[._build_tree()]] - `method` [EXTRACTED]
 - [[._deny()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
@@ -22,12 +22,20 @@ tags:
 - [[.delete_file()]] - `method` [EXTRACTED]
 - [[.delete_folder()]] - `method` [EXTRACTED]
 - [[.move()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
+- [[.test_confirm_action_executes()]] - `calls` [INFERRED]
+- [[FakeTTS]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[Secure filefolder operations with undo support.]] - `rationale_for` [EXTRACTED]
+- [[TestClipboardSyncToken]] - `uses` [INFERRED]
+- [[TestConversationStateMachine]] - `uses` [INFERRED]
 - [[TestFileOps]] - `uses` [INFERRED]
+- [[TestPendingActions]] - `uses` [INFERRED]
+- [[TestProcessManagerExactMatch]] - `uses` [INFERRED]
+- [[TestSSRFProtection]] - `uses` [INFERRED]
 - [[TestShellExec]] - `uses` [INFERRED]
+- [[TestTTSDrain]] - `uses` [INFERRED]
+- [[TestVoicePipeline]] - `uses` [INFERRED]
 - [[file_ops()]] - `calls` [INFERRED]
 - [[file_ops.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/FileOps_/_ShellExec_/_TestFileOps
+#graphify/code #graphify/INFERRED #community/FileOps_/_ShellExec_/_TestFileOps

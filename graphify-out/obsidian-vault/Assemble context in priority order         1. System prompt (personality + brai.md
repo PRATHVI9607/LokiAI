@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/brain.py"
 type: "rationale"
-community: "LokiBrain / ApiMocker / FactChecker"
-location: "L419"
+community: "LokiBrain / test_brain.py / .ask()"
+location: "L430"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiBrain_/_ApiMocker_/_FactChecker
+  - community/LokiBrain_/_test_brainpy_/_ask
 ---
 
 # Assemble context in priority order:         1. System prompt (personality + brai
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[._build_messages()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_ApiMocker_/_FactChecker
+#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask

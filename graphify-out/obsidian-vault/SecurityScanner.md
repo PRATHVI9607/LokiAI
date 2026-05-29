@@ -12,7 +12,7 @@ tags:
 # SecurityScanner
 
 ## Connections
-- [[.__init__()_43]] - `method` [EXTRACTED]
+- [[.__init__()_46]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._iter_files()]] - `method` [EXTRACTED]
 - [[._os_walk()]] - `method` [EXTRACTED]
@@ -21,7 +21,6 @@ tags:
 - [[.test_clean_file_no_findings()]] - `calls` [INFERRED]
 - [[.test_detects_aws_key()]] - `calls` [INFERRED]
 - [[.test_detects_openai_key()]] - `calls` [INFERRED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[Scan code files for secrets and security vulnerabilities.]] - `rationale_for` [EXTRACTED]
 - [[TestClipboardManager]] - `uses` [INFERRED]

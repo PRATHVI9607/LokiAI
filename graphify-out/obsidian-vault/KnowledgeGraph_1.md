@@ -1,17 +1,17 @@
 ---
 source_file: "loki/features/knowledge_graph.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "LokiBrain / test_brain.py / .ask()"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/LokiBrain_/_test_brainpy_/_ask
 ---
 
 # KnowledgeGraph
 
 ## Connections
 - [[FileSearch_1]] - `semantically_similar_to` [INFERRED]
-- [[LokiBrain (core dependency)]] - `calls` [EXTRACTED]
+- [[LokiBrain]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask

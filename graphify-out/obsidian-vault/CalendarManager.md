@@ -12,7 +12,7 @@ tags:
 # CalendarManager
 
 ## Connections
-- [[.__init__()_16]] - `method` [EXTRACTED]
+- [[.__init__()_19]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()]] - `method` [EXTRACTED]
 - [[._load_events()]] - `method` [EXTRACTED]
@@ -20,7 +20,6 @@ tags:
 - [[.import_ics()]] - `method` [EXTRACTED]
 - [[.list_events()]] - `method` [EXTRACTED]
 - [[.suggest_alternatives()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[calendar_manager.py]] - `contains` [EXTRACTED]

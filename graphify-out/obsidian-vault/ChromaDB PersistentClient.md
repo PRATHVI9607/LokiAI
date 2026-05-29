@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/rag_engine.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "RagEngine / LokiServer (FastAPI)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/RagEngine_/_LokiServer_FastAPI
 ---
 
 # ChromaDB PersistentClient
@@ -14,4 +14,4 @@ tags:
 - [[HNSW Cosine Index (loki_rag collection)]] - `implements` [EXTRACTED]
 - [[RagEngine_1]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/RagEngine_/_LokiServer_FastAPI

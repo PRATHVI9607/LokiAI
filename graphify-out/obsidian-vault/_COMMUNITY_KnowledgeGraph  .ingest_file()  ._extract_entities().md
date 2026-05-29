@@ -10,7 +10,7 @@ members: 23
 **Members:** 23 nodes
 
 ## Members
-- [[.__init__()_36]] - code - loki/features/knowledge_graph.py
+- [[.__init__()_39]] - code - loki/features/knowledge_graph.py
 - [[._extract_entities()]] - code - loki/features/knowledge_graph.py
 - [[._llm()_2]] - code - loki/features/knowledge_graph.py
 - [[._load()_1]] - code - loki/features/knowledge_graph.py
@@ -42,9 +42,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
 
 ## Top bridge nodes
-- [[KnowledgeGraph]] - degree 17, connects to 3 communities
+- [[KnowledgeGraph]] - degree 16, connects to 3 communities

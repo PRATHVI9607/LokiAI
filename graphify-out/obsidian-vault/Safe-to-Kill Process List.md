@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/process_triage.py"
 type: "code"
-community: "ProcessManager / ProcessTriage / SystemMonitor"
+community: "SystemMonitor / ProcessTriage / Safe-to-Kill Process List"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ProcessManager_/_ProcessTriage_/_SystemMonitor
+  - community/SystemMonitor_/_ProcessTriage_/_Safe-to-Kill_Process_List
 ---
 
 # Safe-to-Kill Process List
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[ProcessTriage_1]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ProcessManager_/_ProcessTriage_/_SystemMonitor
+#graphify/code #graphify/EXTRACTED #community/SystemMonitor_/_ProcessTriage_/_Safe-to-Kill_Process_List

@@ -12,14 +12,13 @@ tags:
 # CitationGenerator
 
 ## Connections
-- [[.__init__()_17]] - `method` [EXTRACTED]
+- [[.__init__()_20]] - `method` [EXTRACTED]
 - [[._ask()_1]] - `method` [EXTRACTED]
 - [[._fetch_metadata()]] - `method` [EXTRACTED]
 - [[._format()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.from_info()]] - `method` [EXTRACTED]
 - [[.from_url()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[citation_generator.py]] - `contains` [EXTRACTED]

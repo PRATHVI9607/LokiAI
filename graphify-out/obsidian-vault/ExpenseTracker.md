@@ -12,7 +12,7 @@ tags:
 # ExpenseTracker
 
 ## Connections
-- [[.__init__()_26]] - `method` [EXTRACTED]
+- [[.__init__()_29]] - `method` [EXTRACTED]
 - [[._append_row()]] - `method` [EXTRACTED]
 - [[._ensure_ledger()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
@@ -23,7 +23,6 @@ tags:
 - [[.list_expenses()]] - `method` [EXTRACTED]
 - [[.monthly_summary()]] - `method` [EXTRACTED]
 - [[.scan_folder()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[expense_tracker.py]] - `contains` [EXTRACTED]

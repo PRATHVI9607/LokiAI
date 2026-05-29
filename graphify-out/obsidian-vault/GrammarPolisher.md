@@ -12,13 +12,12 @@ tags:
 # GrammarPolisher
 
 ## Connections
-- [[.__init__()_35]] - `method` [EXTRACTED]
+- [[.__init__()_38]] - `method` [EXTRACTED]
 - [[._ask()_8]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.change_tone()]] - `method` [EXTRACTED]
 - [[.polish()]] - `method` [EXTRACTED]
 - [[.translate()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[grammar_polisher.py]] - `contains` [EXTRACTED]

@@ -1,18 +1,17 @@
 ---
 source_file: "loki/features/file_organizer.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "DigitalDeclutter.find_duplicates / DigitalDeclutter"
 tags:
   - graphify/code
-  - graphify/INFERRED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - graphify/EXTRACTED
+  - community/DigitalDeclutterfind_duplicates_/_DigitalDeclutter
 ---
 
 # FileOrganizer
 
 ## Connections
-- [[DigitalDeclutter_1]] - `semantically_similar_to` [INFERRED]
-- [[FileSearch_1]] - `shares_data_with` [INFERRED]
-- [[FileWatcher_1]] - `conceptually_related_to` [INFERRED]
+- [[TestFileOrganizer_1]] - `references` [EXTRACTED]
+- [[_SAFE_DIRS Whitelist (Downloads + Desktop only)]] - `implements` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/DigitalDeclutterfind_duplicates_/_DigitalDeclutter

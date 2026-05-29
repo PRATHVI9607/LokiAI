@@ -12,7 +12,7 @@ tags:
 # KnowledgeGraph
 
 ## Connections
-- [[.__init__()_36]] - `method` [EXTRACTED]
+- [[.__init__()_39]] - `method` [EXTRACTED]
 - [[._extract_entities()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_2]] - `method` [EXTRACTED]
@@ -25,7 +25,6 @@ tags:
 - [[.ingest_file()]] - `method` [EXTRACTED]
 - [[.query()]] - `method` [EXTRACTED]
 - [[.query_entities()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[knowledge_graph.py]] - `contains` [EXTRACTED]

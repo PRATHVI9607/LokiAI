@@ -1,17 +1,13 @@
 ---
 source_file: "loki/features/backup_manager.py"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "BackupManager"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/BackupManager
 ---
 
 # BackupManager
 
-## Connections
-- [[ActionRouter_1]] - `calls` [EXTRACTED]
-- [[LokiApplication_1]] - `calls` [EXTRACTED]
-
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/BackupManager

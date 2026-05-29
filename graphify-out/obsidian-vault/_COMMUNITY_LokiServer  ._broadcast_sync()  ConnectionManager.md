@@ -10,8 +10,8 @@ members: 29
 **Members:** 29 nodes
 
 ## Members
-- [[.__init__()_50]] - code - loki/ui/server.py
-- [[.__init__()_51]] - code - loki/ui/server.py
+- [[.__init__()_54]] - code - loki/ui/server.py
+- [[.__init__()_55]] - code - loki/ui/server.py
 - [[._broadcast_sync()]] - code - loki/ui/server.py
 - [[._handle_client_message()]] - code - loki/ui/server.py
 - [[._setup_routes()]] - code - loki/ui/server.py
@@ -48,7 +48,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
 
 ## Top bridge nodes
 - [[create_loki_server()]] - degree 3, connects to 1 community

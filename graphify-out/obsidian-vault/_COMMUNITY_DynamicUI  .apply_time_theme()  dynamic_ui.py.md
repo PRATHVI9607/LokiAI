@@ -10,7 +10,7 @@ members: 23
 **Members:** 23 nodes
 
 ## Members
-- [[.__init__()_23]] - code - loki/features/dynamic_ui.py
+- [[.__init__()_26]] - code - loki/features/dynamic_ui.py
 - [[._get_period_theme()]] - code - loki/features/dynamic_ui.py
 - [[._write_state()]] - code - loki/features/dynamic_ui.py
 - [[.apply_mood_theme()]] - code - loki/features/dynamic_ui.py
@@ -42,8 +42,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
 
 ## Top bridge nodes
-- [[DynamicUI]] - degree 14, connects to 2 communities
+- [[DynamicUI]] - degree 13, connects to 2 communities

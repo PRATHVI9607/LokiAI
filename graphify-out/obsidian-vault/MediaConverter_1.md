@@ -1,16 +1,17 @@
 ---
 source_file: "loki/features/media_converter.py"
 type: "code"
-community: "MediaConverter / ffmpeg External Tool"
+community: "Community 21"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/MediaConverter_/_ffmpeg_External_Tool
+  - community/Community_21
 ---
 
 # MediaConverter
 
 ## Connections
-- [[ffmpeg External Tool]] - `calls` [EXTRACTED]
+- [[FileWatcher.watch_media_inbox]] - `calls` [EXTRACTED]
+- [[No -y Flag (auto unique filename on collision)]] - `implements` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/MediaConverter_/_ffmpeg_External_Tool
+#graphify/code #graphify/EXTRACTED #community/Community_21

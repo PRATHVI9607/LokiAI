@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 86"
+community: "Community 108"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_86
+  - community/Community_108
 ---
 
 # Brightness Control via screen_brightness_control
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Requirement screen-brightness-control=0.22.0]] - `implements` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_86
+#graphify/document #graphify/EXTRACTED #community/Community_108

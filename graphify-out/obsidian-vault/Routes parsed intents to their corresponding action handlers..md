@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "rationale"
-community: "ActionRouter / ._handle_api_mock_generate() / ._handle_app_close()"
-location: "L12"
+community: "ActionRouter / ._handle_agent_cancel() / ._handle_agent_status()"
+location: "L23"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/ActionRouter_/__handle_api_mock_generate_/__handle_app_close
+  - community/ActionRouter_/__handle_agent_cancel_/__handle_agent_status
 ---
 
 # Routes parsed intents to their corresponding action handlers.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[ActionRouter]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/ActionRouter_/__handle_api_mock_generate_/__handle_app_close
+#graphify/rationale #graphify/EXTRACTED #community/ActionRouter_/__handle_agent_cancel_/__handle_agent_status

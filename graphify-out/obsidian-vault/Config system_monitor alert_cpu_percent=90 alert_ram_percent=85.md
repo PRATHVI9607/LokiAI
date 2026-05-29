@@ -1,11 +1,11 @@
 ---
 source_file: "loki/config.yaml"
 type: "document"
-community: "Community 45"
+community: "Community 59"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_45
+  - community/Community_59
 ---
 
 # Config: system_monitor alert_cpu_percent=90 alert_ram_percent=85
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[System Monitor (CPURAMDiskGPUNetwork)]] - `conceptually_related_to` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_45
+#graphify/document #graphify/EXTRACTED #community/Community_59

@@ -1,13 +1,13 @@
 ---
 type: community
 cohesion: 0.08
-members: 37
+members: 39
 ---
 
 # useLoki.ts / ChatPanel.tsx / page.tsx
 
 **Cohesion:** 0.08 - loosely connected
-**Members:** 37 nodes
+**Members:** 39 nodes
 
 ## Members
 - [[ChatMessage]] - code - loki-ui/hooks/useLoki.ts
@@ -42,8 +42,10 @@ members: 37
 - [[StatusOrb.tsx]] - code - loki-ui/components/StatusOrb.tsx
 - [[UseLokiReturn]] - code - loki-ui/hooks/useLoki.ts
 - [[fetchWithTimeout()]] - code - loki-ui/hooks/useLoki.ts
+- [[inlineRender()]] - code - loki-ui/components/MessageBubble.tsx
 - [[lerp()]] - code - loki-ui/components/RuneCanvas.tsx
 - [[page.tsx]] - code - loki-ui/app/page.tsx
+- [[renderMarkdown()]] - code - loki-ui/components/MessageBubble.tsx
 - [[spawnRune()]] - code - loki-ui/components/RuneCanvas.tsx
 - [[useLoki()]] - code - loki-ui/hooks/useLoki.ts
 - [[useLoki.ts]] - code - loki-ui/hooks/useLoki.ts

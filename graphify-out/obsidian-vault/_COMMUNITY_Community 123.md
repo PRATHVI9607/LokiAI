@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[EnvSetup Feature (Dockerfilevenvdocker-compose)]] - document - LokiPRD.md
+- [[Return True if the connected peer IP is public (fail-closed if inspectable).]] - rationale - loki/features/web_summarizer.py
 
 ## Live Query (requires Dataview plugin)
 

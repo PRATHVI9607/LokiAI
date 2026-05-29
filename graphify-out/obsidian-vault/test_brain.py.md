@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_brain.py"
 type: "code"
-community: "LokiBrain / ApiMocker / FactChecker"
+community: "LokiBrain / test_brain.py / .ask()"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/_ApiMocker_/_FactChecker
+  - community/LokiBrain_/_test_brainpy_/_ask
 ---
 
 # test_brain.py
@@ -20,4 +20,4 @@ tags:
 - [[test_parse_intent_plain_json()]] - `contains` [EXTRACTED]
 - [[test_store_turn()]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_ApiMocker_/_FactChecker
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask

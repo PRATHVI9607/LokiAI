@@ -10,7 +10,7 @@ members: 9
 **Members:** 9 nodes
 
 ## Members
-- [[.__init__()_24]] - code - loki/features/email_drafter.py
+- [[.__init__()_27]] - code - loki/features/email_drafter.py
 - [[._ask()_4]] - code - loki/features/email_drafter.py
 - [[.draft()]] - code - loki/features/email_drafter.py
 - [[.reply()]] - code - loki/features/email_drafter.py
@@ -28,9 +28,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
 
 ## Top bridge nodes
-- [[EmailDrafter]] - degree 9, connects to 3 communities
+- [[EmailDrafter]] - degree 8, connects to 3 communities

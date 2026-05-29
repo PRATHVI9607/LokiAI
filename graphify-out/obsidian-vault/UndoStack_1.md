@@ -1,21 +1,19 @@
 ---
 source_file: "loki/core/undo_stack.py"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "ShellExec / UndoStack / BLOCKED_SCHEMES Security List"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List
 ---
 
 # UndoStack
 
 ## Connections
-- [[ActionRouter_1]] - `calls` [EXTRACTED]
 - [[FileOps_1]] - `calls` [EXTRACTED]
-- [[LokiApplication_1]] - `calls` [EXTRACTED]
 - [[ShellExec_1]] - `calls` [INFERRED]
 - [[SystemCtrl_1]] - `calls` [EXTRACTED]
 - [[UndoEntry Dataclass]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List

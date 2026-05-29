@@ -12,14 +12,13 @@ tags:
 # PhishingDetector
 
 ## Connections
-- [[.__init__()_40]] - `method` [EXTRACTED]
+- [[.__init__()_43]] - `method` [EXTRACTED]
 - [[._heuristic_url()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_4]] - `method` [EXTRACTED]
 - [[.analyze_email()]] - `method` [EXTRACTED]
 - [[.analyze_media_file()]] - `method` [EXTRACTED]
 - [[.analyze_url()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[phishing_detector.py]] - `contains` [EXTRACTED]

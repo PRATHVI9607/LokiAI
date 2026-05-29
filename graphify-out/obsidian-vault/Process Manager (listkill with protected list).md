@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 45"
+community: "Community 59"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_45
+  - community/Community_59
 ---
 
 # Process Manager (list/kill with protected list)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Requirement psutil=5.9.8 (Processsystem monitoring)]] - `implements` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_45
+#graphify/document #graphify/EXTRACTED #community/Community_59

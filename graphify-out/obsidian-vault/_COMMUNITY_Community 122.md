@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[SoftwareUpdater Feature (winget integration)]] - document - LokiPRD.md
+- [[True if `term` appears as a whole word in `text_lower`.]] - rationale - loki/features/knowledge_graph.py
 
 ## Live Query (requires Dataview plugin)
 

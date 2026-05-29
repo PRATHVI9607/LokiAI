@@ -1,11 +1,11 @@
 ---
 source_file: "loki/data/command_allowlist.txt"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "ShellExec / UndoStack / BLOCKED_SCHEMES Security List"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List
 ---
 
 # command_allowlist.txt
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[ShellExec_1]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List

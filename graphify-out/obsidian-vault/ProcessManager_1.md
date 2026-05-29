@@ -1,18 +1,18 @@
 ---
 source_file: "loki/features/process_manager.py"
 type: "code"
-community: "ProcessManager / ProcessTriage / SystemMonitor"
+community: "LokiApplication._init_all / LokiApplication._wire_callbacks / ConversationStateMachine"
+location: "class ProcessManager"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/ProcessManager_/_ProcessTriage_/_SystemMonitor
+  - community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine
 ---
 
 # ProcessManager
 
 ## Connections
-- [[ProcessTriage_1]] - `semantically_similar_to` [INFERRED]
-- [[Protected Process Allowlist]] - `references` [EXTRACTED]
+- [[LokiApplication._init_all]] - `calls` [EXTRACTED]
 - [[SystemMonitor_1]] - `semantically_similar_to` [INFERRED]
 
-#graphify/code #graphify/INFERRED #community/ProcessManager_/_ProcessTriage_/_SystemMonitor
+#graphify/code #graphify/INFERRED #community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine

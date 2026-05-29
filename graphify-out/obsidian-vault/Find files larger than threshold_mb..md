@@ -2,7 +2,7 @@
 source_file: "loki/features/digital_declutter.py"
 type: "rationale"
 community: "DigitalDeclutter / .suggest_cleanup() / .find_duplicates()"
-location: "L66"
+location: "L69"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/brain_memory.py"
 type: "rationale"
-community: "BrainMemory / ._save_unlocked() / ._add_fact_unlocked()"
+community: "TaskManager / .get_memory_context() / .ai_prioritize()"
 location: "L201"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/BrainMemory_/__save_unlocked_/__add_fact_unlocked
+  - community/TaskManager_/_get_memory_context_/_ai_prioritize
 ---
 
 # Build a compact memory block to inject into the system prompt.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[.get_memory_context()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/BrainMemory_/__save_unlocked_/__add_fact_unlocked
+#graphify/rationale #graphify/EXTRACTED #community/TaskManager_/_get_memory_context_/_ai_prioritize

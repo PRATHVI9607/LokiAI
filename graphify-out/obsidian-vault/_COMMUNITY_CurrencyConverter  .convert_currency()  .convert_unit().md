@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_21]] - code - loki/features/currency_converter.py
+- [[.__init__()_24]] - code - loki/features/currency_converter.py
 - [[._ask()_3]] - code - loki/features/currency_converter.py
 - [[._fetch_rates()]] - code - loki/features/currency_converter.py
 - [[.convert_currency()]] - code - loki/features/currency_converter.py
@@ -30,9 +30,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
 
 ## Top bridge nodes
-- [[CurrencyConverter]] - degree 10, connects to 3 communities
+- [[CurrencyConverter]] - degree 9, connects to 3 communities

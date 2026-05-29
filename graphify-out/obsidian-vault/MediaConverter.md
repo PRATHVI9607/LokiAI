@@ -12,12 +12,11 @@ tags:
 # MediaConverter
 
 ## Connections
-- [[.__init__()_37]] - `method` [EXTRACTED]
+- [[.__init__()_40]] - `method` [EXTRACTED]
 - [[._check_ffmpeg()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.convert()_1]] - `method` [EXTRACTED]
 - [[.get_info()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[media_converter.py]] - `contains` [EXTRACTED]
 

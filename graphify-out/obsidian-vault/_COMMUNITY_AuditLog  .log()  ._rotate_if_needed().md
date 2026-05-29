@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_6]] - code - loki/core/audit.py
+- [[.__init__()_5]] - code - loki/core/audit.py
 - [[._rotate_if_needed()]] - code - loki/core/audit.py
 - [[._sanitize()]] - code - loki/core/audit.py
 - [[.get_recent()]] - code - loki/core/audit.py
@@ -30,8 +30,10 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_FakeTTS  ConvState  TestClipboardSyncToken]]
+- 1 edge to [[_COMMUNITY_ConversationStateMachine  ._arm_timeout()  ._cancel_timeout()]]
 
 ## Top bridge nodes
-- [[AuditLog]] - degree 10, connects to 2 communities
+- [[AuditLog]] - degree 11, connects to 4 communities

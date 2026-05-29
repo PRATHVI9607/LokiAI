@@ -1,16 +1,16 @@
 ---
 source_file: "loki/features/clipboard_manager.py"
 type: "code"
-community: "ClipboardSync / ClipboardManager"
+community: "ClipboardSync / ClipboardSync token auth pattern"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/ClipboardSync_/_ClipboardManager
+  - community/ClipboardSync_/_ClipboardSync_token_auth_pattern
 ---
 
 # ClipboardManager
 
 ## Connections
-- [[ClipboardSync_1]] - `conceptually_related_to` [INFERRED]
+- [[ClipboardSync_1]] - `semantically_similar_to` [INFERRED]
 
-#graphify/code #graphify/INFERRED #community/ClipboardSync_/_ClipboardManager
+#graphify/code #graphify/INFERRED #community/ClipboardSync_/_ClipboardSync_token_auth_pattern

@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[Requirement pygame=2.5.2 (Audio playback)]] - document - loki/requirements.txt
+- [[FactChecker Feature (DuckDuckGo + LLM verdict)]] - document - LokiPRD.md
 
 ## Live Query (requires Dataview plugin)
 

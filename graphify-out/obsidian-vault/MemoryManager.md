@@ -26,7 +26,6 @@ tags:
 - [[.set_preference()_1]] - `method` [EXTRACTED]
 - [[.set_user_name()_1]] - `method` [EXTRACTED]
 - [[Centralized persistent memory for Loki.]] - `rationale_for` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[TaskManager]] - `uses` [INFERRED]
 - [[TestClipboardManager]] - `uses` [INFERRED]

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/ghostwriter.py"
 type: "rationale"
-community: "GitHelper / GhostWriter / ._ask()"
+community: "GhostWriter / ._ask() / .bullets_to_prose()"
 location: "L48"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/GitHelper_/_GhostWriter_/__ask
+  - community/GhostWriter_/__ask_/_bullets_to_prose
 ---
 
 # Continue a piece of writing, matching its style and tone.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[.continue_text()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/GitHelper_/_GhostWriter_/__ask
+#graphify/rationale #graphify/EXTRACTED #community/GhostWriter_/__ask_/_bullets_to_prose

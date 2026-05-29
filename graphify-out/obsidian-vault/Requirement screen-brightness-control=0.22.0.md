@@ -1,11 +1,11 @@
 ---
 source_file: "loki/requirements.txt"
 type: "document"
-community: "Community 86"
+community: "Community 108"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_86
+  - community/Community_108
 ---
 
 # Requirement: screen-brightness-control>=0.22.0
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Brightness Control via screen_brightness_control]] - `implements` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_86
+#graphify/document #graphify/EXTRACTED #community/Community_108

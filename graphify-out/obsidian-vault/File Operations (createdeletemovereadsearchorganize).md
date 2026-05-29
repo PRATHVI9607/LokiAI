@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 81"
+community: "Community 107"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_81
+  - community/Community_107
 ---
 
 # File Operations (create/delete/move/read/search/organize)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[File Ops Sandboxed to Home Directory (~)]] - `implements` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_81
+#graphify/document #graphify/EXTRACTED #community/Community_107

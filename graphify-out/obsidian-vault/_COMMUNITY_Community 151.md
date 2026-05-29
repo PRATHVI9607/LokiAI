@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[Requirement pywin32=306 (Windows APIs)]] - document - loki/requirements.txt
+- [[CurrencyConverter Feature (live rates + LLM fallback)]] - document - LokiPRD.md
 
 ## Live Query (requires Dataview plugin)
 

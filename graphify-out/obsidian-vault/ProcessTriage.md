@@ -18,7 +18,6 @@ tags:
 - [[.resume_process()]] - `method` [EXTRACTED]
 - [[.suspend_process()]] - `method` [EXTRACTED]
 - [[.triage_for_app()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[process_triage.py]] - `contains` [EXTRACTED]
 

@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[Requirement openai=1.12.0 (OpenRouterAPI client)]] - document - loki/requirements.txt
+- [[GhostWriter Feature (expandcontinuebullets-to-prose)]] - document - LokiPRD.md
 
 ## Live Query (requires Dataview plugin)
 

@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_35]] - code - loki/features/grammar_polisher.py
+- [[.__init__()_38]] - code - loki/features/grammar_polisher.py
 - [[._ask()_8]] - code - loki/features/grammar_polisher.py
 - [[.change_tone()]] - code - loki/features/grammar_polisher.py
 - [[.polish()]] - code - loki/features/grammar_polisher.py
@@ -30,9 +30,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
 
 ## Top bridge nodes
-- [[GrammarPolisher]] - degree 10, connects to 3 communities
+- [[GrammarPolisher]] - degree 9, connects to 3 communities

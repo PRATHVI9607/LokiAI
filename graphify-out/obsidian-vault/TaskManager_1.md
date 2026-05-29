@@ -1,17 +1,16 @@
 ---
 source_file: "loki/features/task_manager.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "MemoryManager (core) / Test Fixtures (conftest.py) / TestFileOps (test_actions.py)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/MemoryManager_core_/_Test_Fixtures_conftestpy_/_TestFileOps_test_actionspy
 ---
 
 # TaskManager
 
 ## Connections
 - [[MemoryManager (core)]] - `calls` [EXTRACTED]
-- [[TestTaskManager (test_features.py)]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/MemoryManager_core_/_Test_Fixtures_conftestpy_/_TestFileOps_test_actionspy

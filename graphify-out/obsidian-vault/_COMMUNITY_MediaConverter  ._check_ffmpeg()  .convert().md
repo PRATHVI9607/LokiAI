@@ -10,7 +10,7 @@ members: 9
 **Members:** 9 nodes
 
 ## Members
-- [[.__init__()_37]] - code - loki/features/media_converter.py
+- [[.__init__()_40]] - code - loki/features/media_converter.py
 - [[._check_ffmpeg()]] - code - loki/features/media_converter.py
 - [[.convert()_1]] - code - loki/features/media_converter.py
 - [[.get_info()]] - code - loki/features/media_converter.py
@@ -28,8 +28,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
 
 ## Top bridge nodes
-- [[MediaConverter]] - degree 8, connects to 2 communities
+- [[MediaConverter]] - degree 7, connects to 2 communities

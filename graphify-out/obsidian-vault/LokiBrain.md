@@ -1,18 +1,18 @@
 ---
 source_file: "loki/core/brain.py"
 type: "code"
-community: "LokiBrain / ApiMocker / FactChecker"
-location: "L252"
+community: "LokiBrain / test_brain.py / .ask()"
+location: "L263"
 tags:
   - graphify/code
-  - graphify/INFERRED
-  - community/LokiBrain_/_ApiMocker_/_FactChecker
+  - graphify/EXTRACTED
+  - community/LokiBrain_/_test_brainpy_/_ask
 ---
 
 # LokiBrain
 
 ## Connections
-- [[.__init__()_7]] - `method` [EXTRACTED]
+- [[.__init__()_6]] - `method` [EXTRACTED]
 - [[._build_messages()]] - `method` [EXTRACTED]
 - [[._build_system_prompt()]] - `method` [EXTRACTED]
 - [[._call_llm()]] - `method` [EXTRACTED]
@@ -33,29 +33,48 @@ tags:
 - [[.parse_intent()]] - `method` [EXTRACTED]
 - [[.set_user_name()]] - `method` [EXTRACTED]
 - [[ApiMocker]] - `uses` [INFERRED]
+- [[AutoAgent]] - `uses` [INFERRED]
 - [[CalendarManager]] - `uses` [INFERRED]
+- [[CalendarManager_1]] - `references` [EXTRACTED]
 - [[CitationGenerator]] - `uses` [INFERRED]
+- [[CitationGenerator_1]] - `references` [EXTRACTED]
 - [[CodeAssistant]] - `uses` [INFERRED]
-- [[ConversationManager]] - `uses` [INFERRED]
+- [[CodeAssistant_1]] - `references` [EXTRACTED]
+- [[ConvState]] - `uses` [INFERRED]
+- [[ConversationStateMachine]] - `uses` [INFERRED]
 - [[CurrencyConverter]] - `uses` [INFERRED]
+- [[CurrencyConverter_1]] - `references` [EXTRACTED]
 - [[DailyBriefing]] - `uses` [INFERRED]
+- [[DailyBriefing_1]] - `references` [EXTRACTED]
 - [[EmailDrafter]] - `uses` [INFERRED]
+- [[EmailDrafter_1]] - `references` [EXTRACTED]
 - [[EnvSetup]] - `uses` [INFERRED]
 - [[ExpenseTracker]] - `uses` [INFERRED]
+- [[ExpenseTracker_1]] - `references` [EXTRACTED]
 - [[FactChecker]] - `uses` [INFERRED]
+- [[FactChecker_1]] - `references` [EXTRACTED]
 - [[GhostWriter]] - `uses` [INFERRED]
+- [[GhostWriter_1]] - `references` [EXTRACTED]
 - [[GitHelper]] - `uses` [INFERRED]
 - [[GrammarPolisher]] - `uses` [INFERRED]
+- [[GrammarPolisher_1]] - `references` [EXTRACTED]
 - [[KnowledgeGraph]] - `uses` [INFERRED]
+- [[KnowledgeGraph_1]] - `calls` [EXTRACTED]
 - [[LLM integration with KORTEX-style context engineering.     LLM priority Kimi K2]] - `rationale_for` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[MeetingTranscriber]] - `uses` [INFERRED]
+- [[MeetingTranscriber_1]] - `calls` [EXTRACTED]
 - [[PDFChat]] - `uses` [INFERRED]
 - [[PhishingDetector]] - `uses` [INFERRED]
+- [[PhishingDetector_1]] - `calls` [EXTRACTED]
 - [[ScreenshotSearch]] - `uses` [INFERRED]
+- [[ScreenshotSearch_1]] - `references` [EXTRACTED]
 - [[SemanticBrowserHistory]] - `uses` [INFERRED]
+- [[SemanticBrowserHistory_1]] - `calls` [EXTRACTED]
+- [[TestBrain (test_brain.py)]] - `references` [EXTRACTED]
 - [[WebSummarizer]] - `uses` [INFERRED]
+- [[_SSRFBlockingAdapter]] - `uses` [INFERRED]
 - [[brain()]] - `calls` [INFERRED]
 - [[brain.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiBrain_/_ApiMocker_/_FactChecker
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask

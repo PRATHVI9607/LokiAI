@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/tts.py"
 type: "rationale"
-community: "LokiTTS / SoftwareUpdater / ._run()"
-location: "L39"
+community: "LokiTTS / ._queue_worker() / ._speak_edge()"
+location: "L40"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiTTS_/_SoftwareUpdater_/__run
+  - community/LokiTTS_/__queue_worker_/__speak_edge
 ---
 
 # Text-to-speech engine with edge-tts primary, pyttsx3 fallback.      Uses a que
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[LokiTTS]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/_SoftwareUpdater_/__run
+#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/__queue_worker_/__speak_edge

@@ -15,7 +15,6 @@ tags:
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.open_url()]] - `method` [EXTRACTED]
 - [[.search()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[Open URLs and perform web searches safely.]] - `rationale_for` [EXTRACTED]
 - [[browser_ctrl.py]] - `contains` [EXTRACTED]

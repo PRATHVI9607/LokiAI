@@ -1,24 +1,17 @@
 ---
 source_file: "loki/core/brain.py"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "LokiApplication._init_all / LokiApplication._wire_callbacks / ConversationStateMachine"
+location: "class LokiBrain"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine
 ---
 
 # LokiBrain
 
 ## Connections
-- [[ApiMocker_1]] - `calls` [EXTRACTED]
-- [[BrainMemory_1]] - `calls` [EXTRACTED]
-- [[ConversationManager_1]] - `calls` [EXTRACTED]
-- [[INTENT_CATALOG LLM Prompt]] - `rationale_for` [EXTRACTED]
-- [[Kimi K2 LLM Provider]] - `calls` [EXTRACTED]
-- [[LokiApplication_1]] - `calls` [EXTRACTED]
-- [[Ollama Local LLM Provider]] - `calls` [EXTRACTED]
-- [[OpenRouter LLM Provider]] - `calls` [EXTRACTED]
-- [[conversation.json Chat History]] - `shares_data_with` [EXTRACTED]
+- [[LokiApplication._init_all]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine

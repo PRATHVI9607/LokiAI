@@ -30,9 +30,9 @@ SORT file.name ASC
 ## Connections to other communities
 - 2 edges to [[_COMMUNITY_MemoryManager  ._save_json()  .add_task()]]
 - 2 edges to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]
-- 2 edges to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  file_organizer.py]]
+- 2 edges to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  ._organizer()]]
 - 2 edges to [[_COMMUNITY_SecurityScanner  TestSecurityScanner  ._iter_files()]]
-- 2 edges to [[_COMMUNITY_TaskManager  .ai_prioritize()  .list_tasks()]]
+- 2 edges to [[_COMMUNITY_TaskManager  .get_memory_context()  .ai_prioritize()]]
 - 2 edges to [[_COMMUNITY_Vault  TestVault  ._save()]]
 
 ## Top bridge nodes

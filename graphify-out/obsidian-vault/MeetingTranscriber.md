@@ -12,7 +12,7 @@ tags:
 # MeetingTranscriber
 
 ## Connections
-- [[.__init__()_38]] - `method` [EXTRACTED]
+- [[.__init__()_41]] - `method` [EXTRACTED]
 - [[._ensure_model()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_3]] - `method` [EXTRACTED]
@@ -20,7 +20,6 @@ tags:
 - [[.generate_minutes()]] - `method` [EXTRACTED]
 - [[.summarize_transcript()]] - `method` [EXTRACTED]
 - [[.transcribe()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[meeting_transcriber.py]] - `contains` [EXTRACTED]

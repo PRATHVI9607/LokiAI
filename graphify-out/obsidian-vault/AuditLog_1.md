@@ -1,19 +1,16 @@
 ---
 source_file: "loki/core/audit.py"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "PendingActionStore / ActionRouter / INTENT_TIERS Security Classification"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/PendingActionStore_/_ActionRouter_/_INTENT_TIERS_Security_Classification
 ---
 
 # AuditLog
 
 ## Connections
-- [[ConversationManager_1]] - `calls` [EXTRACTED]
 - [[INTENT_TIERS Security Classification]] - `references` [EXTRACTED]
-- [[LokiApplication_1]] - `calls` [EXTRACTED]
-- [[audit.jsonl Append-Only Log]] - `shares_data_with` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/PendingActionStore_/_ActionRouter_/_INTENT_TIERS_Security_Classification

@@ -12,7 +12,7 @@ tags:
 # UndoStack
 
 ## Connections
-- [[.__init__()_12]] - `method` [EXTRACTED]
+- [[.__init__()_13]] - `method` [EXTRACTED]
 - [[.__len__()]] - `method` [EXTRACTED]
 - [[._builtin_undo()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
@@ -21,8 +21,7 @@ tags:
 - [[.is_empty()]] - `method` [EXTRACTED]
 - [[.peek()]] - `method` [EXTRACTED]
 - [[.pop_and_undo()]] - `method` [EXTRACTED]
-- [[.push()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
+- [[.push()_1]] - `method` [EXTRACTED]
 - [[LIFO undo stack with per-type rollback logic.]] - `rationale_for` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[undo_stack.py]] - `contains` [EXTRACTED]

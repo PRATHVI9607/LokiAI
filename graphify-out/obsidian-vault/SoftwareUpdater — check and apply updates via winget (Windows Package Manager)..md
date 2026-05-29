@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/software_updater.py"
 type: "rationale"
-community: "LokiTTS / SoftwareUpdater / ._run()"
+community: "SoftwareUpdater / ._run() / ._check_winget()"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiTTS_/_SoftwareUpdater_/__run
+  - community/SoftwareUpdater_/__run_/__check_winget
 ---
 
 # SoftwareUpdater — check and apply updates via winget (Windows Package Manager).
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[software_updater.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/_SoftwareUpdater_/__run
+#graphify/rationale #graphify/EXTRACTED #community/SoftwareUpdater_/__run_/__check_winget

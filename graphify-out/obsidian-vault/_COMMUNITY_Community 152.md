@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[Requirement pytest + pytest-mock + pytest-asyncio + pytest-cov (Testing)]] - document - loki/requirements.txt
+- [[SoftwareUpdater Feature (winget integration)]] - document - LokiPRD.md
 
 ## Live Query (requires Dataview plugin)
 

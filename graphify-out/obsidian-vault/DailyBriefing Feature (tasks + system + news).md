@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 45"
+community: "Community 59"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_45
+  - community/Community_59
 ---
 
 # DailyBriefing Feature (tasks + system + news)
@@ -15,4 +15,4 @@ tags:
 - [[System Monitor (CPURAMDiskGPUNetwork)]] - `calls` [EXTRACTED]
 - [[Task Manager (persistent priority tasks)]] - `calls` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_45
+#graphify/document #graphify/EXTRACTED #community/Community_59

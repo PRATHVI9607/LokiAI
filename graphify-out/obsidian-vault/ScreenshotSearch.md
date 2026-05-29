@@ -12,7 +12,7 @@ tags:
 # ScreenshotSearch
 
 ## Connections
-- [[.__init__()_42]] - `method` [EXTRACTED]
+- [[.__init__()_45]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_5]] - `method` [EXTRACTED]
 - [[._ocr()]] - `method` [EXTRACTED]
@@ -21,7 +21,6 @@ tags:
 - [[.save_screenshot()]] - `method` [EXTRACTED]
 - [[.search_screen()]] - `method` [EXTRACTED]
 - [[.translate_screen()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[screenshot_search.py]] - `contains` [EXTRACTED]

@@ -2,10 +2,10 @@
 source_file: "loki/tests/test_features.py"
 type: "code"
 community: "Vault / TestVault / ._save()"
-location: "L134"
+location: "L142"
 tags:
   - graphify/code
-  - graphify/EXTRACTED
+  - graphify/INFERRED
   - community/Vault_/_TestVault_/__save
 ---
 
@@ -22,7 +22,8 @@ tags:
 - [[MemoryManager]] - `uses` [INFERRED]
 - [[SecurityScanner]] - `uses` [INFERRED]
 - [[TaskManager]] - `uses` [INFERRED]
+- [[Test Fixtures (conftest.py)]] - `shares_data_with` [INFERRED]
 - [[Vault]] - `uses` [INFERRED]
 - [[test_features.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/Vault_/_TestVault_/__save
+#graphify/code #graphify/INFERRED #community/Vault_/_TestVault_/__save

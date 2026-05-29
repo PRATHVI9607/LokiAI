@@ -1,18 +1,17 @@
 ---
 source_file: "loki/features/web_summarizer.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "LokiApplication._init_all / LokiApplication._wire_callbacks / ConversationStateMachine"
+location: "class WebSummarizer"
 tags:
   - graphify/code
-  - graphify/INFERRED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - graphify/EXTRACTED
+  - community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine
 ---
 
 # WebSummarizer
 
 ## Connections
-- [[LokiBrain (core dependency)]] - `calls` [EXTRACTED]
-- [[NewsAggregator_1]] - `semantically_similar_to` [INFERRED]
-- [[PDFChat_1]] - `semantically_similar_to` [INFERRED]
+- [[LokiApplication._init_all]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/LokiApplication_init_all_/_LokiApplication_wire_callbacks_/_ConversationStateMachine

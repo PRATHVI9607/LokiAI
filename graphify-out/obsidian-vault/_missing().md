@@ -1,17 +1,20 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "_missing() / ._handle_api_mock_data() / ._handle_app_open()"
-location: "L833"
+community: "_missing() / ._handle_agent_run() / ._handle_api_mock_data()"
+location: "L893"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/_missing_/__handle_api_mock_data_/__handle_app_open
+  - community/_missing_/__handle_agent_run_/__handle_api_mock_data
 ---
 
 # _missing()
 
 ## Connections
+- [[._handle_agent_cancel()]] - `calls` [EXTRACTED]
+- [[._handle_agent_run()]] - `calls` [EXTRACTED]
+- [[._handle_agent_status()]] - `calls` [EXTRACTED]
 - [[._handle_api_mock_data()]] - `calls` [EXTRACTED]
 - [[._handle_api_mock_generate()]] - `calls` [EXTRACTED]
 - [[._handle_app_close()]] - `calls` [EXTRACTED]
@@ -150,4 +153,4 @@ tags:
 - [[._handle_window_tile_all()]] - `calls` [EXTRACTED]
 - [[action_router.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/_missing_/__handle_api_mock_data_/__handle_app_open
+#graphify/code #graphify/EXTRACTED #community/_missing_/__handle_agent_run_/__handle_api_mock_data

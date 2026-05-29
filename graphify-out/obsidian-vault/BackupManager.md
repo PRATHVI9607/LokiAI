@@ -12,12 +12,11 @@ tags:
 # BackupManager
 
 ## Connections
-- [[.__init__()_15]] - `method` [EXTRACTED]
+- [[.__init__()_18]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.backup_directory()]] - `method` [EXTRACTED]
 - [[.backup_file()]] - `method` [EXTRACTED]
 - [[.list_backups()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[backup_manager.py]] - `contains` [EXTRACTED]
 

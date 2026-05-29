@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_38]] - code - loki/features/meeting_transcriber.py
+- [[.__init__()_41]] - code - loki/features/meeting_transcriber.py
 - [[._ensure_model()]] - code - loki/features/meeting_transcriber.py
 - [[._llm()_3]] - code - loki/features/meeting_transcriber.py
 - [[.extract_action_items()]] - code - loki/features/meeting_transcriber.py
@@ -33,9 +33,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
 
 ## Top bridge nodes
-- [[MeetingTranscriber]] - degree 12, connects to 3 communities
+- [[MeetingTranscriber]] - degree 11, connects to 3 communities

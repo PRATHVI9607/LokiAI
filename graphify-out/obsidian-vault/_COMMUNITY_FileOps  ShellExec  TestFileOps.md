@@ -10,8 +10,8 @@ members: 39
 **Members:** 39 nodes
 
 ## Members
-- [[.__init__()_2]] - code - loki/actions/file_ops.py
-- [[.__init__()_3]] - code - loki/actions/shell_exec.py
+- [[.__init__()_1]] - code - loki/actions/file_ops.py
+- [[.__init__()_2]] - code - loki/actions/shell_exec.py
 - [[._build_tree()]] - code - loki/actions/file_ops.py
 - [[._deny()]] - code - loki/actions/file_ops.py
 - [[._is_allowed()]] - code - loki/actions/shell_exec.py
@@ -58,9 +58,15 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 4 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 2 edges to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 3 edges to [[_COMMUNITY_FakeTTS  ConvState  TestClipboardSyncToken]]
+- 2 edges to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 2 edges to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 2 edges to [[_COMMUNITY_PendingActionStore  TestPendingActions  .is_expired()]]
+- 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle()]]
+- 1 edge to [[_COMMUNITY_ProcessManager  TestProcessManagerExactMatch  process_manager.py]]
+- 1 edge to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
+- 1 edge to [[_COMMUNITY_TestVoicePipeline  ._make()  .test_activate_starts_wakeword()]]
 
 ## Top bridge nodes
-- [[FileOps]] - degree 17, connects to 2 communities
-- [[ShellExec]] - degree 11, connects to 2 communities
+- [[FileOps]] - degree 25, connects to 8 communities
+- [[ShellExec]] - degree 10, connects to 2 communities

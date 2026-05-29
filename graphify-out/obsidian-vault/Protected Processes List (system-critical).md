@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 68"
+community: "Community 90"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_68
+  - community/Community_90
 ---
 
 # Protected Processes List (system-critical)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Security Decision Flow (Tier Check â†’ Confirm â†’ Path â†’ Shell â†’ Process)]] - `references` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_68
+#graphify/document #graphify/EXTRACTED #community/Community_90

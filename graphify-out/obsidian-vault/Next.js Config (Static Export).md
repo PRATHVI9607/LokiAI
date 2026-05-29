@@ -1,16 +1,13 @@
 ---
 source_file: "loki-ui/next.config.mjs"
 type: "code"
-community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manager) / Home Page (Root Orchestrator)"
+community: "Next.js Config (Static Export)"
 tags:
   - graphify/code
-  - graphify/INFERRED
-  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager_/_Home_Page_Root_Orchestrator
+  - graphify/EXTRACTED
+  - community/Nextjs_Config_Static_Export
 ---
 
 # Next.js Config (Static Export)
 
-## Connections
-- [[Home Page (Root Orchestrator)]] - `conceptually_related_to` [INFERRED]
-
-#graphify/code #graphify/INFERRED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager_/_Home_Page_Root_Orchestrator
+#graphify/code #graphify/EXTRACTED #community/Nextjs_Config_Static_Export

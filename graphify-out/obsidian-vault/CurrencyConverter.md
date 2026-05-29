@@ -12,13 +12,12 @@ tags:
 # CurrencyConverter
 
 ## Connections
-- [[.__init__()_21]] - `method` [EXTRACTED]
+- [[.__init__()_24]] - `method` [EXTRACTED]
 - [[._ask()_3]] - `method` [EXTRACTED]
 - [[._fetch_rates()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.convert_currency()]] - `method` [EXTRACTED]
 - [[.convert_unit()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[currency_converter.py]] - `contains` [EXTRACTED]

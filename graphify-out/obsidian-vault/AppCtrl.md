@@ -15,7 +15,6 @@ tags:
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.close_app()]] - `method` [EXTRACTED]
 - [[.open_app()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[Open and close applications by name.]] - `rationale_for` [EXTRACTED]
 - [[app_ctrl.py]] - `contains` [EXTRACTED]

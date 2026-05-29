@@ -2,7 +2,7 @@
 source_file: "loki-ui/components/MessageBubble.tsx"
 type: "code"
 community: "useLoki.ts / ChatPanel.tsx / page.tsx"
-location: "L6"
+location: "L99"
 tags:
   - graphify/code
   - graphify/EXTRACTED

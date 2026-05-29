@@ -10,7 +10,7 @@ members: 19
 **Members:** 19 nodes
 
 ## Members
-- [[.__init__()_48]] - code - loki/features/vault.py
+- [[.__init__()_51]] - code - loki/features/vault.py
 - [[._derive_key()]] - code - loki/features/vault.py
 - [[._save()_1]] - code - loki/features/vault.py
 - [[.delete()_1]] - code - loki/features/vault.py
@@ -38,15 +38,16 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
 - 2 edges to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]
-- 2 edges to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  file_organizer.py]]
+- 2 edges to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  ._organizer()]]
 - 2 edges to [[_COMMUNITY_SecurityScanner  TestSecurityScanner  ._iter_files()]]
 - 2 edges to [[_COMMUNITY_TestTaskManager  test_features.py  memory_mgr()]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
 - 1 edge to [[_COMMUNITY_MemoryManager  ._save_json()  .add_task()]]
-- 1 edge to [[_COMMUNITY_TaskManager  .ai_prioritize()  .list_tasks()]]
+- 1 edge to [[_COMMUNITY_TaskManager  .get_memory_context()  .ai_prioritize()]]
+- 1 edge to [[_COMMUNITY_MemoryManager (core)  Test Fixtures (conftest.py)  TestFileOps (test_actions.py)]]
 
 ## Top bridge nodes
-- [[Vault]] - degree 23, connects to 6 communities
-- [[TestVault]] - degree 12, connects to 6 communities
+- [[TestVault]] - degree 13, connects to 7 communities
+- [[Vault]] - degree 22, connects to 6 communities

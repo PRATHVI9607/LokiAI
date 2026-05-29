@@ -1,17 +1,17 @@
 ---
 source_file: "loki/tests/conftest.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "MemoryManager (core) / Test Fixtures (conftest.py) / TestFileOps (test_actions.py)"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/MemoryManager_core_/_Test_Fixtures_conftestpy_/_TestFileOps_test_actionspy
 ---
 
 # Test Fixtures (conftest.py)
 
 ## Connections
 - [[TestFileOps (test_actions.py)]] - `shares_data_with` [INFERRED]
-- [[TestVault (test_features.py)]] - `shares_data_with` [INFERRED]
+- [[TestVault]] - `shares_data_with` [INFERRED]
 
-#graphify/code #graphify/INFERRED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/INFERRED #community/MemoryManager_core_/_Test_Fixtures_conftestpy_/_TestFileOps_test_actionspy

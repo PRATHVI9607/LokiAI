@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[Config Memory files (conversationprofiletasksvault)]] - document - loki/config.yaml
+- [[Browser Control with URL Scheme Validation]] - document - LokiPRD.md
 
 ## Live Query (requires Dataview plugin)
 

@@ -12,7 +12,7 @@ tags:
 # SystemCtrl
 
 ## Connections
-- [[.__init__()_4]] - `method` [EXTRACTED]
+- [[.__init__()_3]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.get_brightness()]] - `method` [EXTRACTED]
 - [[.get_volume()]] - `method` [EXTRACTED]
@@ -20,7 +20,6 @@ tags:
 - [[.set_volume()]] - `method` [EXTRACTED]
 - [[.toggle_bluetooth()]] - `method` [EXTRACTED]
 - [[.toggle_wifi()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[Windows system controls with undo support.]] - `rationale_for` [EXTRACTED]
 - [[system_ctrl.py]] - `contains` [EXTRACTED]

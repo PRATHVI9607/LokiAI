@@ -12,14 +12,15 @@ tags:
 # AuditLog
 
 ## Connections
-- [[.__init__()_6]] - `method` [EXTRACTED]
+- [[.__init__()_5]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._rotate_if_needed()]] - `method` [EXTRACTED]
 - [[._sanitize()]] - `method` [EXTRACTED]
 - [[.get_recent()]] - `method` [EXTRACTED]
 - [[.log()]] - `method` [EXTRACTED]
 - [[Append-only audit log stored as JSONL. Thread-safe.]] - `rationale_for` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
+- [[ConvState]] - `uses` [INFERRED]
+- [[ConversationStateMachine]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[audit.py]] - `contains` [EXTRACTED]
 

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/tts.py"
 type: "code"
-community: "LokiTTS / SoftwareUpdater / ._run()"
-location: "L189"
+community: "LokiTTS / ._queue_worker() / ._speak_edge()"
+location: "L217"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiTTS_/_SoftwareUpdater_/__run
+  - community/LokiTTS_/__queue_worker_/__speak_edge
 ---
 
 # is_speaking()
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[tts.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiTTS_/_SoftwareUpdater_/__run
+#graphify/code #graphify/EXTRACTED #community/LokiTTS_/__queue_worker_/__speak_edge

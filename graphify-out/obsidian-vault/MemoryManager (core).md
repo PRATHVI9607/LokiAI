@@ -1,11 +1,11 @@
 ---
 source_file: "loki/core/memory.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "MemoryManager (core) / Test Fixtures (conftest.py) / TestFileOps (test_actions.py)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/MemoryManager_core_/_Test_Fixtures_conftestpy_/_TestFileOps_test_actionspy
 ---
 
 # MemoryManager (core)
@@ -13,6 +13,5 @@ tags:
 ## Connections
 - [[TaskManager_1]] - `calls` [EXTRACTED]
 - [[TestFileOps (test_actions.py)]] - `references` [INFERRED]
-- [[TestTaskManager (test_features.py)]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/MemoryManager_core_/_Test_Fixtures_conftestpy_/_TestFileOps_test_actionspy

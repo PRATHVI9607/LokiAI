@@ -10,7 +10,7 @@ members: 13
 **Members:** 13 nodes
 
 ## Members
-- [[.__init__()_43]] - code - loki/features/security_scanner.py
+- [[.__init__()_46]] - code - loki/features/security_scanner.py
 - [[._iter_files()]] - code - loki/features/security_scanner.py
 - [[._os_walk()]] - code - loki/features/security_scanner.py
 - [[._scan_file()]] - code - loki/features/security_scanner.py
@@ -32,15 +32,15 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
 - 2 edges to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]
-- 2 edges to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  file_organizer.py]]
+- 2 edges to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  ._organizer()]]
 - 2 edges to [[_COMMUNITY_TestTaskManager  test_features.py  memory_mgr()]]
 - 2 edges to [[_COMMUNITY_Vault  TestVault  ._save()]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
 - 1 edge to [[_COMMUNITY_MemoryManager  ._save_json()  .add_task()]]
-- 1 edge to [[_COMMUNITY_TaskManager  .ai_prioritize()  .list_tasks()]]
+- 1 edge to [[_COMMUNITY_TaskManager  .get_memory_context()  .ai_prioritize()]]
 
 ## Top bridge nodes
-- [[SecurityScanner]] - degree 18, connects to 6 communities
+- [[SecurityScanner]] - degree 17, connects to 6 communities
 - [[TestSecurityScanner]] - degree 10, connects to 6 communities

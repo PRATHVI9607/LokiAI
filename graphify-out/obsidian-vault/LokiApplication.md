@@ -1,23 +1,20 @@
 ---
 source_file: "main.py"
 type: "code"
-community: "LokiApplication / ._init_all() / main.py"
-location: "L244"
+community: "LokiApplication / .__init__() / main.py"
+location: "L113"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/LokiApplication_/__init_all_/_mainpy
+  - community/LokiApplication_/___init___/_mainpy
 ---
 
 # LokiApplication
 
 ## Connections
-- [[.__init__()_1]] - `method` [EXTRACTED]
+- [[.__init__()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `method` [EXTRACTED]
 - [[._on_browser_message()]] - `method` [EXTRACTED]
-- [[._on_conversation_ended()]] - `method` [EXTRACTED]
-- [[._on_mute()]] - `method` [EXTRACTED]
-- [[._on_speaking_stopped()]] - `method` [EXTRACTED]
 - [[._on_undo()]] - `method` [EXTRACTED]
 - [[._on_voice_transcript()]] - `method` [EXTRACTED]
 - [[._on_wakeword()]] - `method` [EXTRACTED]
@@ -28,6 +25,7 @@ tags:
 - [[ApiMocker]] - `uses` [INFERRED]
 - [[AppCtrl]] - `uses` [INFERRED]
 - [[AuditLog]] - `uses` [INFERRED]
+- [[AutoAgent]] - `uses` [INFERRED]
 - [[BackupManager]] - `uses` [INFERRED]
 - [[BrainMemory]] - `uses` [INFERRED]
 - [[BrowserCtrl]] - `uses` [INFERRED]
@@ -36,6 +34,7 @@ tags:
 - [[ClipboardManager]] - `uses` [INFERRED]
 - [[ClipboardSync]] - `uses` [INFERRED]
 - [[CodeAssistant]] - `uses` [INFERRED]
+- [[ConversationStateMachine]] - `uses` [INFERRED]
 - [[CurrencyConverter]] - `uses` [INFERRED]
 - [[DailyBriefing]] - `uses` [INFERRED]
 - [[DigitalDeclutter]] - `uses` [INFERRED]
@@ -76,10 +75,11 @@ tags:
 - [[TaskManager]] - `uses` [INFERRED]
 - [[UndoStack]] - `uses` [INFERRED]
 - [[Vault]] - `uses` [INFERRED]
+- [[VoicePipeline]] - `uses` [INFERRED]
 - [[WakewordDetector]] - `uses` [INFERRED]
 - [[WebSummarizer]] - `uses` [INFERRED]
 - [[WindowTiler]] - `uses` [INFERRED]
 - [[main()]] - `calls` [EXTRACTED]
 - [[main.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiApplication_/__init_all_/_mainpy
+#graphify/code #graphify/INFERRED #community/LokiApplication_/___init___/_mainpy

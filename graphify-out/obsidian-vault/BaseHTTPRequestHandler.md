@@ -1,11 +1,11 @@
 ---
 source_file: ""
 type: "code"
-community: "ClipboardSync / _Handler / clipboard_sync.py"
+community: "_Handler / ._check_token() / ._deny()"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ClipboardSync_/__Handler_/_clipboard_syncpy
+  - community/_Handler_/__check_token_/__deny
 ---
 
 # BaseHTTPRequestHandler
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[_Handler]] - `inherits` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ClipboardSync_/__Handler_/_clipboard_syncpy
+#graphify/code #graphify/EXTRACTED #community/_Handler_/__check_token_/__deny

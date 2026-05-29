@@ -12,7 +12,7 @@ tags:
 # LokiServer
 
 ## Connections
-- [[.__init__()_51]] - `method` [EXTRACTED]
+- [[.__init__()_55]] - `method` [EXTRACTED]
 - [[._broadcast_sync()]] - `method` [EXTRACTED]
 - [[._handle_client_message()]] - `method` [EXTRACTED]
 - [[._setup_routes()]] - `method` [EXTRACTED]

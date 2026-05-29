@@ -10,7 +10,7 @@ members: 13
 **Members:** 13 nodes
 
 ## Members
-- [[.__init__()_40]] - code - loki/features/phishing_detector.py
+- [[.__init__()_43]] - code - loki/features/phishing_detector.py
 - [[._heuristic_url()]] - code - loki/features/phishing_detector.py
 - [[._llm()_4]] - code - loki/features/phishing_detector.py
 - [[.analyze_email()]] - code - loki/features/phishing_detector.py
@@ -32,9 +32,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
 
 ## Top bridge nodes
-- [[PhishingDetector]] - degree 11, connects to 3 communities
+- [[PhishingDetector]] - degree 10, connects to 3 communities

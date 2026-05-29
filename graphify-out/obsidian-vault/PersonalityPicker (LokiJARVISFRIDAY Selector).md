@@ -1,11 +1,11 @@
 ---
 source_file: "loki-ui/components/PersonalityPicker.tsx"
 type: "code"
-community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manager) / Home Page (Root Orchestrator)"
+community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manager)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager_/_Home_Page_Root_Orchestrator
+  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager
 ---
 
 # PersonalityPicker (Loki/JARVIS/FRIDAY Selector)
@@ -15,4 +15,4 @@ tags:
 - [[Personality Type (lokijarvisfriday)]] - `shares_data_with` [EXTRACTED]
 - [[setPersonality (HTTP POST brainpersonality)]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager_/_Home_Page_Root_Orchestrator
+#graphify/code #graphify/EXTRACTED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager

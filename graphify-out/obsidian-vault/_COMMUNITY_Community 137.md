@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[One-click installer (install.bat + run.bat)]] - document - README.md
+- [[PORCUPINE_ACCESS_KEY Environment Variable]] - document - CLAUDE.md
 
 ## Live Query (requires Dataview plugin)
 

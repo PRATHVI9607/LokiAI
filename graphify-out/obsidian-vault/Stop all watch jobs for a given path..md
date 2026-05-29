@@ -2,7 +2,7 @@
 source_file: "loki/features/file_watcher.py"
 type: "rationale"
 community: "FileWatcher / WatchJob / .watch_custom()"
-location: "L204"
+location: "L203"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

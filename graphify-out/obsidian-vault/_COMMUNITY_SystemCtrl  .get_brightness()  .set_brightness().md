@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_4]] - code - loki/actions/system_ctrl.py
+- [[.__init__()_3]] - code - loki/actions/system_ctrl.py
 - [[.get_brightness()]] - code - loki/actions/system_ctrl.py
 - [[.get_volume()]] - code - loki/actions/system_ctrl.py
 - [[.set_brightness()]] - code - loki/actions/system_ctrl.py
@@ -30,8 +30,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
 
 ## Top bridge nodes
-- [[SystemCtrl]] - degree 12, connects to 2 communities
+- [[SystemCtrl]] - degree 11, connects to 2 communities

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/brain.py"
 type: "rationale"
-community: "LokiBrain / ApiMocker / FactChecker"
+community: "LokiBrain / test_brain.py / .ask()"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiBrain_/_ApiMocker_/_FactChecker
+  - community/LokiBrain_/_test_brainpy_/_ask
 ---
 
 # Loki's brain — LLM integration with KORTEX-style context engineering.  LLM prior
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[brain.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_ApiMocker_/_FactChecker
+#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask

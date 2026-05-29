@@ -1,11 +1,11 @@
 ---
 source_file: "loki-ui/components/StatusOrb.tsx"
 type: "code"
-community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manager) / Home Page (Root Orchestrator)"
+community: "ChatPanel (Main UI Shell) / useLoki Hook (WebSocket State Manager)"
 tags:
   - graphify/code
-  - graphify/EXTRACTED
-  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager_/_Home_Page_Root_Orchestrator
+  - graphify/INFERRED
+  - community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager
 ---
 
 # StatusOrb (Status Indicator Pill)
@@ -16,4 +16,4 @@ tags:
 - [[Status Orb CSS Animations (orb-pulselistenthinkspeak)]] - `conceptually_related_to` [INFERRED]
 - [[Status Type (idlelisteningthinkingspeakingoffline)]] - `shares_data_with` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager_/_Home_Page_Root_Orchestrator
+#graphify/code #graphify/INFERRED #community/ChatPanel_Main_UI_Shell_/_useLoki_Hook_WebSocket_State_Manager

@@ -12,7 +12,7 @@ tags:
 # DynamicUI
 
 ## Connections
-- [[.__init__()_23]] - `method` [EXTRACTED]
+- [[.__init__()_26]] - `method` [EXTRACTED]
 - [[._get_period_theme()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._write_state()]] - `method` [EXTRACTED]
@@ -23,7 +23,6 @@ tags:
 - [[.set_wallpaper()]] - `method` [EXTRACTED]
 - [[.start_auto_theme()]] - `method` [EXTRACTED]
 - [[.stop_auto_theme()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[dynamic_ui.py]] - `contains` [EXTRACTED]
 

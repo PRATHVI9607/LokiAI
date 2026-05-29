@@ -12,7 +12,7 @@ tags:
 # Vault
 
 ## Connections
-- [[.__init__()_48]] - `method` [EXTRACTED]
+- [[.__init__()_51]] - `method` [EXTRACTED]
 - [[._derive_key()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._save()_1]] - `method` [EXTRACTED]
@@ -27,7 +27,6 @@ tags:
 - [[.test_wrong_password_fails()]] - `calls` [INFERRED]
 - [[.unlock()]] - `method` [EXTRACTED]
 - [[AES-256-GCM encrypted key-value vault.]] - `rationale_for` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[TestClipboardManager]] - `uses` [INFERRED]
 - [[TestFileOrganizer]] - `uses` [INFERRED]

@@ -12,7 +12,7 @@ tags:
 # SemanticBrowserHistory
 
 ## Connections
-- [[.__init__()_44]] - `method` [EXTRACTED]
+- [[.__init__()_47]] - `method` [EXTRACTED]
 - [[._find_history_db()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_6]] - `method` [EXTRACTED]
@@ -21,7 +21,6 @@ tags:
 - [[.recent()]] - `method` [EXTRACTED]
 - [[.search()_2]] - `method` [EXTRACTED]
 - [[.semantic_search()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[semantic_browser_history.py]] - `contains` [EXTRACTED]

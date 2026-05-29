@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/daily_briefing.py"
 type: "rationale"
-community: "DailyBriefing / .generate() / daily_briefing.py"
+community: "._init_all() / DailyBriefing / .generate()"
 location: "L24"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/DailyBriefing_/_generate_/_daily_briefingpy
+  - community/_init_all_/_DailyBriefing_/_generate
 ---
 
 # Generate a full daily briefing covering date, tasks, system, and news.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[.generate()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/DailyBriefing_/_generate_/_daily_briefingpy
+#graphify/rationale #graphify/EXTRACTED #community/_init_all_/_DailyBriefing_/_generate

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/task_manager.py"
 type: "code"
-community: "TaskManager / .ai_prioritize() / .list_tasks()"
+community: "TaskManager / .get_memory_context() / .ai_prioritize()"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/TaskManager_/_ai_prioritize_/_list_tasks
+  - community/TaskManager_/_get_memory_context_/_ai_prioritize
 ---
 
 # task_manager.py
@@ -15,4 +15,4 @@ tags:
 - [[Task manager — add, list, complete, delete tasks with priority scoring.]] - `rationale_for` [EXTRACTED]
 - [[TaskManager]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/TaskManager_/_ai_prioritize_/_list_tasks
+#graphify/code #graphify/EXTRACTED #community/TaskManager_/_get_memory_context_/_ai_prioritize

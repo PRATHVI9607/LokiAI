@@ -1,17 +1,17 @@
 ---
 source_file: "loki/features/git_helper.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "Community 21"
 tags:
   - graphify/code
-  - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - graphify/INFERRED
+  - community/Community_21
 ---
 
 # GitHelper
 
 ## Connections
 - [[CodeAssistant_1]] - `semantically_similar_to` [INFERRED]
-- [[LokiBrain (core dependency)]] - `references` [EXTRACTED]
+- [[No auto git add -A (only staged files committed)]] - `implements` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/INFERRED #community/Community_21

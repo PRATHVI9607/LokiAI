@@ -1,11 +1,11 @@
 ---
 source_file: "loki/requirements.txt"
 type: "document"
-community: "Community 45"
+community: "Community 59"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_45
+  - community/Community_59
 ---
 
 # Requirement: psutil>=5.9.8 (Process/system monitoring)
@@ -14,4 +14,4 @@ tags:
 - [[Process Manager (listkill with protected list)]] - `implements` [EXTRACTED]
 - [[System Monitor (CPURAMDiskGPUNetwork)]] - `implements` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_45
+#graphify/document #graphify/EXTRACTED #community/Community_59

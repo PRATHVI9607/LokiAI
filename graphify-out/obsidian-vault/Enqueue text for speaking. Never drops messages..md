@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/tts.py"
 type: "rationale"
-community: "LokiTTS / SoftwareUpdater / ._run()"
+community: "LokiTTS / ._queue_worker() / ._speak_edge()"
 location: "L85"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiTTS_/_SoftwareUpdater_/__run
+  - community/LokiTTS_/__queue_worker_/__speak_edge
 ---
 
 # Enqueue text for speaking. Never drops messages.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[.speak()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/_SoftwareUpdater_/__run
+#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/__queue_worker_/__speak_edge

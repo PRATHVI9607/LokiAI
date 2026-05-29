@@ -12,7 +12,7 @@ tags:
 # RagEngine
 
 ## Connections
-- [[.__init__()_41]] - `method` [EXTRACTED]
+- [[.__init__()_44]] - `method` [EXTRACTED]
 - [[._check_embed()]] - `method` [EXTRACTED]
 - [[._embed()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
@@ -22,7 +22,6 @@ tags:
 - [[.format_context()]] - `method` [EXTRACTED]
 - [[.index_file()]] - `method` [EXTRACTED]
 - [[.query()_1]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[File RAG with ChromaDB (HNSW) + Ollama nomic-embed-text embeddings.     One pers]] - `rationale_for` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[rag_engine.py]] - `contains` [EXTRACTED]

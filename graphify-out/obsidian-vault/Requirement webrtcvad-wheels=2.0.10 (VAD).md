@@ -1,13 +1,13 @@
 ---
 source_file: "loki/requirements.txt"
 type: "document"
-community: "Community 149"
+community: "Community 179"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_149
+  - community/Community_179
 ---
 
 # Requirement: webrtcvad-wheels>=2.0.10 (VAD)
 
-#graphify/document #graphify/EXTRACTED #community/Community_149
+#graphify/document #graphify/EXTRACTED #community/Community_179

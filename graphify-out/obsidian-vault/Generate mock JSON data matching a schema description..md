@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/api_mocker.py"
 type: "rationale"
-community: "LokiBrain / ApiMocker / FactChecker"
-location: "L79"
+community: "ApiMocker / .generate_mock() / ._ask()"
+location: "L97"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiBrain_/_ApiMocker_/_FactChecker
+  - community/ApiMocker_/_generate_mock_/__ask
 ---
 
 # Generate mock JSON data matching a schema description.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[.generate_mock_data()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_ApiMocker_/_FactChecker
+#graphify/rationale #graphify/EXTRACTED #community/ApiMocker_/_generate_mock_/__ask

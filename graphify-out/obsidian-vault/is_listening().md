@@ -1,0 +1,17 @@
+---
+source_file: "loki/core/listener.py"
+type: "code"
+community: "SpeechListener / ._transcribe_worker() / listener.py"
+location: "L90"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/SpeechListener_/__transcribe_worker_/_listenerpy
+---
+
+# is_listening()
+
+## Connections
+- [[listener.py]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/SpeechListener_/__transcribe_worker_/_listenerpy

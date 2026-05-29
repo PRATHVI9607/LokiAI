@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/software_updater.py"
 type: "rationale"
-community: "LokiTTS / SoftwareUpdater / ._run()"
+community: "SoftwareUpdater / ._run() / ._check_winget()"
 location: "L76"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiTTS_/_SoftwareUpdater_/__run
+  - community/SoftwareUpdater_/__run_/__check_winget
 ---
 
 # Upgrade a specific package by name or ID.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[.update_package()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/_SoftwareUpdater_/__run
+#graphify/rationale #graphify/EXTRACTED #community/SoftwareUpdater_/__run_/__check_winget

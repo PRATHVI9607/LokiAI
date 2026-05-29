@@ -12,7 +12,7 @@ tags:
 # UndoEntry
 
 ## Connections
-- [[.push()]] - `calls` [EXTRACTED]
+- [[.push()_1]] - `calls` [EXTRACTED]
 - [[undo_stack.py]] - `contains` [EXTRACTED]
 
 #graphify/code #graphify/EXTRACTED #community/UndoStack_/__builtin_undo_/_undo_stackpy

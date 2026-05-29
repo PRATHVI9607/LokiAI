@@ -17,7 +17,6 @@ tags:
 - [[.list_layouts()]] - `method` [EXTRACTED]
 - [[.snap_window()]] - `method` [EXTRACTED]
 - [[.tile_all()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[window_tiler.py]] - `contains` [EXTRACTED]
 

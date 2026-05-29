@@ -10,7 +10,7 @@ members: 17
 **Members:** 17 nodes
 
 ## Members
-- [[.__init__()_44]] - code - loki/features/semantic_browser_history.py
+- [[.__init__()_47]] - code - loki/features/semantic_browser_history.py
 - [[._find_history_db()]] - code - loki/features/semantic_browser_history.py
 - [[._llm()_6]] - code - loki/features/semantic_browser_history.py
 - [[._read_history()]] - code - loki/features/semantic_browser_history.py
@@ -36,9 +36,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  test_brain.py  .ask()]]
 
 ## Top bridge nodes
-- [[SemanticBrowserHistory]] - degree 13, connects to 3 communities
+- [[SemanticBrowserHistory]] - degree 12, connects to 3 communities

@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Community 45"
+community: "Community 59"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_45
+  - community/Community_59
 ---
 
 # Task Manager (persistent priority tasks)
@@ -14,4 +14,4 @@ tags:
 - [[DailyBriefing Feature (tasks + system + news)]] - `calls` [EXTRACTED]
 - [[Persona Personal Productivity User]] - `conceptually_related_to` [INFERRED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_45
+#graphify/document #graphify/EXTRACTED #community/Community_59

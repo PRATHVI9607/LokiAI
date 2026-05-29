@@ -12,7 +12,7 @@ tags:
 # FocusMode
 
 ## Connections
-- [[.__init__()_32]] - `method` [EXTRACTED]
+- [[.__init__()_35]] - `method` [EXTRACTED]
 - [[._auto_disable()]] - `method` [EXTRACTED]
 - [[._block_sites()]] - `method` [EXTRACTED]
 - [[._flush_dns()]] - `method` [EXTRACTED]
@@ -21,7 +21,6 @@ tags:
 - [[.disable()]] - `method` [EXTRACTED]
 - [[.enable()]] - `method` [EXTRACTED]
 - [[Block distracting sites during focus sessions.]] - `rationale_for` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[focus_mode.py]] - `contains` [EXTRACTED]
 

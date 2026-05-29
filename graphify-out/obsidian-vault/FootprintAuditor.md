@@ -18,7 +18,6 @@ tags:
 - [[.audit_scheduled_tasks()]] - `method` [EXTRACTED]
 - [[.audit_startup()]] - `method` [EXTRACTED]
 - [[.full_audit()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[footprint_auditor.py]] - `contains` [EXTRACTED]
 

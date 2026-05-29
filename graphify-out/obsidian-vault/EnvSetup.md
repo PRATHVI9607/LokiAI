@@ -12,14 +12,16 @@ tags:
 # EnvSetup
 
 ## Connections
-- [[.__init__()_25]] - `method` [EXTRACTED]
+- [[.__init__()_28]] - `method` [EXTRACTED]
 - [[._ask()_5]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._read_project_files()]] - `method` [EXTRACTED]
 - [[.generate_docker_compose()]] - `method` [EXTRACTED]
 - [[.generate_dockerfile()]] - `method` [EXTRACTED]
 - [[.generate_venv_script()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
+- [[.save_docker_compose()]] - `method` [EXTRACTED]
+- [[.save_dockerfile()]] - `method` [EXTRACTED]
+- [[.save_venv_script()]] - `method` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[env_setup.py]] - `contains` [EXTRACTED]

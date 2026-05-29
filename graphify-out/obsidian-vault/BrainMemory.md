@@ -12,7 +12,7 @@ tags:
 # BrainMemory
 
 ## Connections
-- [[.__init__()_8]] - `method` [EXTRACTED]
+- [[.__init__()_7]] - `method` [EXTRACTED]
 - [[._add_fact_unlocked()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._load()]] - `method` [EXTRACTED]
@@ -27,7 +27,6 @@ tags:
 - [[.save()]] - `method` [EXTRACTED]
 - [[.set_preference()]] - `method` [EXTRACTED]
 - [[.to_dict()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[Persistent structured memory. Replaces flat user_profile.json.     All data live]] - `rationale_for` [EXTRACTED]
 - [[brain_memory.py]] - `contains` [EXTRACTED]

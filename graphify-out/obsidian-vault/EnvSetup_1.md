@@ -1,17 +1,17 @@
 ---
 source_file: "loki/features/env_setup.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "Community 21"
 tags:
   - graphify/code
-  - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - graphify/INFERRED
+  - community/Community_21
 ---
 
 # EnvSetup
 
 ## Connections
-- [[CodeAssistant_1]] - `shares_data_with` [INFERRED]
-- [[LokiBrain (core dependency)]] - `references` [EXTRACTED]
+- [[CodeAssistant_1]] - `semantically_similar_to` [INFERRED]
+- [[Preview-First Pattern (pending_write flag, no auto-write)]] - `implements` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/INFERRED #community/Community_21

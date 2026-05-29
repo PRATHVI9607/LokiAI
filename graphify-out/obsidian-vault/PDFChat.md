@@ -12,12 +12,11 @@ tags:
 # PDFChat
 
 ## Connections
-- [[.__init__()_39]] - `method` [EXTRACTED]
+- [[.__init__()_42]] - `method` [EXTRACTED]
 - [[._extract_text()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.ask()_1]] - `method` [EXTRACTED]
 - [[Chat with PDF documents using LLM.]] - `rationale_for` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[pdf_chat.py]] - `contains` [EXTRACTED]

@@ -35,14 +35,14 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
 - 2 edges to [[_COMMUNITY_TestTaskManager  test_features.py  memory_mgr()]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_TaskManager  .ai_prioritize()  .list_tasks()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 1 edge to [[_COMMUNITY_TaskManager  .get_memory_context()  .ai_prioritize()]]
 - 1 edge to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]
 - 1 edge to [[_COMMUNITY_SecurityScanner  TestSecurityScanner  ._iter_files()]]
-- 1 edge to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  file_organizer.py]]
+- 1 edge to [[_COMMUNITY_FileOrganizer  TestFileOrganizer  ._organizer()]]
 - 1 edge to [[_COMMUNITY_Vault  TestVault  ._save()]]
 
 ## Top bridge nodes
-- [[MemoryManager]] - degree 24, connects to 8 communities
+- [[MemoryManager]] - degree 23, connects to 8 communities

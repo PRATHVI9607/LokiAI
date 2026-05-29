@@ -2,7 +2,7 @@
 source_file: "loki/features/vault.py"
 type: "code"
 community: "Vault / TestVault / ._save()"
-location: "L128"
+location: "L135"
 tags:
   - graphify/code
   - graphify/EXTRACTED

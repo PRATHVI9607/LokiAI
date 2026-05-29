@@ -1,11 +1,11 @@
 ---
 source_file: "loki/config.yaml"
 type: "document"
-community: "Community 87"
+community: "Community 114"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Community_87
+  - community/Community_114
 ---
 
 # Config: Audio sample_rate=16000 vad_aggressiveness=1 silence_duration=1.0s
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Rationale Silence Duration 1.0s (was 2.0s, felt laggy)]] - `rationale_for` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Community_87
+#graphify/document #graphify/EXTRACTED #community/Community_114

@@ -1,11 +1,11 @@
 ---
 source_file: "loki/actions/shell_exec.py"
 type: "code"
-community: "LokiApplication / ActionRouter / LokiBrain"
+community: "ShellExec / UndoStack / BLOCKED_SCHEMES Security List"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiApplication_/_ActionRouter_/_LokiBrain
+  - community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List
 ---
 
 # BLOCKED_PATTERNS Shell Deny List
@@ -14,4 +14,4 @@ tags:
 - [[METACHAR_RE Injection Guard]] - `conceptually_related_to` [EXTRACTED]
 - [[ShellExec_1]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiApplication_/_ActionRouter_/_LokiBrain
+#graphify/code #graphify/EXTRACTED #community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List

@@ -12,7 +12,7 @@ tags:
 # ClipboardManager
 
 ## Connections
-- [[.__init__()_18]] - `method` [EXTRACTED]
+- [[.__init__()_21]] - `method` [EXTRACTED]
 - [[._add()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._monitor_loop()]] - `method` [EXTRACTED]
@@ -25,7 +25,6 @@ tags:
 - [[.test_get_item_copies_to_clipboard()]] - `calls` [INFERRED]
 - [[.test_get_item_out_of_range()]] - `calls` [INFERRED]
 - [[.test_history_tracks_entries()]] - `calls` [INFERRED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[TestClipboardManager]] - `uses` [INFERRED]
 - [[TestFileOrganizer]] - `uses` [INFERRED]

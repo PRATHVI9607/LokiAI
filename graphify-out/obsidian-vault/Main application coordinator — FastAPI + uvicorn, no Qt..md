@@ -1,12 +1,12 @@
 ---
 source_file: "main.py"
 type: "rationale"
-community: "LokiApplication / ._init_all() / main.py"
-location: "L245"
+community: "LokiApplication / .__init__() / main.py"
+location: "L114"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiApplication_/__init_all_/_mainpy
+  - community/LokiApplication_/___init___/_mainpy
 ---
 
 # Main application coordinator — FastAPI + uvicorn, no Qt.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[LokiApplication]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiApplication_/__init_all_/_mainpy
+#graphify/rationale #graphify/EXTRACTED #community/LokiApplication_/___init___/_mainpy

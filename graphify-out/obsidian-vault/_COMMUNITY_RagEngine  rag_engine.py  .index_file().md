@@ -10,7 +10,7 @@ members: 18
 **Members:** 18 nodes
 
 ## Members
-- [[.__init__()_41]] - code - loki/features/rag_engine.py
+- [[.__init__()_44]] - code - loki/features/rag_engine.py
 - [[._check_embed()]] - code - loki/features/rag_engine.py
 - [[._embed()]] - code - loki/features/rag_engine.py
 - [[._init_chroma()]] - code - loki/features/rag_engine.py
@@ -37,8 +37,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
+- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
+- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
 
 ## Top bridge nodes
-- [[RagEngine]] - degree 14, connects to 2 communities
+- [[RagEngine]] - degree 13, connects to 2 communities

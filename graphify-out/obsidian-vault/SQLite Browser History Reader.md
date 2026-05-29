@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/semantic_browser_history.py"
 type: "code"
-community: "LokiBrain (core dependency) / RagEngine / PDFChat"
+community: "LokiBrain / test_brain.py / .ask()"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+  - community/LokiBrain_/_test_brainpy_/_ask
 ---
 
 # SQLite Browser History Reader
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[SemanticBrowserHistory_1]] - `implements` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_core_dependency_/_RagEngine_/_PDFChat
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_test_brainpy_/_ask

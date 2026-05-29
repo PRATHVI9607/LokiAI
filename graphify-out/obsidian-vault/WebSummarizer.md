@@ -1,24 +1,32 @@
 ---
 source_file: "loki/features/web_summarizer.py"
 type: "code"
-community: "WebSummarizer / web_summarizer.py"
-location: "L27"
+community: "WebSummarizer / TestSSRFProtection / _is_ssrf_risk()"
+location: "L88"
 tags:
   - graphify/code
-  - graphify/EXTRACTED
-  - community/WebSummarizer_/_web_summarizerpy
+  - graphify/INFERRED
+  - community/WebSummarizer_/_TestSSRFProtection_/__is_ssrf_risk
 ---
 
 # WebSummarizer
 
 ## Connections
-- [[.__init__()_49]] - `method` [EXTRACTED]
+- [[.__init__()_52]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.summarize()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
+- [[.test_summarizer_blocks_localhost()]] - `calls` [INFERRED]
+- [[FakeTTS]] - `uses` [INFERRED]
 - [[Fetch web pages and summarize their content.]] - `rationale_for` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[LokiBrain]] - `uses` [INFERRED]
+- [[TestClipboardSyncToken]] - `uses` [INFERRED]
+- [[TestConversationStateMachine]] - `uses` [INFERRED]
+- [[TestPendingActions]] - `uses` [INFERRED]
+- [[TestProcessManagerExactMatch]] - `uses` [INFERRED]
+- [[TestSSRFProtection]] - `uses` [INFERRED]
+- [[TestTTSDrain]] - `uses` [INFERRED]
+- [[TestVoicePipeline]] - `uses` [INFERRED]
 - [[web_summarizer.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WebSummarizer_/_web_summarizerpy
+#graphify/code #graphify/INFERRED #community/WebSummarizer_/_TestSSRFProtection_/__is_ssrf_risk

@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/api_mocker.py"
 type: "rationale"
-community: "LokiBrain / ApiMocker / FactChecker"
+community: "ApiMocker / .generate_mock() / ._ask()"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiBrain_/_ApiMocker_/_FactChecker
+  - community/ApiMocker_/_generate_mock_/__ask
 ---
 
 # ApiMocker — generate mock REST API server code from a plain-English description.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[api_mocker.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiBrain_/_ApiMocker_/_FactChecker
+#graphify/rationale #graphify/EXTRACTED #community/ApiMocker_/_generate_mock_/__ask

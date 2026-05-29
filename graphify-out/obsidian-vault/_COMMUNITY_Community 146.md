@@ -10,7 +10,7 @@ members: 1
 **Members:** 1 nodes
 
 ## Members
-- [[Config file_search max_results=20 search_content=true max_file_size_mb=10]] - document - loki/config.yaml
+- [[Data Persistence Layer (lokimemory files)]] - document - LokiPRD.md
 
 ## Live Query (requires Dataview plugin)
 

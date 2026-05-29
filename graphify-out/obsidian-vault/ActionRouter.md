@@ -1,18 +1,21 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "ActionRouter / ._handle_api_mock_generate() / ._handle_app_close()"
-location: "L11"
+community: "ActionRouter / ._handle_agent_cancel() / ._handle_agent_status()"
+location: "L22"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ActionRouter_/__handle_api_mock_generate_/__handle_app_close
+  - community/ActionRouter_/__handle_agent_cancel_/__handle_agent_status
 ---
 
 # ActionRouter
 
 ## Connections
-- [[.__init__()_5]] - `method` [EXTRACTED]
+- [[.__init__()_4]] - `method` [EXTRACTED]
+- [[._handle_agent_cancel()]] - `method` [EXTRACTED]
+- [[._handle_agent_run()]] - `method` [EXTRACTED]
+- [[._handle_agent_status()]] - `method` [EXTRACTED]
 - [[._handle_api_mock_data()]] - `method` [EXTRACTED]
 - [[._handle_api_mock_generate()]] - `method` [EXTRACTED]
 - [[._handle_app_close()]] - `method` [EXTRACTED]
@@ -155,9 +158,22 @@ tags:
 - [[.register_action()]] - `method` [EXTRACTED]
 - [[.register_feature()]] - `method` [EXTRACTED]
 - [[.route_intent()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
+- [[.test_confirm_action_executes()]] - `calls` [INFERRED]
+- [[.test_router_returns_pending_for_destructive()]] - `calls` [INFERRED]
+- [[AutoAgent]] - `uses` [INFERRED]
+- [[ConvState]] - `uses` [INFERRED]
+- [[ConversationStateMachine]] - `uses` [INFERRED]
+- [[FakeTTS]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
+- [[PendingActionStore]] - `uses` [INFERRED]
 - [[Routes parsed intents to their corresponding action handlers.]] - `rationale_for` [EXTRACTED]
+- [[TestClipboardSyncToken]] - `uses` [INFERRED]
+- [[TestConversationStateMachine]] - `uses` [INFERRED]
+- [[TestPendingActions]] - `uses` [INFERRED]
+- [[TestProcessManagerExactMatch]] - `uses` [INFERRED]
+- [[TestSSRFProtection]] - `uses` [INFERRED]
+- [[TestTTSDrain]] - `uses` [INFERRED]
+- [[TestVoicePipeline]] - `uses` [INFERRED]
 - [[action_router.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ActionRouter_/__handle_api_mock_generate_/__handle_app_close
+#graphify/code #graphify/EXTRACTED #community/ActionRouter_/__handle_agent_cancel_/__handle_agent_status

@@ -18,7 +18,6 @@ tags:
 - [[.find_large_files()]] - `method` [EXTRACTED]
 - [[.find_old_files()]] - `method` [EXTRACTED]
 - [[.suggest_cleanup()]] - `method` [EXTRACTED]
-- [[ConversationManager]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[digital_declutter.py]] - `contains` [EXTRACTED]
 
