@@ -50,6 +50,7 @@ class LokiTTS:
         self._rate = config.get("rate", "+0%")
         self._volume_str = config.get("volume", "+0%")
         self._pyttsx3_engine: Optional[Any] = None
+        self._pyttsx3_ready = False  # True once initialized inside the worker thread
         self._speaking = False
         self._lock = threading.Lock()
         self._stopped = False  # set True on stop() to skip remaining items
@@ -59,10 +60,8 @@ class LokiTTS:
         self.on_speaking_started: Optional[Callable] = None
         self.on_speaking_stopped: Optional[Callable] = None
 
-        # Always initialize pyttsx3 so edge-tts failures have a working fallback
-        self._init_pyttsx3()
-
-        # Start the single-threaded queue worker
+        # Start the single-threaded queue worker — pyttsx3 is initialized there
+        # so COM is created in the same thread that calls runAndWait() (Windows req.)
         threading.Thread(target=self._queue_worker, daemon=True, name="loki-tts").start()
 
         logger.info(f"TTS initialized: {self._engine_name}")
@@ -89,7 +88,12 @@ class LokiTTS:
         self._queue.put(text)
 
     def _queue_worker(self) -> None:
-        """Single background thread — serializes all speech, signals when queue drains."""
+        """Single background thread — serializes all speech, signals when queue drains.
+        pyttsx3 is initialized here (same-thread requirement for COM on Windows)."""
+        if PYTTSX3_AVAILABLE and not self._pyttsx3_ready:
+            self._init_pyttsx3()
+            self._pyttsx3_ready = True
+
         while True:
             text = self._queue.get()
             skip = False

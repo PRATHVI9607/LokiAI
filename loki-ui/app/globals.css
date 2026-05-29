@@ -638,3 +638,161 @@ html, body, #__next {
   0%   { background-position: -200% center; }
   100% { background-position:  200% center; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   DESIGN UPGRADE — v2 polish pass
+══════════════════════════════════════════════════════════════ */
+
+/* Header: deeper glass, subtle top border glow */
+.app-header {
+  border-top: 1px solid rgba(245,197,24,0.07);
+  box-shadow: 0 1px 0 rgba(245,197,24,0.06), 0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* LOKI logo: upgraded gradient with blue‑violet mid‑stop */
+.loki-logo {
+  background: linear-gradient(135deg, #F5C518 0%, #FFE57A 40%, #A78BFA 70%, #F5C518 100%);
+  background-size: 300% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Loki message bubble: subtle depth + faint left glow */
+.msg-bubble-loki {
+  background: linear-gradient(160deg, rgba(18,28,58,0.92) 0%, rgba(10,16,38,0.88) 100%);
+  border-color: rgba(245,197,24,0.14);
+  box-shadow: -2px 0 0 rgba(245,197,24,0.2), 0 2px 16px rgba(0,0,0,0.35);
+}
+
+/* User message: refined gold shimmer */
+.msg-bubble-user {
+  background: linear-gradient(135deg, rgba(245,197,24,0.16) 0%, rgba(245,197,24,0.07) 100%);
+  border-color: rgba(245,197,24,0.28);
+  box-shadow: 0 2px 12px rgba(245,197,24,0.06);
+}
+
+/* Avatar: richer gradient + stronger glow */
+.msg-avatar {
+  background: radial-gradient(circle at 35% 30%, #FFE57A 0%, #F5C518 35%, #8B5CF6 80%);
+  box-shadow: 0 0 16px rgba(245,197,24,0.4), 0 0 4px rgba(139,92,246,0.3);
+}
+
+/* Input field: cleaner focus ring */
+.input-field:focus {
+  border-color: rgba(245,197,24,0.55);
+  background: rgba(22, 36, 68, 0.9);
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.06), inset 0 0 16px rgba(245,197,24,0.03);
+}
+
+/* Send button: richer gradient + press feel */
+.send-btn {
+  background: linear-gradient(135deg, #F5C518 0%, #FFD54F 50%, #E6B310 100%);
+  box-shadow: 0 2px 12px rgba(245,197,24,0.3);
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+.send-btn:hover:not(:disabled) {
+  opacity: 1;
+  box-shadow: 0 4px 20px rgba(245,197,24,0.45);
+}
+.send-btn:active:not(:disabled) {
+  transform: scale(0.95);
+  box-shadow: 0 1px 6px rgba(245,197,24,0.2);
+}
+
+/* Input bar: deeper glass */
+.input-bar {
+  background: rgba(6,12,28,0.8);
+  border-top-color: rgba(245,197,24,0.12);
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.3);
+}
+
+/* Scrollbar: thicker on hover for findability */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(245,197,24,0.2);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(245,197,24,0.4); }
+
+/* Thinking dots: enhanced with box-shadow pulse */
+.thinking-dot {
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* Code block: richer background + left accent line */
+.msg-code-block {
+  background: rgba(8,10,24,0.92);
+  border-color: rgba(245,197,24,0.12);
+  border-left: 3px solid rgba(245,197,24,0.35);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+/* Inline code: brighter */
+.msg-inline-code {
+  background: rgba(245,197,24,0.1);
+  border-color: rgba(245,197,24,0.22);
+  color: #FFD54F;
+}
+
+/* Status pill: refined border */
+.status-pill {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2) inset;
+}
+
+/* Personality button: hover lift */
+.personality-btn {
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.personality-btn:hover {
+  box-shadow: 0 0 0 2px rgba(245,197,24,0.12);
+}
+
+/* File sidebar: stronger glass */
+.file-sidebar {
+  background: rgba(6,12,26,0.92);
+  box-shadow: 2px 0 32px rgba(0,0,0,0.4);
+}
+
+/* Dropzone: subtle pulse on active */
+.dropzone-active {
+  will-change: border-color;
+  animation: dropzone-pulse 1s ease-in-out infinite;
+}
+@keyframes dropzone-pulse {
+  0%,100% { border-color: rgba(245,197,24,0.5); }
+  50%      { border-color: rgba(245,197,24,0.9); }
+}
+
+/* RAG pill: stronger green glow */
+.rag-pill {
+  box-shadow: 0 0 8px rgba(16,217,126,0.15);
+}
+
+/* Message area: fade‑in at top for depth illusion */
+.messages-area::before {
+  content: "";
+  position: sticky;
+  top: 0;
+  display: block;
+  height: 20px;
+  margin-bottom: -20px;
+  background: linear-gradient(to bottom, rgba(5,11,24,0.6), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Offline banner: pulsing red dot */
+.offline-banner::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F87171;
+  will-change: opacity;
+  animation: offline-blink 1.2s ease-in-out infinite;
+}
+@keyframes offline-blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}

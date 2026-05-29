@@ -67,17 +67,22 @@ class _SSRFBlockingAdapter:
 
     @staticmethod
     def check_response(resp) -> bool:
-        """Return True if the connected peer IP is safe."""
+        """Return True if the connected peer IP is public (fail-closed if inspectable).
+        If the socket is not inspectable at all, the pre-connect DNS check already ran,
+        so we allow — but any inspectable private IP is immediately blocked."""
         try:
             raw = getattr(resp.raw, "_connection", None) or getattr(resp.raw, "connection", None)
-            if raw:
-                sock = getattr(raw, "sock", None)
-                if sock:
-                    peer_ip = sock.getpeername()[0]
-                    return not _ip_is_internal(peer_ip)
+            if raw is None:
+                return True  # socket not reachable — trust pre-connect check
+            sock = getattr(raw, "sock", None)
+            if sock is None:
+                return True  # same
+            peer_ip = sock.getpeername()[0]
+            if _ip_is_internal(peer_ip):
+                return False  # fail closed: connected IP is private
+            return True
         except Exception:
-            pass
-        return True  # can't inspect socket — don't block (pre-connect check already ran)
+            return True  # socket inspection failed for unrelated reason — allow
 
 
 class WebSummarizer:

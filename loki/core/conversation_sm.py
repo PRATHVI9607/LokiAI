@@ -1,0 +1,257 @@
+"""
+ConversationStateMachine — replaces the monolithic ConversationManager.
+
+States:
+  IDLE      → conversation not active; wakeword owns mic
+  LISTENING → waiting for user utterance; inactivity timer armed
+  THINKING  → LLM + action router running on worker thread; timer cancelled
+  SPEAKING  → TTS playing a response; timer cancelled
+  ENDING    → farewell spoken on timeout; waiting for TTS to drain before tear-down
+
+Transition rules:
+  IDLE      → LISTENING  : start_conversation()
+  LISTENING → THINKING   : process_input(text)
+  THINKING  → SPEAKING   : response ready (inside worker thread)
+  SPEAKING  → LISTENING  : on_tts_done() while still active
+  SPEAKING  → IDLE       : on_tts_done() after end_conversation()
+  LISTENING → ENDING     : _on_timeout() → speak farewell
+  ENDING    → IDLE       : on_tts_done() when _state==ENDING
+
+All state transitions are protected by _lock; callbacks fire outside the lock.
+"""
+
+import logging
+import random
+import threading
+from enum import Enum, auto
+from typing import Callable, Dict, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from loki.core.brain import LokiBrain
+    from loki.core.tts import LokiTTS
+    from loki.core.action_router import ActionRouter
+    from loki.core.audit import AuditLog
+
+logger = logging.getLogger(__name__)
+
+DISMISSALS = [
+    "Farewell. Try not to cause chaos without me.",
+    "Until next time. Don't touch anything important.",
+    "Gone, but never truly absent.",
+]
+
+
+class ConvState(Enum):
+    IDLE      = auto()
+    LISTENING = auto()
+    THINKING  = auto()
+    SPEAKING  = auto()
+    ENDING    = auto()
+
+
+class ConversationStateMachine:
+    """Manages conversation state and drives LLM/action/TTS flow."""
+
+    def __init__(
+        self,
+        config: dict,
+        server,
+        tts: "LokiTTS",
+        brain: "LokiBrain",
+        router: "ActionRouter",
+        audit_log: Optional["AuditLog"] = None,
+    ):
+        self._cfg = config
+        self._server = server
+        self._tts = tts
+        self._brain = brain
+        self._router = router
+        self._audit = audit_log
+
+        self._state = ConvState.IDLE
+        self._lock = threading.Lock()
+        self._timeout_sec = config.get("ui", {}).get("conversation_timeout_seconds", 30)
+        self._timeout_handle: Optional[threading.Timer] = None
+        self._process_thread: Optional[threading.Thread] = None
+
+        # Outbound callbacks (set by LokiApplication)
+        self.on_ready_for_next: Optional[Callable] = None   # mic back to listening
+        self.on_ended: Optional[Callable] = None            # mic back to wakeword
+
+    # ── Properties ──────────────────────────────────────────────────────
+
+    @property
+    def state(self) -> ConvState:
+        return self._state
+
+    @property
+    def is_active(self) -> bool:
+        return self._state != ConvState.IDLE
+
+    # ── Conversation lifecycle ───────────────────────────────────────────
+
+    def start_conversation(self) -> None:
+        with self._lock:
+            if self._state != ConvState.IDLE:
+                # Already active — just re-arm the timeout if we're listening
+                if self._state == ConvState.LISTENING:
+                    self._arm_timeout()
+                return
+            self._state = ConvState.LISTENING
+        self._server.show_window()
+        self._server.set_status("listening")
+        self._arm_timeout()
+        logger.info("Conversation started → LISTENING")
+
+    def process_input(self, text: str) -> None:
+        if not text or not text.strip():
+            return
+        with self._lock:
+            if self._state not in (ConvState.LISTENING, ConvState.IDLE):
+                logger.warning("process_input called in state %s — ignoring", self._state)
+                return
+            self._state = ConvState.THINKING
+        self._cancel_timeout()
+        self._server.add_user_message(text)
+        self._server.set_status("thinking")
+        self._server.clear_transcript()
+
+        # Run LLM + action on a worker thread so the voice pipeline stays responsive
+        self._process_thread = threading.Thread(
+            target=self._process_worker,
+            args=(text,),
+            daemon=True,
+            name="loki-process",
+        )
+        self._process_thread.start()
+
+    def end_conversation(self) -> None:
+        """Immediately end (browser close, mute, etc.) — no farewell."""
+        with self._lock:
+            self._state = ConvState.IDLE
+        self._cancel_timeout()
+        self._server.set_status("idle")
+        self._server.hide_window()
+        logger.info("Conversation ended → IDLE")
+        if self.on_ended:
+            self.on_ended()
+
+    def on_tts_done(self) -> None:
+        """Called by LokiApplication when TTS queue drains completely."""
+        with self._lock:
+            if self._state == ConvState.ENDING:
+                self._state = ConvState.IDLE
+                do_end = True
+            elif self._state == ConvState.SPEAKING:
+                self._state = ConvState.LISTENING
+                do_end = False
+            else:
+                return
+
+        if do_end:
+            self._server.set_status("idle")
+            self._server.hide_window()
+            logger.info("Farewell complete → IDLE")
+            if self.on_ended:
+                self.on_ended()
+        else:
+            self._server.set_status("listening")
+            self._arm_timeout()
+            if self.on_ready_for_next:
+                self.on_ready_for_next()
+
+    # ── Internal ────────────────────────────────────────────────────────
+
+    def _on_timeout(self) -> None:
+        with self._lock:
+            if self._state != ConvState.LISTENING:
+                return
+            self._state = ConvState.ENDING
+        farewell = random.choice(DISMISSALS)
+        self._server.add_loki_message(farewell)
+        self._server.set_status("speaking")
+        self._tts.speak(farewell)
+        logger.info("Timeout → ENDING (farewell queued)")
+
+    def _arm_timeout(self) -> None:
+        self._cancel_timeout()
+        self._timeout_handle = threading.Timer(self._timeout_sec, self._on_timeout)
+        self._timeout_handle.daemon = True
+        self._timeout_handle.start()
+
+    def _cancel_timeout(self) -> None:
+        if self._timeout_handle:
+            self._timeout_handle.cancel()
+            self._timeout_handle = None
+
+    # ── Worker thread (LLM + action) ─────────────────────────────────────
+
+    def _process_worker(self, text: str) -> None:
+        try:
+            response = ""
+            for chunk in self._brain.ask(text):
+                response += chunk
+
+            if not response.strip():
+                response = "Hmm. That query produced nothing of substance. Try again."
+
+            intent = self._brain.parse_intent(response)
+            if intent and intent.get("intent") and intent["intent"] != "chat":
+                self._handle_intent(intent)
+            else:
+                self._emit_response(response)
+
+        except Exception as e:
+            logger.error("Process worker error: %s", e, exc_info=True)
+            self._emit_response("Something went awry. Even gods have bad days.")
+
+    def _handle_intent(self, intent: Dict) -> None:
+        loki_msg = intent.get("message", "")
+        if loki_msg:
+            self._emit_response(loki_msg, speak=True)
+
+        self._server.set_status("thinking")
+        result = self._router.route_intent(intent)
+        result_msg = result.get("message", "")
+
+        if self._audit:
+            self._audit.log(
+                intent=intent.get("intent", "unknown"),
+                params=intent.get("params", {}),
+                success=result.get("success", False),
+                result_summary=result_msg,
+            )
+
+        # Pending confirmation — show message but don't speak; user must reply
+        if result.get("pending"):
+            self._emit_response(result_msg, speak=False)
+            with self._lock:
+                self._state = ConvState.LISTENING
+            self._server.set_status("listening")
+            self._arm_timeout()
+            if self.on_ready_for_next:
+                self.on_ready_for_next()
+            return
+
+        if result_msg and result_msg != loki_msg:
+            self._emit_response(result_msg, speak=result.get("success", False))
+
+        if not result.get("success") and not loki_msg:
+            self._emit_response(f"That operation failed. {result_msg}")
+
+    def _emit_response(self, text: str, speak: bool = True) -> None:
+        self._server.add_loki_message(text)
+        if speak and text:
+            with self._lock:
+                self._state = ConvState.SPEAKING
+            self._server.set_status("speaking")
+            self._tts.speak(text)
+        else:
+            # No TTS — transition back to LISTENING directly
+            with self._lock:
+                if self._state == ConvState.THINKING:
+                    self._state = ConvState.LISTENING
+            self._server.set_status("listening")
+            self._arm_timeout()
+            if self.on_ready_for_next:
+                self.on_ready_for_next()

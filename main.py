@@ -7,12 +7,9 @@ FastAPI + Next.js UI, voice interface, 50+ features, comprehensive PC control.
 
 import asyncio
 import logging
-import os
-import random
 import sys
 import threading
 from pathlib import Path
-from typing import Callable, Optional
 
 import uvicorn
 import yaml
@@ -30,6 +27,8 @@ from loki.core.action_router import ActionRouter
 from loki.core.undo_stack import UndoStack
 from loki.core.memory import MemoryManager
 from loki.core.audit import AuditLog
+from loki.core.voice_pipeline import VoicePipeline
+from loki.core.conversation_sm import ConversationStateMachine
 from loki.features.rag_engine import RagEngine
 
 from loki.actions.file_ops import FileOps
@@ -92,12 +91,6 @@ from loki.ui.server import create_loki_server
 
 LOKI_LOG = PROJECT_ROOT / "loki" / "loki.log"
 
-DISMISSALS = [
-    "Farewell. Try not to cause chaos without me.",
-    "Until next time. Don't touch anything important.",
-    "Gone, but never truly absent.",
-]
-
 
 def setup_logging(config: dict) -> None:
     log_cfg = config.get("logging", {})
@@ -115,143 +108,6 @@ def setup_logging(config: dict) -> None:
 
 
 logger = logging.getLogger("loki.main")
-
-
-class ConversationManager:
-    """Orchestrates wakeword → listen → process → respond flow."""
-
-    def __init__(self, config: dict, server, tts, brain: LokiBrain, router: ActionRouter, audit_log=None):
-        self._cfg = config
-        self._server = server
-        self._tts = tts
-        self._brain = brain
-        self._router = router
-        self._audit = audit_log
-        self._active = False
-        self._timeout_sec = config.get("ui", {}).get("conversation_timeout_seconds", 30)
-        self._timeout_handle: Optional[threading.Timer] = None
-
-        self.on_conversation_ended: Optional[Callable] = None
-
-    @property
-    def is_active(self) -> bool:
-        return self._active
-
-    def _arm_timeout(self) -> None:
-        """Start/restart the inactivity timer. Only call when waiting for user input."""
-        self._cancel_timeout()
-        self._timeout_handle = threading.Timer(self._timeout_sec, self._on_timeout)
-        self._timeout_handle.daemon = True
-        self._timeout_handle.start()
-
-    def _cancel_timeout(self) -> None:
-        """Disarm the timer — call during thinking and speaking so we don't time out mid-process."""
-        if self._timeout_handle:
-            self._timeout_handle.cancel()
-            self._timeout_handle = None
-
-    def _on_timeout(self) -> None:
-        if not self._active:
-            return
-        farewell = random.choice(DISMISSALS)
-        self._server.add_loki_message(farewell)
-        self._speak(farewell)
-        self._end_conversation()
-
-    def start_conversation(self) -> None:
-        if self._active:
-            self._arm_timeout()
-            return
-        self._active = True
-        self._server.show_window()
-        self._server.set_status("listening")
-        self._arm_timeout()
-        logger.info("Conversation started")
-
-    def arm_listening_timeout(self) -> None:
-        """Re-arm the timeout after TTS finishes and we return to listening state."""
-        if self._active:
-            self._arm_timeout()
-
-    def process_input(self, text: str) -> None:
-        if not text or not text.strip():
-            return
-
-        # Cancel timeout while LLM + action + TTS are running — we must not
-        # time out mid-processing and end the conversation prematurely.
-        self._cancel_timeout()
-        self._server.add_user_message(text)
-        self._server.set_status("thinking")
-        self._server.clear_transcript()
-
-        try:
-            full_response = ""
-            for chunk in self._brain.ask(text):
-                full_response += chunk
-
-            if not full_response.strip():
-                full_response = "Hmm. That query produced nothing of substance. Try again."
-
-            intent = self._brain.parse_intent(full_response)
-            if intent and intent.get("intent") and intent["intent"] != "chat":
-                self._handle_intent(intent)
-            else:
-                self._server.add_loki_message(full_response)
-                self._speak(full_response)
-
-        except Exception as e:
-            logger.error(f"Process input error: {e}", exc_info=True)
-            err_msg = "Something went awry. Even gods have bad days."
-            self._server.add_loki_message(err_msg)
-            self._speak(err_msg)
-        # Do NOT re-arm timeout here — _on_speaking_stopped will arm it once TTS finishes
-
-    def _handle_intent(self, intent: dict) -> None:
-        loki_msg = intent.get("message", "")
-        if loki_msg:
-            self._server.add_loki_message(loki_msg)
-            self._speak(loki_msg)
-
-        self._server.set_status("thinking")
-        result = self._router.route_intent(intent)
-        result_msg = result.get("message", "")
-
-        # Audit log
-        if self._audit:
-            self._audit.log(
-                intent=intent.get("intent", "unknown"),
-                params=intent.get("params", {}),
-                success=result.get("success", False),
-                result_summary=result_msg,
-            )
-
-        if result_msg and result_msg != loki_msg:
-            self._server.add_loki_message(result_msg)
-            if result.get("success"):
-                self._speak(result_msg)
-
-        if not result.get("success") and not loki_msg:
-            fallback = f"That operation failed. {result_msg}"
-            self._server.add_loki_message(fallback)
-            self._speak(fallback)
-
-    def _speak(self, text: str) -> None:
-        self._server.set_status("speaking")
-        try:
-            self._tts.speak(text)
-        except Exception as e:
-            logger.error(f"TTS error: {e}")
-            self._server.set_status("idle")
-
-    def _end_conversation(self) -> None:
-        self._active = False
-        if self._timeout_handle:
-            self._timeout_handle.cancel()
-        self._server.set_status("idle")
-        self._server.hide_window()
-        logger.info("Conversation ended")
-        if self.on_conversation_ended:
-            self.on_conversation_ended()
 
 
 class LokiApplication:
@@ -435,101 +291,70 @@ class LokiApplication:
 
         # Wire auto_agent router now that router is fully initialized
         self.auto_agent._router = self.router
-        # Give auto_agent a progress callback once server is ready (wired in _wire_callbacks)
 
-        self.conversation = ConversationManager(
+        # Conversation state machine (replaces ConversationManager)
+        self.conversation = ConversationStateMachine(
             self.config, self.server, self.tts, self.brain, self.router, self.audit_log
         )
 
-        self.listener = SpeechListener(self.config)
-        self.wakeword = WakewordDetector(self.config)
+        # Voice pipeline — exclusive mic management (wakeword ↔ listener)
+        self.voice = VoicePipeline(
+            wakeword=WakewordDetector(self.config),
+            listener=SpeechListener(self.config),
+        )
 
         logger.info("All components initialized")
 
     def _wire_callbacks(self) -> None:
-        # Wakeword callbacks
-        self.wakeword.on_wakeword = self._on_wakeword
-        self.wakeword.on_transcript = self.server.update_transcript
+        # VoicePipeline → conversation state machine
+        self.voice.on_wakeword = self._on_wakeword
+        self.voice.on_transcript = self._on_voice_transcript
+        self.voice.on_transcript_partial = self.server.update_transcript
 
-        # Listener callbacks — stop mic first, process, then _on_speaking_stopped restarts
-        self.listener.on_transcript = self._on_voice_transcript
+        # ConversationStateMachine → voice pipeline
+        self.conversation.on_ready_for_next = self.voice.resume_listening
+        self.conversation.on_ended = self.voice.return_to_wakeword
 
-        # TTS callbacks
-        self.tts.on_speaking_started = lambda: self.server.set_status("speaking")
-        self.tts.on_speaking_stopped = self._on_speaking_stopped
+        # TTS done → state machine drives the next transition
+        self.tts.on_speaking_stopped = self.conversation.on_tts_done
 
-        # Conversation lifecycle
-        self.conversation.on_conversation_ended = self._on_conversation_ended
-
-        # Server (browser UI) → Python callbacks
+        # Server (browser UI) → Python
         self.server.on_user_message = self._on_browser_message
-        self.server.on_mute_toggle = self._on_mute
-        self.server.on_undo = self._on_undo
+        self.server.on_mute_toggle  = lambda m: self.voice.set_muted(m)
+        self.server.on_undo         = self._on_undo
 
-        # Wire auto_agent progress → server messages
+        # AutoAgent progress → chat feed
         self.auto_agent._on_progress = self.server.add_loki_message
 
         logger.info("Callbacks wired")
 
+    # ── Thin event handlers ─────────────────────────────────────────────
+
     def _on_wakeword(self) -> None:
-        self.wakeword.stop()  # release mic before command listener takes it
         self.conversation.start_conversation()
-        self.listener.start_listening()
         self.server.clear_transcript()
 
     def _on_voice_transcript(self, text: str) -> None:
-        self.listener.stop_listening()  # release mic while LLM thinks + TTS speaks
         self.conversation.process_input(text)
-        # _on_speaking_stopped will restart listener once TTS finishes
-
-    def _on_speaking_stopped(self) -> None:
-        self.server.set_status("idle")
-        if self.conversation.is_active:
-            # Back to listening — arm the inactivity timeout now
-            self.listener.start_listening()
-            self.server.set_status("listening")
-            self.conversation.arm_listening_timeout()
-        elif not self.wakeword.is_running:
-            # Conversation ended and TTS queue is now fully drained —
-            # safe to restart wakeword (it won't hear our own voice)
-            self.wakeword.start()
-
-    def _on_conversation_ended(self) -> None:
-        self.listener.stop_listening()
-        # Use public is_idle which checks both is_speaking and queue.empty()
-        if self.tts.is_idle:
-            if not self.wakeword.is_running:
-                self.wakeword.start()
-        # else: TTS still has audio queued; _on_speaking_stopped fires when done
 
     def _on_browser_message(self, text: str) -> None:
         self.conversation.start_conversation()
         self.conversation.process_input(text)
-
-    def _on_mute(self, is_muted: bool) -> None:
-        if is_muted:
-            self.wakeword.stop()
-            self.listener.stop_listening()
-        else:
-            if not self.wakeword.is_running:
-                self.wakeword.start()
-            self.server.set_status("idle")
 
     def _on_undo(self) -> None:
         if self.undo_stack.is_empty():
             self.server.add_loki_message("Nothing to undo. The slate is already clean.")
             return
         success = self.undo_stack.pop_and_undo()
-        msg = "Done. Reversed." if success else "Undo failed. Some things are permanent."
-        self.server.add_loki_message(msg)
+        self.server.add_loki_message("Done. Reversed." if success else "Undo failed. Some things are permanent.")
+
+    # ── Lifecycle ───────────────────────────────────────────────────────
 
     def shutdown(self) -> None:
         logger.info("Shutting down Loki...")
-        self.wakeword.stop()
-        self.listener.stop_listening()
+        self.voice.deactivate()
         self.tts.stop()
         self.clipboard.stop_monitoring()
-        # Stop all background services
         self.file_watcher.stop_all()
         if self.clipboard_sync.is_running():
             self.clipboard_sync.stop()
@@ -543,8 +368,8 @@ class LokiApplication:
     def run(self) -> None:
         port = self.config.get("ui", {}).get("port", 7777)
 
-        # Start wakeword on a background thread
-        self.wakeword.start()
+        # Activate voice pipeline (wakeword starts)
+        self.voice.activate()
 
         name = self.memory.get_user_name()
         logger.info(f"Loki online. Welcome back, {name}.")
