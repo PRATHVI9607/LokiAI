@@ -208,25 +208,27 @@ class ConversationStateMachine:
             self._emit_response("Something went awry. Even gods have bad days.")
 
     def _handle_intent(self, intent: Dict) -> None:
+        intent_name = intent.get("intent", "")
         loki_msg = intent.get("message", "")
-        if loki_msg:
-            self._emit_response(loki_msg, speak=True)
 
+        # Route FIRST — never speak an optimistic promise before we know the
+        # action is real and succeeded. (The LLM sometimes invents intents like
+        # "weather_fetch" that don't exist and promises results it can't deliver.)
         self._server.set_status("thinking")
         result = self._router.route_intent(intent)
         result_msg = result.get("message", "")
 
         if self._audit:
             self._audit.log(
-                intent=intent.get("intent", "unknown"),
+                intent=intent_name,
                 params=intent.get("params", {}),
                 success=result.get("success", False),
                 result_summary=result_msg,
             )
 
-        # Pending confirmation — show message but don't speak; user must reply
+        # Pending confirmation — speak the confirm prompt, wait for the user
         if result.get("pending"):
-            self._emit_response(result_msg, speak=False)
+            self._emit_response(result_msg, speak=True)
             with self._lock:
                 self._state = ConvState.LISTENING
             self._server.set_status("listening")
@@ -235,11 +237,21 @@ class ConversationStateMachine:
                 self.on_ready_for_next()
             return
 
-        if result_msg and result_msg != loki_msg:
-            self._emit_response(result_msg, speak=result.get("success", False))
+        # Hallucinated / unsupported intent — answer honestly instead of
+        # speaking the LLM's misleading promise.
+        if not result.get("success") and result_msg.lower().startswith("unknown intent"):
+            logger.warning(f"LLM emitted unsupported intent '{intent_name}' — answering as chat")
+            self._emit_response("That's not in my repertoire. Ask me something else.", speak=True)
+            return
 
-        if not result.get("success") and not loki_msg:
-            self._emit_response(f"That operation failed. {result_msg}")
+        if result.get("success"):
+            # Speak the conversational ack (if any), then the concrete result
+            if loki_msg:
+                self._emit_response(loki_msg, speak=True)
+            if result_msg and result_msg != loki_msg:
+                self._emit_response(result_msg, speak=True)
+        else:
+            self._emit_response(result_msg or "That operation failed.", speak=True)
 
     def _emit_response(self, text: str, speak: bool = True) -> None:
         self._server.add_loki_message(text)

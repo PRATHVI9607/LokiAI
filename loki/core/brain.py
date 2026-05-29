@@ -375,14 +375,15 @@ class LokiBrain:
                 max_retries=0,
             )
             probe.models.list()
+            self._ollama_timeout = config.get("ollama_timeout", 60)  # voice can't wait 2min
             self._ollama_infer_client = OpenAI(
                 base_url="http://localhost:11434/v1",
                 api_key="ollama",
-                timeout=120.0,
+                timeout=float(self._ollama_timeout),
                 max_retries=0,
             )
             self._ollama_available = True
-            logger.info(f"Ollama connected: {self._ollama_model}")
+            logger.info(f"Ollama connected: {self._ollama_model} (timeout {self._ollama_timeout}s)")
         except Exception:
             logger.info("Ollama not running — local inference disabled")
 
