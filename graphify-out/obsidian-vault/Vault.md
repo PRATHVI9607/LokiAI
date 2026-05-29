@@ -12,7 +12,7 @@ tags:
 # Vault
 
 ## Connections
-- [[.__init__()_51]] - `method` [EXTRACTED]
+- [[.__init__()_52]] - `method` [EXTRACTED]
 - [[._derive_key()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._save()_1]] - `method` [EXTRACTED]

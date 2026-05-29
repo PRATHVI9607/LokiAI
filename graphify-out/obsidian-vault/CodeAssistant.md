@@ -12,7 +12,7 @@ tags:
 # CodeAssistant
 
 ## Connections
-- [[.__init__()_23]] - `method` [EXTRACTED]
+- [[.__init__()_24]] - `method` [EXTRACTED]
 - [[._ask()_2]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._require_brain()]] - `method` [EXTRACTED]

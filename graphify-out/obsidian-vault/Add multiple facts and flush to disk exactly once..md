@@ -2,7 +2,7 @@
 source_file: "loki/core/brain_memory.py"
 type: "rationale"
 community: "BrainMemory / ._save_unlocked() / ._add_fact_unlocked()"
-location: "L170"
+location: "L183"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

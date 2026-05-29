@@ -12,7 +12,7 @@ tags:
 # GhostWriter
 
 ## Connections
-- [[.__init__()_36]] - `method` [EXTRACTED]
+- [[.__init__()_37]] - `method` [EXTRACTED]
 - [[._ask()_7]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.bullets_to_prose()]] - `method` [EXTRACTED]

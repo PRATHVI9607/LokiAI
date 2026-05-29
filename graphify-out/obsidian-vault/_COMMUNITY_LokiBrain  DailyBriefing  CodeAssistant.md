@@ -13,6 +13,7 @@ members: 23
 - [[.__init__()_6]] - code - loki/core/brain.py
 - [[._load_history()]] - code - loki/core/brain.py
 - [[._log_provider_status()]] - code - loki/core/brain.py
+- [[._warmup_ollama()]] - code - loki/core/brain.py
 - [[.get_conversation_summary()]] - code - loki/core/brain.py
 - [[.get_dismissal_message()]] - code - loki/core/brain.py
 - [[.get_user_name()]] - code - loki/core/brain.py
@@ -32,7 +33,6 @@ members: 23
 - [[KnowledgeGraph_1]] - code - loki/features/knowledge_graph.py
 - [[LLM integration with KORTEX-style context engineering.      Provider priority (s]] - rationale - loki/core/brain.py
 - [[LokiBrain]] - code - loki/core/brain.py
-- [[TestBrain (test_brain.py)]] - code - loki/tests/test_brain.py
 
 ## Live Query (requires Dataview plugin)
 
@@ -42,13 +42,11 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 6 edges to [[_COMMUNITY_._store_turn()  ._call_llm()  ._compress_old_turns()]]
-- 5 edges to [[_COMMUNITY_.ask()  ._build_messages()  ._get_kg_context()]]
-- 2 edges to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
-- 2 edges to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
+- 7 edges to [[_COMMUNITY_._call_llm()  ._compress_old_turns()  ._save_history()]]
+- 6 edges to [[_COMMUNITY_.ask()  ._build_messages()  ._get_kg_context()]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 2 edges to [[_COMMUNITY_ScreenshotSearch  SemanticBrowserHistory  Tesseract OCR (pytesseract fallback]]
 - 2 edges to [[_COMMUNITY_Preview-First Pattern (pending_writ  WatchJob (polling thread, snapshot   No auto git add -A (only staged fil]]
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
 - 1 edge to [[_COMMUNITY_brain.py  Loki's brain — LLM integration with]]
 - 1 edge to [[_COMMUNITY_ConvState  conversation_sm.py  Enum]]
 - 1 edge to [[_COMMUNITY_ConversationStateMachine  ._arm_timeout()  ._cancel_timeout()]]
@@ -58,6 +56,7 @@ SORT file.name ASC
 - 1 edge to [[_COMMUNITY_CitationGenerator  ._format()  .from_url()]]
 - 1 edge to [[_COMMUNITY_CodeAssistant  ._ask()  ._require_brain()]]
 - 1 edge to [[_COMMUNITY_CurrencyConverter  .convert_currency()  .convert_unit()]]
+- 1 edge to [[_COMMUNITY_DailyBriefing  .generate()  daily_briefing.py]]
 - 1 edge to [[_COMMUNITY_EmailDrafter  ._ask()  .draft()]]
 - 1 edge to [[_COMMUNITY_EnvSetup  ._read_project_files()  ._ask()]]
 - 1 edge to [[_COMMUNITY_ExpenseTracker  .extract_from_text()  .extract_from_file()]]
@@ -71,10 +70,12 @@ SORT file.name ASC
 - 1 edge to [[_COMMUNITY_PhishingDetector  .analyze_email()  .analyze_url()]]
 - 1 edge to [[_COMMUNITY_ScreenshotSearch  .capture_and_read()  _capture_screen()]]
 - 1 edge to [[_COMMUNITY_SemanticBrowserHistory  ._read_history()  .semantic_search()]]
+- 1 edge to [[_COMMUNITY__SSRFBlockingAdapter  Wraps a requests Session to verify]]
+- 1 edge to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
 - 1 edge to [[_COMMUNITY_test_brain.py  brain()  test_clear_conversation()]]
-- 1 edge to [[_COMMUNITY_MeetingTranscriber  Whisper Model (shared)]]
+- 1 edge to [[_COMMUNITY_MeetingTranscriber  PDFChat  PDFChat._extract_text]]
 - 1 edge to [[_COMMUNITY_PhishingDetector  DeepfakeAI Media Detector  URLEmail Heuristic Engine]]
 
 ## Top bridge nodes
-- [[LokiBrain]] - degree 64, connects to 31 communities
+- [[LokiBrain]] - degree 66, connects to 32 communities
 - [[CodeAssistant_1]] - degree 3, connects to 1 community

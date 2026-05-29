@@ -2,7 +2,7 @@
 source_file: "loki/core/brain_memory.py"
 type: "rationale"
 community: "TaskManager / .get_memory_context() / .ai_prioritize()"
-location: "L201"
+location: "L214"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

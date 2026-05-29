@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_13]] - code - loki/core/undo_stack.py
+- [[.__init__()_14]] - code - loki/core/undo_stack.py
 - [[.__len__()]] - code - loki/core/undo_stack.py
 - [[._builtin_undo()]] - code - loki/core/undo_stack.py
 - [[._restore_tree()]] - code - loki/core/undo_stack.py
@@ -33,8 +33,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 
 ## Top bridge nodes
-- [[UndoStack]] - degree 13, connects to 2 communities
+- [[UndoStack]] - degree 13, connects to 1 community

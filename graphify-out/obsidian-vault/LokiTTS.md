@@ -1,18 +1,18 @@
 ---
 source_file: "loki/core/tts.py"
 type: "code"
-community: "LokiTTS / TestTTSDrain / ._queue_worker()"
+community: "LokiTTS / ._queue_worker() / ._speak_edge()"
 location: "L39"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/LokiTTS_/_TestTTSDrain_/__queue_worker
+  - community/LokiTTS_/__queue_worker_/__speak_edge
 ---
 
 # LokiTTS
 
 ## Connections
-- [[.__init__()_12]] - `method` [EXTRACTED]
+- [[.__init__()_13]] - `method` [EXTRACTED]
 - [[._init_pyttsx3()]] - `method` [EXTRACTED]
 - [[._play_audio()]] - `method` [EXTRACTED]
 - [[._queue_worker()]] - `method` [EXTRACTED]
@@ -36,4 +36,4 @@ tags:
 - [[create_tts_engine()]] - `calls` [EXTRACTED]
 - [[tts.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiTTS_/_TestTTSDrain_/__queue_worker
+#graphify/code #graphify/INFERRED #community/LokiTTS_/__queue_worker_/__speak_edge

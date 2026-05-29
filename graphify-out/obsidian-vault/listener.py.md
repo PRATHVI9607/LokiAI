@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/listener.py"
 type: "code"
-community: "SpeechListener / WakewordDetector / ._transcribe_worker()"
+community: "SpeechListener / ._transcribe_worker() / listener.py"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SpeechListener_/_WakewordDetector_/__transcribe_worker
+  - community/SpeechListener_/__transcribe_worker_/_listenerpy
 ---
 
 # listener.py
@@ -16,4 +16,4 @@ tags:
 - [[SpeechListener]] - `contains` [EXTRACTED]
 - [[is_listening()]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_WakewordDetector_/__transcribe_worker
+#graphify/code #graphify/EXTRACTED #community/SpeechListener_/__transcribe_worker_/_listenerpy

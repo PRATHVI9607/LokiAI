@@ -10,7 +10,7 @@ members: 12
 **Members:** 12 nodes
 
 ## Members
-- [[.__init__()_35]] - code - loki/features/focus_mode.py
+- [[.__init__()_36]] - code - loki/features/focus_mode.py
 - [[._auto_disable()]] - code - loki/features/focus_mode.py
 - [[._block_sites()]] - code - loki/features/focus_mode.py
 - [[._flush_dns()]] - code - loki/features/focus_mode.py
@@ -31,8 +31,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 
 ## Top bridge nodes
-- [[FocusMode]] - degree 11, connects to 2 communities
+- [[FocusMode]] - degree 11, connects to 1 community

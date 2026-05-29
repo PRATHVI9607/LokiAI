@@ -12,7 +12,7 @@ tags:
 # PDFChat
 
 ## Connections
-- [[.__init__()_42]] - `method` [EXTRACTED]
+- [[.__init__()_43]] - `method` [EXTRACTED]
 - [[._extract_text()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.ask()_1]] - `method` [EXTRACTED]

@@ -10,7 +10,7 @@ members: 18
 **Members:** 18 nodes
 
 ## Members
-- [[.__init__()_12]] - code - loki/core/tts.py
+- [[.__init__()_13]] - code - loki/core/tts.py
 - [[._init_pyttsx3()]] - code - loki/core/tts.py
 - [[._play_audio()]] - code - loki/core/tts.py
 - [[._queue_worker()]] - code - loki/core/tts.py
@@ -37,17 +37,18 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 6 edges to [[_COMMUNITY_FakeTTS  ConvState  TestClipboardSyncToken]]
-- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 5 edges to [[_COMMUNITY_FakeTTS  ProcessManager  TestProcessManagerExactMatch]]
+- 1 edge to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 1 edge to [[_COMMUNITY_ConvState  conversation_sm.py  Enum]]
 - 1 edge to [[_COMMUNITY_ConversationStateMachine  ._arm_timeout()  ._cancel_timeout()]]
-- 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle()]]
+- 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle]]
 - 1 edge to [[_COMMUNITY_PendingActionStore  TestPendingActions  .is_expired()]]
-- 1 edge to [[_COMMUNITY_ProcessManager  TestProcessManagerExactMatch  process_manager.py]]
 - 1 edge to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
-- 1 edge to [[_COMMUNITY_TestVoicePipeline  ._make()  .test_activate_starts_wakeword()]]
+- 1 edge to [[_COMMUNITY_ClipboardSync  TestClipboardSyncToken  .stop()]]
+- 1 edge to [[_COMMUNITY_VoicePipeline  TestVoicePipeline  ._make()]]
 - 1 edge to [[_COMMUNITY_SoftwareUpdater  ._run()  ._check_winget()]]
 
 ## Top bridge nodes
-- [[LokiTTS]] - degree 23, connects to 7 communities
+- [[LokiTTS]] - degree 23, connects to 8 communities
 - [[._speak_edge()]] - degree 5, connects to 1 community
 - [[create_tts_engine()]] - degree 3, connects to 1 community

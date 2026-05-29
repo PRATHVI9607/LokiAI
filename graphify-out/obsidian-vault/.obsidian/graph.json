@@ -1,28 +1,28 @@
 {
   "colorGroups": [
     {
-      "query": "tag:#community/_missing()_/_._handle_agent_cancel()_/_._handle_agent_run()",
+      "query": "tag:#community/ActionRouter_/_._handle_agent_cancel()_/_._handle_agent_run()",
       "color": {
         "a": 1,
         "rgb": 5142951
       }
     },
     {
-      "query": "tag:#community/ActionRouter_/_._handle_api_mock_data()_/_._handle_api_mock_generate()",
+      "query": "tag:#community/_missing()_/_._handle_api_mock_generate()_/_._handle_backup_list()",
       "color": {
         "a": 1,
         "rgb": 15896107
       }
     },
     {
-      "query": "tag:#community/FileOps_/_ShellExec_/_TestFileOps",
+      "query": "tag:#community/useLoki.ts_/_ChatPanel.tsx_/_PlasmaOrb.tsx",
       "color": {
         "a": 1,
         "rgb": 14767961
       }
     },
     {
-      "query": "tag:#community/useLoki.ts_/_ChatPanel.tsx_/_page.tsx",
+      "query": "tag:#community/FileOps_/_ShellExec_/_TestFileOps",
       "color": {
         "a": 1,
         "rgb": 7780274
@@ -43,21 +43,21 @@
       }
     },
     {
-      "query": "tag:#community/LokiServer_/_._broadcast_sync()_/_ConnectionManager",
+      "query": "tag:#community/LokiBrain_/_PlasmaOrb_/__call_llm_(provider_priority)",
       "color": {
         "a": 1,
         "rgb": 11565729
       }
     },
     {
-      "query": "tag:#community/LokiBrain_/__call_llm_(Provider_Cascade)_/_OpenRouter_Provider_(Primary)",
+      "query": "tag:#community/VoicePipeline_/_TestVoicePipeline_/_._make()",
       "color": {
         "a": 1,
         "rgb": 16752039
       }
     },
     {
-      "query": "tag:#community/AutoAgent._execute_task_/_ActionRouter.route_intent_/_PendingActionStore",
+      "query": "tag:#community/LokiServer_/_._broadcast_sync()_/_ConnectionManager",
       "color": {
         "a": 1,
         "rgb": 10253663
@@ -99,112 +99,112 @@
       }
     },
     {
-      "query": "tag:#community/SpeechListener_/_WakewordDetector_/_._transcribe_worker()",
-      "color": {
-        "a": 1,
-        "rgb": 5873999
-      }
-    },
-    {
       "query": "tag:#community/ExpenseTracker_/_.extract_from_text()_/_.extract_from_file()",
       "color": {
         "a": 1,
-        "rgb": 15583560
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/ScreenshotSearch_/_.capture_and_read()_/__capture_screen()",
       "color": {
         "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch",
+      "color": {
+        "a": 1,
         "rgb": 11565729
-      }
-    },
-    {
-      "query": "tag:#community/LokiTTS_/_TestTTSDrain_/_._queue_worker()",
-      "color": {
-        "a": 1,
-        "rgb": 16752039
-      }
-    },
-    {
-      "query": "tag:#community/VoicePipeline_/_voice_pipeline.py_/_.activate()",
-      "color": {
-        "a": 1,
-        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/ClipboardSync_/_TestClipboardSyncToken_/_.stop()",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/CalendarManager_/_._load_events()_/_calendar_manager.py",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
-      "query": "tag:#community/PendingActionStore_/_TestPendingActions_/_.is_expired()",
+      "query": "tag:#community/RagEngine_/_rag_engine.py_/_._embed_batch()",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/ChatPanel_(Main_UI_Shell)_/_useLoki_Hook_(WebSocket_State_Manag_/_Status_Type_(idle/listening/thinkin",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/EnvSetup_/_._read_project_files()_/_._ask()",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/Vault_/_TestVault_/_._save()",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/PendingActionStore_/_TestPendingActions_/_.is_expired()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
       }
     },
     {
       "query": "tag:#community/Preview-First_Pattern_(pending_writ_/_WatchJob_(polling_thread,_snapshot__/_No_auto_git_add_-A_(only_staged_fil",
       "color": {
         "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/LokiTTS_/_._queue_worker()_/_._speak_edge()",
+      "color": {
+        "a": 1,
         "rgb": 15583560
-      }
-    },
-    {
-      "query": "tag:#community/RagEngine_/_rag_engine.py_/_.index_file()",
-      "color": {
-        "a": 1,
-        "rgb": 11565729
-      }
-    },
-    {
-      "query": "tag:#community/WebSummarizer_/_TestSSRFProtection_/__is_ssrf_risk()",
-      "color": {
-        "a": 1,
-        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/SemanticBrowserHistory_/_._read_history()_/_.semantic_search()",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/ClipboardManager_/_TestClipboardManager_/_._add()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/AutoAgent._execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/log_setup.py_/_setup_logging()_/_TerminalFormatter",
       "color": {
         "a": 1,
         "rgb": 12234924
@@ -218,70 +218,70 @@
       }
     },
     {
-      "query": "tag:#community/ConversationStateMachine_/_._arm_timeout()_/_._cancel_timeout()",
+      "query": "tag:#community/WebSummarizer_/_TestSSRFProtection_/__is_ssrf_risk()",
       "color": {
         "a": 1,
         "rgb": 15896107
       }
     },
     {
-      "query": "tag:#community/TTS_Engine_edge-tts_(en-GB-RyanNeur_/_Voice_Pipeline_(Mic_\u00e2\u2020\u2019_Wakeword_\u00e2\u2020_/_Wakeword_Detection_(Hey_Loki_varian",
+      "query": "tag:#community/LokiApplication_/_._init_all()_/_.__init__()",
       "color": {
         "a": 1,
         "rgb": 14767961
       }
     },
     {
-      "query": "tag:#community/WindowTiler_/_.snap_window()_/_window_tiler.py",
+      "query": "tag:#community/ConversationStateMachine_/_._arm_timeout()_/_._cancel_timeout()",
       "color": {
         "a": 1,
         "rgb": 7780274
       }
     },
     {
-      "query": "tag:#community/FootprintAuditor_/_.full_audit()_/_.audit_network_listeners()",
+      "query": "tag:#community/TTS_Engine_edge-tts_(en-GB-RyanNeur_/_Voice_Pipeline_(Mic_\u00e2\u2020\u2019_Wakeword_\u00e2\u2020_/_Wakeword_Detection_(Hey_Loki_varian",
       "color": {
         "a": 1,
         "rgb": 5873999
       }
     },
     {
-      "query": "tag:#community/UndoStack_/_._builtin_undo()_/_undo_stack.py",
+      "query": "tag:#community/WindowTiler_/_.snap_window()_/_window_tiler.py",
       "color": {
         "a": 1,
         "rgb": 15583560
       }
     },
     {
-      "query": "tag:#community/CodeAssistant_/_._ask()_/_._require_brain()",
+      "query": "tag:#community/UndoStack_/_._builtin_undo()_/_undo_stack.py",
       "color": {
         "a": 1,
         "rgb": 11565729
       }
     },
     {
-      "query": "tag:#community/MeetingTranscriber_/_.transcribe()_/_.extract_action_items()",
+      "query": "tag:#community/CodeAssistant_/_._ask()_/_._require_brain()",
       "color": {
         "a": 1,
         "rgb": 16752039
       }
     },
     {
-      "query": "tag:#community/SoftwareUpdater_/_._run()_/_._check_winget()",
+      "query": "tag:#community/FootprintAuditor_/_.full_audit()_/_.audit_network_listeners()",
       "color": {
         "a": 1,
         "rgb": 10253663
       }
     },
     {
-      "query": "tag:#community/._init_all()_/_BrowserCtrl_/_DailyBriefing",
+      "query": "tag:#community/MeetingTranscriber_/_.transcribe()_/_.extract_action_items()",
       "color": {
         "a": 1,
         "rgb": 12234924
       }
     },
     {
-      "query": "tag:#community/LokiApplication_/_.__init__()_/_main.py",
+      "query": "tag:#community/SoftwareUpdater_/_._run()_/_._check_winget()",
       "color": {
         "a": 1,
         "rgb": 5142951
@@ -330,49 +330,49 @@
       }
     },
     {
-      "query": "tag:#community/ApiMocker_/_.generate_mock()_/_._ask()",
+      "query": "tag:#community/SpeechListener_/_._transcribe_worker()_/_listener.py",
       "color": {
         "a": 1,
         "rgb": 16752039
       }
     },
     {
-      "query": "tag:#community/CitationGenerator_/_._format()_/_.from_url()",
+      "query": "tag:#community/ApiMocker_/_.generate_mock()_/_._ask()",
       "color": {
         "a": 1,
         "rgb": 10253663
       }
     },
     {
-      "query": "tag:#community/DigitalDeclutter_/_.suggest_cleanup()_/_.find_duplicates()",
+      "query": "tag:#community/CitationGenerator_/_._format()_/_.from_url()",
       "color": {
         "a": 1,
         "rgb": 12234924
       }
     },
     {
-      "query": "tag:#community/FocusMode_/_._unblock_sites()_/_._block_sites()",
+      "query": "tag:#community/DigitalDeclutter_/_.suggest_cleanup()_/_.find_duplicates()",
       "color": {
         "a": 1,
         "rgb": 5142951
       }
     },
     {
-      "query": "tag:#community/ProcessTriage_/_.analyze()_/_._snapshot()",
+      "query": "tag:#community/FocusMode_/_._unblock_sites()_/_._block_sites()",
       "color": {
         "a": 1,
         "rgb": 15896107
       }
     },
     {
-      "query": "tag:#community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List",
+      "query": "tag:#community/ProcessTriage_/_.analyze()_/_._snapshot()",
       "color": {
         "a": 1,
         "rgb": 14767961
       }
     },
     {
-      "query": "tag:#community/SystemCtrl_/_.get_brightness()_/_.set_brightness()",
+      "query": "tag:#community/ShellExec_/_UndoStack_/_BLOCKED_SCHEMES_Security_List",
       "color": {
         "a": 1,
         "rgb": 7780274
@@ -386,189 +386,189 @@
       }
     },
     {
-      "query": "tag:#community/CurrencyConverter_/_.convert_currency()_/_.convert_unit()",
+      "query": "tag:#community/SystemCtrl_/_.get_brightness()_/_.set_brightness()",
       "color": {
         "a": 1,
         "rgb": 15583560
-      }
-    },
-    {
-      "query": "tag:#community/GhostWriter_/_._ask()_/_.bullets_to_prose()",
-      "color": {
-        "a": 1,
-        "rgb": 11565729
-      }
-    },
-    {
-      "query": "tag:#community/GrammarPolisher_/_._ask()_/_.change_tone()",
-      "color": {
-        "a": 1,
-        "rgb": 16752039
-      }
-    },
-    {
-      "query": "tag:#community/SpeechListener_/_SpeechListener._transcribe_worker_/_VoicePipeline._handle_wakeword",
-      "color": {
-        "a": 1,
-        "rgb": 10253663
-      }
-    },
-    {
-      "query": "tag:#community/BackupManager_/_.backup_directory()_/_.backup_file()",
-      "color": {
-        "a": 1,
-        "rgb": 12234924
-      }
-    },
-    {
-      "query": "tag:#community/FileSearch_/_._scan()_/_.search()",
-      "color": {
-        "a": 1,
-        "rgb": 5142951
-      }
-    },
-    {
-      "query": "tag:#community/DailyBriefing_Feature_(tasks_+_syst_/_Clipboard_Manager_(20-item_history__/_Persona:_Personal_Productivity_User",
-      "color": {
-        "a": 1,
-        "rgb": 15896107
-      }
-    },
-    {
-      "query": "tag:#community/MediaConverter_/_._check_ffmpeg()_/_.convert()",
-      "color": {
-        "a": 1,
-        "rgb": 14767961
-      }
-    },
-    {
-      "query": "tag:#community/EmailDrafter_/_._ask()_/_.draft()",
-      "color": {
-        "a": 1,
-        "rgb": 7780274
-      }
-    },
-    {
-      "query": "tag:#community/FactChecker_/_.check()_/_._search_web()",
-      "color": {
-        "a": 1,
-        "rgb": 5873999
-      }
-    },
-    {
-      "query": "tag:#community/GitHelper_/_._get_repo()_/_.commit()",
-      "color": {
-        "a": 1,
-        "rgb": 15583560
-      }
-    },
-    {
-      "query": "tag:#community/TestTaskManager_/_test_features.py_/_memory_mgr()",
-      "color": {
-        "a": 1,
-        "rgb": 11565729
-      }
-    },
-    {
-      "query": "tag:#community/ProcessManager_/_TestProcessManagerExactMatch_/_process_manager.py",
-      "color": {
-        "a": 1,
-        "rgb": 16752039
-      }
-    },
-    {
-      "query": "tag:#community/FakeTTS_/_test_voice_and_security.py_/_.drain_and_fire()",
-      "color": {
-        "a": 1,
-        "rgb": 10253663
-      }
-    },
-    {
-      "query": "tag:#community/RagEngine_/_LokiServer_(FastAPI)_/_POST_/upload_RAG_File_Endpoint_(10M",
-      "color": {
-        "a": 1,
-        "rgb": 12234924
-      }
-    },
-    {
-      "query": "tag:#community/NewsAggregator_/_.get_headlines()_/_.get_briefing()",
-      "color": {
-        "a": 1,
-        "rgb": 5142951
-      }
-    },
-    {
-      "query": "tag:#community/SystemMonitor_/_._get_gpu_stats()_/_.get_stats()",
-      "color": {
-        "a": 1,
-        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/test_brain.py_/_brain()_/_test_clear_conversation()",
       "color": {
         "a": 1,
-        "rgb": 14767961
-      }
-    },
-    {
-      "query": "tag:#community/.ask()_/_._build_messages()_/_._get_kg_context()",
-      "color": {
-        "a": 1,
-        "rgb": 7780274
-      }
-    },
-    {
-      "query": "tag:#community/_Handler_/_._check_token()_/_._deny()",
-      "color": {
-        "a": 1,
-        "rgb": 5873999
-      }
-    },
-    {
-      "query": "tag:#community/TestConversationStateMachine_/_._make_sm()_/_.test_end_conversation_goes_to_idle",
-      "color": {
-        "a": 1,
-        "rgb": 15583560
-      }
-    },
-    {
-      "query": "tag:#community/MessageBubble_Component_/_renderMarkdown_(block-level:_fenced_/_useMemo_Caching_for_renderMarkdown",
-      "color": {
-        "a": 1,
         "rgb": 11565729
       }
     },
     {
-      "query": "tag:#community/PDFChat_/_.ask()_/_._extract_text()",
+      "query": "tag:#community/CurrencyConverter_/_.convert_currency()_/_.convert_unit()",
       "color": {
         "a": 1,
         "rgb": 16752039
       }
     },
     {
-      "query": "tag:#community/TestVoicePipeline_/_._make()_/_.test_activate_starts_wakeword()",
+      "query": "tag:#community/GhostWriter_/_._ask()_/_.bullets_to_prose()",
       "color": {
         "a": 1,
         "rgb": 10253663
       }
     },
     {
-      "query": "tag:#community/AppCtrl_/_app_ctrl.py_/_.close_app()",
+      "query": "tag:#community/GrammarPolisher_/_._ask()_/_.change_tone()",
       "color": {
         "a": 1,
         "rgb": 12234924
       }
     },
     {
-      "query": "tag:#community/._store_turn()_/_._call_llm()_/_._compress_old_turns()",
+      "query": "tag:#community/BackupManager_/_.backup_directory()_/_.backup_file()",
       "color": {
         "a": 1,
         "rgb": 5142951
       }
     },
     {
+      "query": "tag:#community/WakewordDetector_/_wakeword.py_/_._detect_loop()",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/FileSearch_/_._scan()_/_.search()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/DailyBriefing_Feature_(tasks_+_syst_/_Clipboard_Manager_(20-item_history__/_Persona:_Personal_Productivity_User",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/EmailDrafter_/_._ask()_/_.draft()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/MediaConverter_/_._check_ffmpeg()_/_.convert()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/.ask()_/_._build_messages()_/_._get_kg_context()",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/FactChecker_/_.check()_/_._search_web()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/GitHelper_/_._get_repo()_/_.commit()",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/TestTaskManager_/_test_features.py_/_memory_mgr()",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/SystemMonitor_/_._get_gpu_stats()_/_.get_stats()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/NewsAggregator_/_.get_headlines()_/_.get_briefing()",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/._call_llm()_/_._compress_old_turns()_/_._save_history()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/_Handler_/_._check_token()_/_._deny()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/TestConversationStateMachine_/_._make_sm()_/_.test_end_conversation_goes_to_idle",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/PDFChat_/_.ask()_/_._extract_text()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/AppCtrl_/_app_ctrl.py_/_.close_app()",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/BrowserCtrl_/_browser_ctrl.py_/_.open_url()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/DailyBriefing_/_.generate()_/_daily_briefing.py",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/MeetingTranscriber_/_PDFChat_/_PDFChat._extract_text",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
       "query": "tag:#community/ConvState_/_conversation_sm.py_/_Enum",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/LokiTTS_/__queue_worker_(TTS_Serialization_Th_/_COM_Thread_Requirement_Fix_(pyttsx3",
       "color": {
         "a": 1,
         "rgb": 15896107
@@ -645,7 +645,7 @@
       }
     },
     {
-      "query": "tag:#community/Home_Page_Component_(page.tsx)_/_app-layer--dormant_CSS_Class_(CSS_h_/_Dormant_Overlay_(AnimatePresence_wh",
+      "query": "tag:#community/Web_Summarizer_Feature_/_Requirement:_requests_+_beautifulso_/_CitationGenerator_Feature_(APA/MLA/",
       "color": {
         "a": 1,
         "rgb": 14767961
@@ -659,147 +659,147 @@
       }
     },
     {
-      "query": "tag:#community/Web_Summarizer_Feature_/_Requirement:_requests_+_beautifulso_/_CitationGenerator_Feature_(APA/MLA/",
-      "color": {
-        "a": 1,
-        "rgb": 5873999
-      }
-    },
-    {
       "query": "tag:#community/layout.tsx_/_metadata_/_RootLayout()",
       "color": {
         "a": 1,
-        "rgb": 15583560
-      }
-    },
-    {
-      "query": "tag:#community/BrainMemory_/_PERSONALITY_PROMPTS_Dictionary_/_MemoryManager",
-      "color": {
-        "a": 1,
-        "rgb": 11565729
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/PendingAction_60s_TTL_Expiry_/_PendingActionStore.pop_/_PendingActionStore.push",
       "color": {
         "a": 1,
-        "rgb": 16752039
+        "rgb": 15583560
       }
     },
     {
       "query": "tag:#community/WebSummarizer_DNS-rebinding_guard_(_/_WebSummarizer_SSRF_guard_(_is_ssrf__/_WebSummarizer.summarize",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/FakeTTS_Stub_(queue_+_drain_and_fir_/_TestConversationStateMachine_(state_/_TestTTSDrain_(TTS_queue_drain_+_idl",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/Audit_Log_Append-Only_JSONL_/_Audit_Log_Automatic_Sanitization_(R_/_Audit_Tier_Classification_(Tier_1_S",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/__init__.py_/_Loki_\u2014_Elite_AI_Desktop_Assistant",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/brain.py_/_Loki's_brain_\u2014_LLM_integration_with",
       "color": {
         "a": 1,
-        "rgb": 14767961
-      }
-    },
-    {
-      "query": "tag:#community/MeetingTranscriber_/_Whisper_Model_(shared)",
-      "color": {
-        "a": 1,
-        "rgb": 7780274
-      }
-    },
-    {
-      "query": "tag:#community/next.config.mjs_/_nextConfig",
-      "color": {
-        "a": 1,
-        "rgb": 5873999
-      }
-    },
-    {
-      "query": "tag:#community/config_/_tailwind.config.ts",
-      "color": {
-        "a": 1,
-        "rgb": 15583560
-      }
-    },
-    {
-      "query": "tag:#community/APP_MAP_Application_Name_Registry_/_AppCtrl",
-      "color": {
-        "a": 1,
-        "rgb": 11565729
-      }
-    },
-    {
-      "query": "tag:#community/ConversationStateMachine_/_ConvState_Enum_(IDLE/LISTENING/THIN",
-      "color": {
-        "a": 1,
-        "rgb": 16752039
-      }
-    },
-    {
-      "query": "tag:#community/FocusMode_/_FootprintAuditor",
-      "color": {
-        "a": 1,
-        "rgb": 10253663
-      }
-    },
-    {
-      "query": "tag:#community/NewsAggregator_/_RSS_Feed_Sources",
-      "color": {
-        "a": 1,
-        "rgb": 12234924
-      }
-    },
-    {
-      "query": "tag:#community/SoftwareUpdater_/_winget_(Windows_Package_Manager)",
-      "color": {
-        "a": 1,
         "rgb": 5142951
       }
     },
     {
-      "query": "tag:#community/WindowTiler_/_Windows_user32_ctypes_API",
+      "query": "tag:#community/_SSRFBlockingAdapter_/_Wraps_a_requests_Session_to_verify_",
       "color": {
         "a": 1,
         "rgb": 15896107
       }
     },
     {
-      "query": "tag:#community/TestClipboardSyncToken_(token_auth__/_TestSSRFProtection_(localhost/priva",
+      "query": "tag:#community/next.config.mjs_/_nextConfig",
       "color": {
         "a": 1,
         "rgb": 14767961
       }
     },
     {
-      "query": "tag:#community/File_Operations_(create/delete/move_/_File_Ops_Sandboxed_to_Home_Director",
+      "query": "tag:#community/config_/_tailwind.config.ts",
       "color": {
         "a": 1,
         "rgb": 7780274
       }
     },
     {
-      "query": "tag:#community/Volume_Control_via_pycaw_Windows_AP_/_Requirement:_pycaw>=20231129_(Windo",
+      "query": "tag:#community/APP_MAP_Application_Name_Registry_/_AppCtrl",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/FocusMode_/_FootprintAuditor",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/NewsAggregator_/_RSS_Feed_Sources",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/SoftwareUpdater_/_winget_(Windows_Package_Manager)",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/WindowTiler_/_Windows_user32_ctypes_API",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/TestClipboardSyncToken_(token_auth__/_TestSSRFProtection_(localhost/priva",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/MessageBubble_/_renderMarkdown_/_inlineRender",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/File_Operations_(create/delete/move_/_File_Ops_Sandboxed_to_Home_Director",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/Brightness_Control_via_screen_brigh_/_Requirement:_screen-brightness-cont",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/Windows-Only_Constraint_(Windows_10_/_Hardware_Requirements_(4GB_RAM_min,",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/CalendarManager_Feature_(ICS_parse__/_Rationale:_Calendar_ICS_parsing_use",
       "color": {
         "a": 1,
         "rgb": 5873999
@@ -813,72 +813,72 @@
       }
     },
     {
-      "query": "tag:#community/CalendarManager_Feature_(ICS_parse__/_Rationale:_Calendar_ICS_parsing_use",
+      "query": "tag:#community/Volume_Control_via_pycaw_Windows_AP_/_Requirement:_pycaw>=20231129_(Windo",
       "color": {
         "a": 1,
         "rgb": 11565729
-      }
-    },
-    {
-      "query": "tag:#community/Windows-Only_Constraint_(Windows_10_/_Hardware_Requirements_(4GB_RAM_min,",
-      "color": {
-        "a": 1,
-        "rgb": 16752039
-      }
-    },
-    {
-      "query": "tag:#community/Brightness_Control_via_screen_brigh_/_Requirement:_screen-brightness-cont",
-      "color": {
-        "a": 1,
-        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/DynamicUI",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/__init__.py",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/Human-readable_description_of_a_des",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/True_when_neither_speaking_nor_queu",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/__init__.py",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/True_if_`term`_appears_as_a_whole_w",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
       }
     },
     {
       "query": "tag:#community/Return_True_if_the_connected_peer_I",
       "color": {
         "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/__init__.py",
+      "color": {
+        "a": 1,
         "rgb": 15583560
       }
     },
@@ -887,482 +887,468 @@
       "color": {
         "a": 1,
         "rgb": 11565729
-      }
-    },
-    {
-      "query": "tag:#community/__init__.py",
-      "color": {
-        "a": 1,
-        "rgb": 16752039
-      }
-    },
-    {
-      "query": "tag:#community/__init__.py",
-      "color": {
-        "a": 1,
-        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/next-env.d.ts",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/postcss.config.js",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/Loki_Package",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/ActionRouter._describe_destructive",
       "color": {
         "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/banner_/_flow_helpers",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/MemoryManager",
+      "color": {
+        "a": 1,
         "rgb": 14767961
-      }
-    },
-    {
-      "query": "tag:#community/ConversationStateMachine.start_conv",
-      "color": {
-        "a": 1,
-        "rgb": 7780274
-      }
-    },
-    {
-      "query": "tag:#community/VoicePipeline.activate",
-      "color": {
-        "a": 1,
-        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/ApiMocker",
       "color": {
         "a": 1,
-        "rgb": 15583560
+        "rgb": 7780274
       }
     },
     {
       "query": "tag:#community/AutoAgent",
       "color": {
         "a": 1,
-        "rgb": 11565729
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/BackupManager",
       "color": {
         "a": 1,
-        "rgb": 16752039
+        "rgb": 15583560
       }
     },
     {
       "query": "tag:#community/FileWatcher.watch_custom",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/GitHelper.get_status",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/MediaConverter.get_info",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/Vault_(AES-256-GCM_encrypted_KV)",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/Vault.store",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/WebSummarizer",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/TestShellExec_(test_actions.py)",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
       }
     },
     {
       "query": "tag:#community/TestTaskManager",
       "color": {
         "a": 1,
-        "rgb": 15583560
+        "rgb": 7780274
       }
     },
     {
       "query": "tag:#community/TestClipboardManager",
       "color": {
         "a": 1,
-        "rgb": 11565729
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/TestSecurityScanner",
       "color": {
         "a": 1,
-        "rgb": 16752039
+        "rgb": 15583560
       }
     },
     {
       "query": "tag:#community/TestVault",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/TestPendingActions_(confirmation_fl",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/TestProcessManagerExactMatch_(no_su",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/TestVoicePipeline_(activate/deactiv",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/Next.js_Type_Reference",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/Next.js_Config_(Static_Export)",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/Root_Layout_(Next.js_App_Router)",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
       }
     },
     {
       "query": "tag:#community/PyQt6_Threading_Pitfall",
       "color": {
         "a": 1,
-        "rgb": 15583560
+        "rgb": 7780274
       }
     },
     {
       "query": "tag:#community/OPENROUTER_API_KEY_Environment_Vari",
       "color": {
         "a": 1,
-        "rgb": 11565729
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/PORCUPINE_ACCESS_KEY_Environment_Va",
       "color": {
         "a": 1,
-        "rgb": 16752039
+        "rgb": 15583560
       }
     },
     {
       "query": "tag:#community/File_Search_with_Relevance_Scoring",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/File_Organizer_(auto-sort_by_extens",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/Wi-Fi_Toggle_via_netsh_wlan",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/Bluetooth_Toggle_via_PowerShell_Win",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/Application_Launch_and_Close",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/Browser_Control_with_URL_Scheme_Val",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/Focus_Mode_(hosts_file_site_blockin",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
       }
     },
     {
       "query": "tag:#community/Security_Scanner_(13_regex_patterns",
       "color": {
         "a": 1,
-        "rgb": 15583560
+        "rgb": 7780274
       }
     },
     {
       "query": "tag:#community/Undo_Stack_(max_25_reversible_actio",
       "color": {
         "a": 1,
-        "rgb": 11565729
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/Data_Persistence_Layer_(loki/memory",
       "color": {
         "a": 1,
-        "rgb": 16752039
+        "rgb": 15583560
       }
     },
     {
       "query": "tag:#community/GhostWriter_Feature_(expand/continu",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/GrammarPolisher_Feature_(polish/ton",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/EmailDrafter_Feature",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/FactChecker_Feature_(DuckDuckGo_+_L",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/CurrencyConverter_Feature_(live_rat",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/SoftwareUpdater_Feature_(winget_int",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/EnvSetup_Feature_(Dockerfile/venv/d",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
       }
     },
     {
       "query": "tag:#community/ApiMocker_Feature_(LLM-generated_Fa",
       "color": {
         "a": 1,
-        "rgb": 15583560
+        "rgb": 7780274
       }
     },
     {
       "query": "tag:#community/DigitalDeclutter_Feature_(MD5_dupli",
       "color": {
         "a": 1,
-        "rgb": 11565729
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/ProcessTriage_Feature_(resource_opt",
       "color": {
         "a": 1,
-        "rgb": 16752039
+        "rgb": 15583560
       }
     },
     {
       "query": "tag:#community/PhishingDetector_Feature_(heuristic",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/FootprintAuditor_Feature_(startup/t",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/KnowledgeGraph_Feature_(entity/rela",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/SemanticBrowserHistory_Feature_(Chr",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/ScreenshotSearch_Feature_(OCR_+_sea",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/ExpenseTracker_Feature_(email/EML_p",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/DynamicUI_Feature_(time-based_theme",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
       }
     },
     {
       "query": "tag:#community/Deepfake/AI_Media_Detection_(EXIF_+",
       "color": {
         "a": 1,
-        "rgb": 15583560
+        "rgb": 7780274
       }
     },
     {
       "query": "tag:#community/AI_Task_Prioritization_via_LLM_scor",
       "color": {
         "a": 1,
-        "rgb": 11565729
+        "rgb": 5873999
       }
     },
     {
       "query": "tag:#community/Tech_Stack:_psutil_pycaw_screen-bri",
       "color": {
         "a": 1,
-        "rgb": 16752039
+        "rgb": 15583560
       }
     },
     {
       "query": "tag:#community/One-click_installer_(install.bat_+_",
       "color": {
         "a": 1,
-        "rgb": 10253663
+        "rgb": 11565729
       }
     },
     {
       "query": "tag:#community/Requirement:_openai>=1.12.0_(OpenRo",
       "color": {
         "a": 1,
-        "rgb": 12234924
+        "rgb": 16752039
       }
     },
     {
       "query": "tag:#community/Requirement:_websockets>=12.0",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 10253663
       }
     },
     {
       "query": "tag:#community/Requirement:_webrtcvad-wheels>=2.0.",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12234924
       }
     },
     {
       "query": "tag:#community/Requirement:_pygame>=2.5.2_(Audio_p",
       "color": {
         "a": 1,
-        "rgb": 14767961
+        "rgb": 5142951
       }
     },
     {
       "query": "tag:#community/Requirement:_pywin32>=306_(Windows_",
       "color": {
         "a": 1,
-        "rgb": 7780274
+        "rgb": 15896107
       }
     },
     {
       "query": "tag:#community/Requirement:_pytest_+_pytest-mock_+",
       "color": {
         "a": 1,
-        "rgb": 5873999
+        "rgb": 14767961
       }
     }
   ]

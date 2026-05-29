@@ -12,7 +12,7 @@ tags:
 # TaskManager
 
 ## Connections
-- [[.__init__()_50]] - `method` [EXTRACTED]
+- [[.__init__()_51]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.add()]] - `method` [EXTRACTED]
 - [[.ai_prioritize()]] - `method` [EXTRACTED]

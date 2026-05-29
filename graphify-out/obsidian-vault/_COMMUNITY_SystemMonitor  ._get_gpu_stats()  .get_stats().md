@@ -10,7 +10,7 @@ members: 8
 **Members:** 8 nodes
 
 ## Members
-- [[.__init__()_49]] - code - loki/features/system_monitor.py
+- [[.__init__()_50]] - code - loki/features/system_monitor.py
 - [[._get_gpu_stats()]] - code - loki/features/system_monitor.py
 - [[.get_stats()_2]] - code - loki/features/system_monitor.py
 - [[.get_top_processes()]] - code - loki/features/system_monitor.py
@@ -27,8 +27,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 
 ## Top bridge nodes
-- [[SystemMonitor]] - degree 8, connects to 2 communities
+- [[SystemMonitor]] - degree 8, connects to 1 community

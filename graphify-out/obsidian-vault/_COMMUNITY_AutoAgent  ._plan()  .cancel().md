@@ -10,7 +10,7 @@ members: 13
 **Members:** 13 nodes
 
 ## Members
-- [[.__init__()_17]] - code - loki/features/auto_agent.py
+- [[.__init__()_18]] - code - loki/features/auto_agent.py
 - [[._execute_task()]] - code - loki/features/auto_agent.py
 - [[._plan()]] - code - loki/features/auto_agent.py
 - [[.cancel()]] - code - loki/features/auto_agent.py
@@ -32,10 +32,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
-- 1 edge to [[_COMMUNITY_ActionRouter  ._handle_api_mock_data()  ._handle_api_mock_generate()]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 1 edge to [[_COMMUNITY_ActionRouter  ._handle_agent_cancel()  ._handle_agent_run()]]
 - 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[AutoAgent]] - degree 12, connects to 4 communities
+- [[AutoAgent]] - degree 12, connects to 3 communities

@@ -1,20 +1,21 @@
 ---
 source_file: "loki/features/rag_engine.py"
 type: "code"
-community: "RagEngine / rag_engine.py / .index_file()"
+community: "RagEngine / rag_engine.py / ._embed_batch()"
 location: "L36"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/RagEngine_/_rag_enginepy_/_index_file
+  - community/RagEngine_/_rag_enginepy_/__embed_batch
 ---
 
 # RagEngine
 
 ## Connections
-- [[.__init__()_44]] - `method` [EXTRACTED]
+- [[.__init__()_45]] - `method` [EXTRACTED]
 - [[._check_embed()]] - `method` [EXTRACTED]
 - [[._embed()]] - `method` [EXTRACTED]
+- [[._embed_batch()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._init_chroma()]] - `method` [EXTRACTED]
 - [[.clear_index()]] - `method` [EXTRACTED]
@@ -26,4 +27,4 @@ tags:
 - [[LokiApplication]] - `uses` [INFERRED]
 - [[rag_engine.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/RagEngine_/_rag_enginepy_/_index_file
+#graphify/code #graphify/EXTRACTED #community/RagEngine_/_rag_enginepy_/__embed_batch

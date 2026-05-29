@@ -12,7 +12,7 @@ tags:
 # GrammarPolisher
 
 ## Connections
-- [[.__init__()_38]] - `method` [EXTRACTED]
+- [[.__init__()_39]] - `method` [EXTRACTED]
 - [[._ask()_8]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.change_tone()]] - `method` [EXTRACTED]

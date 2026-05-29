@@ -12,7 +12,7 @@ tags:
 # ClipboardManager
 
 ## Connections
-- [[.__init__()_21]] - `method` [EXTRACTED]
+- [[.__init__()_22]] - `method` [EXTRACTED]
 - [[._add()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._monitor_loop()]] - `method` [EXTRACTED]

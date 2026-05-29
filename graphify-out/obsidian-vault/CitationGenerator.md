@@ -12,7 +12,7 @@ tags:
 # CitationGenerator
 
 ## Connections
-- [[.__init__()_20]] - `method` [EXTRACTED]
+- [[.__init__()_21]] - `method` [EXTRACTED]
 - [[._ask()_1]] - `method` [EXTRACTED]
 - [[._fetch_metadata()]] - `method` [EXTRACTED]
 - [[._format()]] - `method` [EXTRACTED]

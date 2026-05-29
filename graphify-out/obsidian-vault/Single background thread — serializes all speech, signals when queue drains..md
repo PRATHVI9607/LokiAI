@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/tts.py"
 type: "rationale"
-community: "LokiTTS / TestTTSDrain / ._queue_worker()"
+community: "LokiTTS / ._queue_worker() / ._speak_edge()"
 location: "L91"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/LokiTTS_/_TestTTSDrain_/__queue_worker
+  - community/LokiTTS_/__queue_worker_/__speak_edge
 ---
 
 # Single background thread — serializes all speech, signals when queue drains.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[._queue_worker()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/_TestTTSDrain_/__queue_worker
+#graphify/rationale #graphify/EXTRACTED #community/LokiTTS_/__queue_worker_/__speak_edge

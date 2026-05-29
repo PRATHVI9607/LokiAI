@@ -12,7 +12,7 @@ tags:
 # PhishingDetector
 
 ## Connections
-- [[.__init__()_43]] - `method` [EXTRACTED]
+- [[.__init__()_44]] - `method` [EXTRACTED]
 - [[._heuristic_url()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_4]] - `method` [EXTRACTED]

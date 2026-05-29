@@ -10,7 +10,7 @@ members: 13
 **Members:** 13 nodes
 
 ## Members
-- [[.__init__()_31]] - code - loki/features/file_organizer.py
+- [[.__init__()_32]] - code - loki/features/file_organizer.py
 - [[._is_safe_dir()]] - code - loki/features/file_organizer.py
 - [[._organizer()]] - code - loki/tests/test_features.py
 - [[.organize()]] - code - loki/features/file_organizer.py
@@ -32,15 +32,14 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 2 edges to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]
 - 2 edges to [[_COMMUNITY_TestTaskManager  test_features.py  memory_mgr()]]
 - 2 edges to [[_COMMUNITY_SecurityScanner  TestSecurityScanner  ._iter_files()]]
 - 2 edges to [[_COMMUNITY_Vault  TestVault  ._save()]]
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
 - 1 edge to [[_COMMUNITY_MemoryManager  ._save_json()  .add_task()]]
 - 1 edge to [[_COMMUNITY_TaskManager  .get_memory_context()  .ai_prioritize()]]
 
 ## Top bridge nodes
-- [[FileOrganizer]] - degree 14, connects to 6 communities
 - [[TestFileOrganizer]] - degree 12, connects to 6 communities
+- [[FileOrganizer]] - degree 14, connects to 5 communities

@@ -12,7 +12,7 @@ tags:
 # ScreenshotSearch
 
 ## Connections
-- [[.__init__()_45]] - `method` [EXTRACTED]
+- [[.__init__()_46]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_5]] - `method` [EXTRACTED]
 - [[._ocr()]] - `method` [EXTRACTED]

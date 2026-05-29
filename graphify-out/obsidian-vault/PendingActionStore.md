@@ -12,7 +12,7 @@ tags:
 # PendingActionStore
 
 ## Connections
-- [[.__init__()_11]] - `method` [EXTRACTED]
+- [[.__init__()_12]] - `method` [EXTRACTED]
 - [[.__init__()_4]] - `calls` [INFERRED]
 - [[.cancel_all()]] - `method` [EXTRACTED]
 - [[.peek_last()]] - `method` [EXTRACTED]

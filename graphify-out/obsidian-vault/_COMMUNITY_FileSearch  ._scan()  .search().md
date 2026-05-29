@@ -10,7 +10,7 @@ members: 10
 **Members:** 10 nodes
 
 ## Members
-- [[.__init__()_32]] - code - loki/features/file_search.py
+- [[.__init__()_33]] - code - loki/features/file_search.py
 - [[._parse_query()]] - code - loki/features/file_search.py
 - [[._scan()]] - code - loki/features/file_search.py
 - [[._score_file()]] - code - loki/features/file_search.py
@@ -29,8 +29,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 
 ## Top bridge nodes
-- [[FileSearch]] - degree 9, connects to 2 communities
+- [[FileSearch]] - degree 9, connects to 1 community

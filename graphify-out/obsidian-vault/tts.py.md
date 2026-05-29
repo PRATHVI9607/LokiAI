@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/tts.py"
 type: "code"
-community: "LokiTTS / TestTTSDrain / ._queue_worker()"
+community: "LokiTTS / ._queue_worker() / ._speak_edge()"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiTTS_/_TestTTSDrain_/__queue_worker
+  - community/LokiTTS_/__queue_worker_/__speak_edge
 ---
 
 # tts.py
@@ -18,4 +18,4 @@ tags:
 - [[is_idle()]] - `contains` [EXTRACTED]
 - [[is_speaking()]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiTTS_/_TestTTSDrain_/__queue_worker
+#graphify/code #graphify/EXTRACTED #community/LokiTTS_/__queue_worker_/__speak_edge

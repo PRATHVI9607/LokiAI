@@ -1,12 +1,12 @@
 ---
 source_file: "main.py"
 type: "code"
-community: "LokiApplication / .__init__() / main.py"
-location: "L113"
+community: "LokiApplication / ._init_all() / .__init__()"
+location: "L114"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/LokiApplication_/___init___/_mainpy
+  - community/LokiApplication_/__init_all_/___init__
 ---
 
 # LokiApplication
@@ -82,4 +82,4 @@ tags:
 - [[main()]] - `calls` [EXTRACTED]
 - [[main.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiApplication_/___init___/_mainpy
+#graphify/code #graphify/INFERRED #community/LokiApplication_/__init_all_/___init__

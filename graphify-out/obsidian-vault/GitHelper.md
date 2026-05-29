@@ -12,7 +12,7 @@ tags:
 # GitHelper
 
 ## Connections
-- [[.__init__()_37]] - `method` [EXTRACTED]
+- [[.__init__()_38]] - `method` [EXTRACTED]
 - [[._get_repo()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.commit()]] - `method` [EXTRACTED]

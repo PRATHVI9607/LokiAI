@@ -10,7 +10,7 @@ members: 9
 **Members:** 9 nodes
 
 ## Members
-- [[.__init__()_37]] - code - loki/features/git_helper.py
+- [[.__init__()_38]] - code - loki/features/git_helper.py
 - [[._get_repo()]] - code - loki/features/git_helper.py
 - [[.commit()]] - code - loki/features/git_helper.py
 - [[.generate_commit_message()]] - code - loki/features/git_helper.py
@@ -28,9 +28,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[GitHelper]] - degree 10, connects to 3 communities
+- [[GitHelper]] - degree 10, connects to 2 communities

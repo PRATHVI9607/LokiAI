@@ -10,7 +10,7 @@ members: 16
 **Members:** 16 nodes
 
 ## Members
-- [[.__init__()_10]] - code - loki/core/memory.py
+- [[.__init__()_11]] - code - loki/core/memory.py
 - [[._load_json()]] - code - loki/core/memory.py
 - [[._next_task_id()]] - code - loki/core/memory.py
 - [[._save_json()]] - code - loki/core/memory.py
@@ -35,9 +35,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 2 edges to [[_COMMUNITY_TestTaskManager  test_features.py  memory_mgr()]]
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
 - 1 edge to [[_COMMUNITY_TaskManager  .get_memory_context()  .ai_prioritize()]]
 - 1 edge to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]
 - 1 edge to [[_COMMUNITY_SecurityScanner  TestSecurityScanner  ._iter_files()]]
@@ -45,4 +44,4 @@ SORT file.name ASC
 - 1 edge to [[_COMMUNITY_Vault  TestVault  ._save()]]
 
 ## Top bridge nodes
-- [[MemoryManager]] - degree 23, connects to 8 communities
+- [[MemoryManager]] - degree 23, connects to 7 communities

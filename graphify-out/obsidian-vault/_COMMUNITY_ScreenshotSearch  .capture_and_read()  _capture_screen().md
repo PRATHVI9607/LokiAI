@@ -10,7 +10,7 @@ members: 22
 **Members:** 22 nodes
 
 ## Members
-- [[.__init__()_45]] - code - loki/features/screenshot_search.py
+- [[.__init__()_46]] - code - loki/features/screenshot_search.py
 - [[._llm()_5]] - code - loki/features/screenshot_search.py
 - [[._ocr()]] - code - loki/features/screenshot_search.py
 - [[.capture_and_read()]] - code - loki/features/screenshot_search.py
@@ -41,9 +41,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[ScreenshotSearch]] - degree 12, connects to 3 communities
+- [[ScreenshotSearch]] - degree 12, connects to 2 communities

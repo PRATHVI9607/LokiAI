@@ -12,7 +12,7 @@ tags:
 # WatchJob
 
 ## Connections
-- [[.__init__()_33]] - `method` [EXTRACTED]
+- [[.__init__()_34]] - `method` [EXTRACTED]
 - [[._loop()]] - `method` [EXTRACTED]
 - [[._scan()_1]] - `method` [EXTRACTED]
 - [[.start()_2]] - `method` [EXTRACTED]

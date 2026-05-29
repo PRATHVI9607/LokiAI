@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/voice_pipeline.py"
 type: "rationale"
-community: "VoicePipeline / voice_pipeline.py / .activate()"
-location: "L47"
+community: "VoicePipeline / TestVoicePipeline / ._make()"
+location: "L51"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/VoicePipeline_/_voice_pipelinepy_/_activate
+  - community/VoicePipeline_/_TestVoicePipeline_/__make
 ---
 
 # Start wakeword detection. Call once on app start.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[.activate()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/VoicePipeline_/_voice_pipelinepy_/_activate
+#graphify/rationale #graphify/EXTRACTED #community/VoicePipeline_/_TestVoicePipeline_/__make

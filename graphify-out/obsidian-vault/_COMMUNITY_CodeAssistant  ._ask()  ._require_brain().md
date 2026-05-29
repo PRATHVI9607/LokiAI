@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_23]] - code - loki/features/code_assistant.py
+- [[.__init__()_24]] - code - loki/features/code_assistant.py
 - [[._ask()_2]] - code - loki/features/code_assistant.py
 - [[._require_brain()]] - code - loki/features/code_assistant.py
 - [[.analyze()]] - code - loki/features/code_assistant.py
@@ -33,9 +33,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[CodeAssistant]] - degree 14, connects to 3 communities
+- [[CodeAssistant]] - degree 14, connects to 2 communities

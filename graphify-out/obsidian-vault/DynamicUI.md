@@ -12,7 +12,7 @@ tags:
 # DynamicUI
 
 ## Connections
-- [[.__init__()_26]] - `method` [EXTRACTED]
+- [[.__init__()_27]] - `method` [EXTRACTED]
 - [[._get_period_theme()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._write_state()]] - `method` [EXTRACTED]

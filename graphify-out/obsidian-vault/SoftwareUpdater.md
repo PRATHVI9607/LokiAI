@@ -12,7 +12,7 @@ tags:
 # SoftwareUpdater
 
 ## Connections
-- [[.__init__()_48]] - `method` [EXTRACTED]
+- [[.__init__()_49]] - `method` [EXTRACTED]
 - [[._check_winget()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._run()]] - `method` [EXTRACTED]

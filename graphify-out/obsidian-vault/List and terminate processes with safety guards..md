@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/process_manager.py"
 type: "rationale"
-community: "ProcessManager / TestProcessManagerExactMatch / process_manager.py"
+community: "FakeTTS / ProcessManager / TestProcessManagerExactMatch"
 location: "L28"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/ProcessManager_/_TestProcessManagerExactMatch_/_process_managerpy
+  - community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch
 ---
 
 # List and terminate processes with safety guards.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[ProcessManager]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/ProcessManager_/_TestProcessManagerExactMatch_/_process_managerpy
+#graphify/rationale #graphify/EXTRACTED #community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch

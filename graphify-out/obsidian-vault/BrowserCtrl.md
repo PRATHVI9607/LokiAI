@@ -1,12 +1,12 @@
 ---
 source_file: "loki/actions/browser_ctrl.py"
 type: "code"
-community: "._init_all() / BrowserCtrl / DailyBriefing"
+community: "BrowserCtrl / browser_ctrl.py / .open_url()"
 location: "L25"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/_init_all_/_BrowserCtrl_/_DailyBriefing
+  - community/BrowserCtrl_/_browser_ctrlpy_/_open_url
 ---
 
 # BrowserCtrl
@@ -19,4 +19,4 @@ tags:
 - [[Open URLs and perform web searches safely.]] - `rationale_for` [EXTRACTED]
 - [[browser_ctrl.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/_init_all_/_BrowserCtrl_/_DailyBriefing
+#graphify/code #graphify/EXTRACTED #community/BrowserCtrl_/_browser_ctrlpy_/_open_url

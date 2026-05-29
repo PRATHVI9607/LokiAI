@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/wakeword.py"
 type: "code"
-community: "SpeechListener / WakewordDetector / ._transcribe_worker()"
-location: "L64"
+community: "WakewordDetector / wakeword.py / ._detect_loop()"
+location: "L79"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SpeechListener_/_WakewordDetector_/__transcribe_worker
+  - community/WakewordDetector_/_wakewordpy_/__detect_loop
 ---
 
 # is_running()
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[wakeword.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_WakewordDetector_/__transcribe_worker
+#graphify/code #graphify/EXTRACTED #community/WakewordDetector_/_wakewordpy_/__detect_loop

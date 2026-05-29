@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/rag_engine.py"
 type: "code"
-community: "RagEngine / rag_engine.py / .index_file()"
-location: "L110"
+community: "RagEngine / rag_engine.py / ._embed_batch()"
+location: "L120"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/RagEngine_/_rag_enginepy_/_index_file
+  - community/RagEngine_/_rag_enginepy_/__embed_batch
 ---
 
 # _chunk_text()
@@ -15,4 +15,4 @@ tags:
 - [[.index_file()]] - `calls` [EXTRACTED]
 - [[rag_engine.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/RagEngine_/_rag_enginepy_/_index_file
+#graphify/code #graphify/EXTRACTED #community/RagEngine_/_rag_enginepy_/__embed_batch

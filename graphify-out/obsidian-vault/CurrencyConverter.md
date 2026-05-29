@@ -12,7 +12,7 @@ tags:
 # CurrencyConverter
 
 ## Connections
-- [[.__init__()_24]] - `method` [EXTRACTED]
+- [[.__init__()_25]] - `method` [EXTRACTED]
 - [[._ask()_3]] - `method` [EXTRACTED]
 - [[._fetch_rates()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]

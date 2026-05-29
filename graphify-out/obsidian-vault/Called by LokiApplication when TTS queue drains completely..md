@@ -2,7 +2,7 @@
 source_file: "loki/core/conversation_sm.py"
 type: "rationale"
 community: "ConversationStateMachine / ._arm_timeout() / ._cancel_timeout()"
-location: "L140"
+location: "L141"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

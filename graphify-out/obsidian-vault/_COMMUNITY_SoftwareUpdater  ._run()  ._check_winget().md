@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_48]] - code - loki/features/software_updater.py
+- [[.__init__()_49]] - code - loki/features/software_updater.py
 - [[._check_winget()]] - code - loki/features/software_updater.py
 - [[._run()]] - code - loki/features/software_updater.py
 - [[.check_updates()]] - code - loki/features/software_updater.py
@@ -33,10 +33,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
-- 1 edge to [[_COMMUNITY_LokiTTS  TestTTSDrain  ._queue_worker()]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 1 edge to [[_COMMUNITY_LokiTTS  ._queue_worker()  ._speak_edge()]]
 
 ## Top bridge nodes
-- [[SoftwareUpdater]] - degree 10, connects to 2 communities
+- [[SoftwareUpdater]] - degree 10, connects to 1 community
 - [[._run()]] - degree 6, connects to 1 community

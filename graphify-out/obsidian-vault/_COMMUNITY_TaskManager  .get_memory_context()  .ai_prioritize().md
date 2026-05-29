@@ -10,7 +10,7 @@ members: 13
 **Members:** 13 nodes
 
 ## Members
-- [[.__init__()_50]] - code - loki/features/task_manager.py
+- [[.__init__()_51]] - code - loki/features/task_manager.py
 - [[.add()]] - code - loki/features/task_manager.py
 - [[.ai_prioritize()]] - code - loki/features/task_manager.py
 - [[.complete()]] - code - loki/features/task_manager.py
@@ -32,9 +32,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 2 edges to [[_COMMUNITY_TestTaskManager  test_features.py  memory_mgr()]]
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
 - 1 edge to [[_COMMUNITY_BrainMemory  ._save_unlocked()  ._add_fact_unlocked()]]
 - 1 edge to [[_COMMUNITY_MemoryManager  ._save_json()  .add_task()]]
 - 1 edge to [[_COMMUNITY_ClipboardManager  TestClipboardManager  ._add()]]
@@ -43,5 +42,5 @@ SORT file.name ASC
 - 1 edge to [[_COMMUNITY_Vault  TestVault  ._save()]]
 
 ## Top bridge nodes
-- [[TaskManager]] - degree 17, connects to 8 communities
+- [[TaskManager]] - degree 17, connects to 7 communities
 - [[.get_memory_context()]] - degree 3, connects to 1 community

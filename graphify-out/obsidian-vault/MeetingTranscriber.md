@@ -12,7 +12,7 @@ tags:
 # MeetingTranscriber
 
 ## Connections
-- [[.__init__()_41]] - `method` [EXTRACTED]
+- [[.__init__()_42]] - `method` [EXTRACTED]
 - [[._ensure_model()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_3]] - `method` [EXTRACTED]

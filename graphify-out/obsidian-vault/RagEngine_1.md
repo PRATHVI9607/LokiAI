@@ -1,20 +1,19 @@
 ---
 source_file: "loki/features/rag_engine.py"
 type: "code"
-community: "RagEngine / LokiServer (FastAPI) / POST /upload RAG File Endpoint (10M"
+community: "LokiBrain / PlasmaOrb / _call_llm (provider priority)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/RagEngine_/_LokiServer_FastAPI_/_POST_/upload_RAG_File_Endpoint_10M
+  - community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority
 ---
 
 # RagEngine
 
 ## Connections
-- [[ChromaDB PersistentClient]] - `calls` [EXTRACTED]
 - [[LokiServer (FastAPI)]] - `references` [EXTRACTED]
 - [[POST upload RAG File Endpoint (10MB cap)]] - `calls` [EXTRACTED]
-- [[Text Chunk Pipeline (400w40w overlap)]] - `implements` [EXTRACTED]
-- [[nomic-embed-text Embedding Model]] - `calls` [EXTRACTED]
+- [[TerminalFormatter (color-coded tags)]] - `references` [EXTRACTED]
+- [[_embed_batch (32call batch embeddings)]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/RagEngine_/_LokiServer_FastAPI_/_POST_/upload_RAG_File_Endpoint_10M
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority

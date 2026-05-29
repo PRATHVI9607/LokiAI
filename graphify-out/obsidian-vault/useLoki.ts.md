@@ -1,12 +1,12 @@
 ---
 source_file: "loki-ui/hooks/useLoki.ts"
 type: "code"
-community: "useLoki.ts / ChatPanel.tsx / page.tsx"
+community: "useLoki.ts / ChatPanel.tsx / PlasmaOrb.tsx"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/useLokits_/_ChatPaneltsx_/_pagetsx
+  - community/useLokits_/_ChatPaneltsx_/_PlasmaOrbtsx
 ---
 
 # useLoki.ts
@@ -21,6 +21,7 @@ tags:
 - [[MessageType]] - `contains` [EXTRACTED]
 - [[Personality]] - `contains` [EXTRACTED]
 - [[PersonalityPicker.tsx]] - `imports_from` [EXTRACTED]
+- [[PlasmaOrb.tsx]] - `imports_from` [EXTRACTED]
 - [[RuneCanvas.tsx]] - `imports_from` [EXTRACTED]
 - [[Status]] - `contains` [EXTRACTED]
 - [[StatusOrb.tsx]] - `imports_from` [EXTRACTED]
@@ -29,4 +30,4 @@ tags:
 - [[page.tsx]] - `imports_from` [EXTRACTED]
 - [[useLoki()]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/useLokits_/_ChatPaneltsx_/_pagetsx
+#graphify/code #graphify/EXTRACTED #community/useLokits_/_ChatPaneltsx_/_PlasmaOrbtsx

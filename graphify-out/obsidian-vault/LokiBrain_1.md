@@ -1,22 +1,22 @@
 ---
 source_file: "loki/core/brain.py"
 type: "code"
-community: "LokiBrain / _call_llm (Provider Cascade) / OpenRouter Provider (Primary)"
+community: "LokiBrain / PlasmaOrb / _call_llm (provider priority)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/LokiBrain_/__call_llm_Provider_Cascade_/_OpenRouter_Provider_Primary
+  - community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority
 ---
 
 # LokiBrain
 
 ## Connections
-- [[Kimi Moonshot Provider (Tertiary)]] - `calls` [EXTRACTED]
-- [[LokiApplication_1]] - `calls` [EXTRACTED]
-- [[NVIDIA NIM Provider (Deep Reasoning Secondary)]] - `calls` [EXTRACTED]
-- [[Ollama Local Provider (Offline Fallback)]] - `calls` [EXTRACTED]
-- [[OpenRouter Provider (Primary)]] - `calls` [EXTRACTED]
-- [[Speed-First Provider Architecture]] - `conceptually_related_to` [INFERRED]
-- [[_call_llm (Provider Cascade)]] - `calls` [EXTRACTED]
+- [[RagEngine.query]] - `calls` [EXTRACTED]
+- [[TerminalFormatter (color-coded tags)]] - `references` [EXTRACTED]
+- [[_call_llm (provider priority)]] - `calls` [EXTRACTED]
+- [[_history_lock (thread safety)]] - `references` [EXTRACTED]
+- [[_process_worker]] - `calls` [EXTRACTED]
+- [[_run_maintenance (background memory thread)]] - `calls` [EXTRACTED]
+- [[parse_intent (balanced-brace extraction)]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/LokiBrain_/__call_llm_Provider_Cascade_/_OpenRouter_Provider_Primary
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority

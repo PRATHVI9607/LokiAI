@@ -10,7 +10,7 @@ members: 20
 **Members:** 20 nodes
 
 ## Members
-- [[.__init__()_19]] - code - loki/features/calendar_manager.py
+- [[.__init__()_20]] - code - loki/features/calendar_manager.py
 - [[._llm()]] - code - loki/features/calendar_manager.py
 - [[._load_events()]] - code - loki/features/calendar_manager.py
 - [[.find_conflicts()]] - code - loki/features/calendar_manager.py
@@ -39,9 +39,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[CalendarManager]] - degree 11, connects to 3 communities
+- [[CalendarManager]] - degree 11, connects to 2 communities

@@ -12,7 +12,7 @@ tags:
 # FileSearch
 
 ## Connections
-- [[.__init__()_32]] - `method` [EXTRACTED]
+- [[.__init__()_33]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._parse_query()]] - `method` [EXTRACTED]
 - [[._scan()]] - `method` [EXTRACTED]

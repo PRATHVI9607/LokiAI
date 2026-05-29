@@ -1,13 +1,13 @@
 ---
 type: community
-cohesion: 0.25
-members: 8
+cohesion: 0.18
+members: 11
 ---
 
 # test_brain.py / brain() / test_clear_conversation()
 
-**Cohesion:** 0.25 - loosely connected
-**Members:** 8 nodes
+**Cohesion:** 0.18 - loosely connected
+**Members:** 11 nodes
 
 ## Members
 - [[brain()]] - code - loki/tests/test_brain.py
@@ -16,7 +16,10 @@ members: 8
 - [[test_parse_intent_invalid_returns_none()]] - code - loki/tests/test_brain.py
 - [[test_parse_intent_markdown_wrapped()]] - code - loki/tests/test_brain.py
 - [[test_parse_intent_missing_intent_key()]] - code - loki/tests/test_brain.py
+- [[test_parse_intent_nested_braces()]] - code - loki/tests/test_brain.py
 - [[test_parse_intent_plain_json()]] - code - loki/tests/test_brain.py
+- [[test_parse_intent_prose_around_json()]] - code - loki/tests/test_brain.py
+- [[test_parse_intent_unterminated_fence()]] - code - loki/tests/test_brain.py
 - [[test_store_turn()]] - code - loki/tests/test_brain.py
 
 ## Live Query (requires Dataview plugin)

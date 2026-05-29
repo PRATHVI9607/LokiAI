@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "code"
-community: "LokiTTS / TestTTSDrain / ._queue_worker()"
+community: "FakeTTS / ProcessManager / TestProcessManagerExactMatch"
 location: "L58"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/LokiTTS_/_TestTTSDrain_/__queue_worker
+  - community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch
 ---
 
 # TestTTSDrain
@@ -26,4 +26,4 @@ tags:
 - [[WebSummarizer]] - `uses` [INFERRED]
 - [[test_voice_and_security.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/LokiTTS_/_TestTTSDrain_/__queue_worker
+#graphify/code #graphify/INFERRED #community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch

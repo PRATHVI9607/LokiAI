@@ -1,13 +1,13 @@
 ---
 type: community
 cohesion: 0.07
-members: 39
+members: 40
 ---
 
 # FileOps / ShellExec / TestFileOps
 
 **Cohesion:** 0.07 - loosely connected
-**Members:** 39 nodes
+**Members:** 40 nodes
 
 ## Members
 - [[.__init__()_1]] - code - loki/actions/file_ops.py
@@ -26,6 +26,7 @@ members: 39
 - [[.test_blocked_format()]] - code - loki/tests/test_actions.py
 - [[.test_blocked_rm_rf()]] - code - loki/tests/test_actions.py
 - [[.test_blocked_shutdown()]] - code - loki/tests/test_actions.py
+- [[.test_confirm_action_executes()]] - code - loki/tests/test_voice_and_security.py
 - [[.test_create_file()]] - code - loki/tests/test_actions.py
 - [[.test_create_file_already_exists()]] - code - loki/tests/test_actions.py
 - [[.test_create_file_outside_home_blocked()]] - code - loki/tests/test_actions.py
@@ -58,17 +59,16 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 2 edges to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 4 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 3 edges to [[_COMMUNITY_FakeTTS  ProcessManager  TestProcessManagerExactMatch]]
 - 2 edges to [[_COMMUNITY_PendingActionStore  TestPendingActions  .is_expired()]]
-- 1 edge to [[_COMMUNITY_FakeTTS  test_voice_and_security.py  .drain_and_fire()]]
-- 1 edge to [[_COMMUNITY_LokiTTS  TestTTSDrain  ._queue_worker()]]
 - 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle]]
-- 1 edge to [[_COMMUNITY_ProcessManager  TestProcessManagerExactMatch  process_manager.py]]
 - 1 edge to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
 - 1 edge to [[_COMMUNITY_ClipboardSync  TestClipboardSyncToken  .stop()]]
-- 1 edge to [[_COMMUNITY_TestVoicePipeline  ._make()  .test_activate_starts_wakeword()]]
+- 1 edge to [[_COMMUNITY_VoicePipeline  TestVoicePipeline  ._make()]]
+- 1 edge to [[_COMMUNITY_ActionRouter  ._handle_agent_cancel()  ._handle_agent_run()]]
 
 ## Top bridge nodes
-- [[FileOps]] - degree 25, connects to 10 communities
-- [[ShellExec]] - degree 10, connects to 2 communities
+- [[FileOps]] - degree 25, connects to 7 communities
+- [[.test_confirm_action_executes()]] - degree 3, connects to 2 communities
+- [[ShellExec]] - degree 10, connects to 1 community

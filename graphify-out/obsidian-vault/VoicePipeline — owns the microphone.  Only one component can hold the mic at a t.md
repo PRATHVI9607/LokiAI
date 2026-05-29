@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/voice_pipeline.py"
 type: "rationale"
-community: "VoicePipeline / voice_pipeline.py / .activate()"
+community: "VoicePipeline / TestVoicePipeline / ._make()"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/VoicePipeline_/_voice_pipelinepy_/_activate
+  - community/VoicePipeline_/_TestVoicePipeline_/__make
 ---
 
 # VoicePipeline — owns the microphone.  Only one component can hold the mic at a t
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[voice_pipeline.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/VoicePipeline_/_voice_pipelinepy_/_activate
+#graphify/rationale #graphify/EXTRACTED #community/VoicePipeline_/_TestVoicePipeline_/__make

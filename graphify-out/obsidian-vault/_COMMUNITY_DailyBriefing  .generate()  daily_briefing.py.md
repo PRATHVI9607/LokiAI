@@ -10,7 +10,7 @@ members: 6
 **Members:** 6 nodes
 
 ## Members
-- [[.__init__()_22]] - code - loki/features/daily_briefing.py
+- [[.__init__()_26]] - code - loki/features/daily_briefing.py
 - [[.generate()]] - code - loki/features/daily_briefing.py
 - [[DailyBriefing]] - code - loki/features/daily_briefing.py
 - [[DailyBriefing — morning brief combining tasks, system health, datetime, and new]] - rationale - loki/features/daily_briefing.py
@@ -25,9 +25,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 1 edge to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 1 edge to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[DailyBriefing]] - degree 7, connects to 3 communities
+- [[DailyBriefing]] - degree 6, connects to 2 communities

@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/meeting_transcriber.py"
 type: "code"
-community: "MeetingTranscriber / Whisper Model (shared)"
+community: "MeetingTranscriber / PDFChat / PDFChat._extract_text"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/MeetingTranscriber_/_Whisper_Model_shared
+  - community/MeetingTranscriber_/_PDFChat_/_PDFChat_extract_text
 ---
 
 # MeetingTranscriber
@@ -15,4 +15,4 @@ tags:
 - [[PDFChat_1]] - `semantically_similar_to` [INFERRED]
 - [[Whisper Model (shared)]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/MeetingTranscriber_/_Whisper_Model_shared
+#graphify/code #graphify/EXTRACTED #community/MeetingTranscriber_/_PDFChat_/_PDFChat_extract_text

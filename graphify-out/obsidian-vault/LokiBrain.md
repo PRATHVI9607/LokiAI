@@ -2,7 +2,7 @@
 source_file: "loki/core/brain.py"
 type: "code"
 community: "LokiBrain / DailyBriefing / CodeAssistant"
-location: "L263"
+location: "L266"
 tags:
   - graphify/code
   - graphify/EXTRACTED
@@ -16,6 +16,7 @@ tags:
 - [[._build_messages()]] - `method` [EXTRACTED]
 - [[._build_system_prompt()]] - `method` [EXTRACTED]
 - [[._call_llm()]] - `method` [EXTRACTED]
+- [[._call_ollama()]] - `method` [EXTRACTED]
 - [[._compress_old_turns()]] - `method` [EXTRACTED]
 - [[._extract_facts()]] - `method` [EXTRACTED]
 - [[._get_kg_context()]] - `method` [EXTRACTED]
@@ -23,8 +24,10 @@ tags:
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._load_history()]] - `method` [EXTRACTED]
 - [[._log_provider_status()]] - `method` [EXTRACTED]
+- [[._run_maintenance()]] - `method` [EXTRACTED]
 - [[._save_history()]] - `method` [EXTRACTED]
 - [[._store_turn()]] - `method` [EXTRACTED]
+- [[._warmup_ollama()]] - `method` [EXTRACTED]
 - [[.ask()]] - `method` [EXTRACTED]
 - [[.clear_conversation()]] - `method` [EXTRACTED]
 - [[.get_conversation_summary()]] - `method` [EXTRACTED]
@@ -71,7 +74,6 @@ tags:
 - [[ScreenshotSearch_1]] - `references` [EXTRACTED]
 - [[SemanticBrowserHistory]] - `uses` [INFERRED]
 - [[SemanticBrowserHistory_1]] - `calls` [EXTRACTED]
-- [[TestBrain (test_brain.py)]] - `references` [EXTRACTED]
 - [[WebSummarizer]] - `uses` [INFERRED]
 - [[_SSRFBlockingAdapter]] - `uses` [INFERRED]
 - [[brain()]] - `calls` [INFERRED]

@@ -12,7 +12,7 @@ tags:
 # ClipboardSync
 
 ## Connections
-- [[.__init__()_22]] - `method` [EXTRACTED]
+- [[.__init__()_23]] - `method` [EXTRACTED]
 - [[._build_url()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.get_clipboard()]] - `method` [EXTRACTED]

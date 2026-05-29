@@ -1,18 +1,18 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "code"
-community: "FakeTTS / test_voice_and_security.py / .drain_and_fire()"
+community: "FakeTTS / ProcessManager / TestProcessManagerExactMatch"
 location: "L15"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/FakeTTS_/_test_voice_and_securitypy_/_drain_and_fire
+  - community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch
 ---
 
 # FakeTTS
 
 ## Connections
-- [[.__init__()_53]] - `method` [EXTRACTED]
+- [[.__init__()_54]] - `method` [EXTRACTED]
 - [[._make_sm()]] - `calls` [EXTRACTED]
 - [[.drain_and_fire()]] - `method` [EXTRACTED]
 - [[.speak()_1]] - `method` [EXTRACTED]
@@ -30,4 +30,4 @@ tags:
 - [[WebSummarizer]] - `uses` [INFERRED]
 - [[test_voice_and_security.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/FakeTTS_/_test_voice_and_securitypy_/_drain_and_fire
+#graphify/code #graphify/INFERRED #community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch

@@ -12,7 +12,7 @@ tags:
 # ExpenseTracker
 
 ## Connections
-- [[.__init__()_29]] - `method` [EXTRACTED]
+- [[.__init__()_30]] - `method` [EXTRACTED]
 - [[._append_row()]] - `method` [EXTRACTED]
 - [[._ensure_ledger()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]

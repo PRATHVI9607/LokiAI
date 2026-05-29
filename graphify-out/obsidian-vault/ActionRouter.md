@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "ActionRouter / ._handle_api_mock_data() / ._handle_api_mock_generate()"
+community: "ActionRouter / ._handle_agent_cancel() / ._handle_agent_run()"
 location: "L22"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ActionRouter_/__handle_api_mock_data_/__handle_api_mock_generate
+  - community/ActionRouter_/__handle_agent_cancel_/__handle_agent_run
 ---
 
 # ActionRouter
@@ -176,4 +176,4 @@ tags:
 - [[TestVoicePipeline]] - `uses` [INFERRED]
 - [[action_router.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ActionRouter_/__handle_api_mock_data_/__handle_api_mock_generate
+#graphify/code #graphify/EXTRACTED #community/ActionRouter_/__handle_agent_cancel_/__handle_agent_run

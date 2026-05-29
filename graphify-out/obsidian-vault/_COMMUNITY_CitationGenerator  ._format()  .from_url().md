@@ -10,7 +10,7 @@ members: 12
 **Members:** 12 nodes
 
 ## Members
-- [[.__init__()_20]] - code - loki/features/citation_generator.py
+- [[.__init__()_21]] - code - loki/features/citation_generator.py
 - [[._ask()_1]] - code - loki/features/citation_generator.py
 - [[._fetch_metadata()]] - code - loki/features/citation_generator.py
 - [[._format()]] - code - loki/features/citation_generator.py
@@ -31,9 +31,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 1 edge to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[CitationGenerator]] - degree 10, connects to 3 communities
+- [[CitationGenerator]] - degree 10, connects to 2 communities

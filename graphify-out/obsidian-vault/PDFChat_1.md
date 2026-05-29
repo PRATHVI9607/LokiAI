@@ -1,11 +1,11 @@
 ---
 source_file: "loki/features/pdf_chat.py"
 type: "code"
-community: "MessageBubble Component / renderMarkdown (block-level: fenced / useMemo Caching for renderMarkdown"
+community: "MeetingTranscriber / PDFChat / PDFChat._extract_text"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/MessageBubble_Component_/_renderMarkdown_block-level_fenced_/_useMemo_Caching_for_renderMarkdown
+  - community/MeetingTranscriber_/_PDFChat_/_PDFChat_extract_text
 ---
 
 # PDFChat
@@ -14,4 +14,4 @@ tags:
 - [[(text, page_count) Tuple Cache]] - `implements` [EXTRACTED]
 - [[MeetingTranscriber_1]] - `semantically_similar_to` [INFERRED]
 
-#graphify/code #graphify/INFERRED #community/MessageBubble_Component_/_renderMarkdown_block-level_fenced_/_useMemo_Caching_for_renderMarkdown
+#graphify/code #graphify/INFERRED #community/MeetingTranscriber_/_PDFChat_/_PDFChat_extract_text

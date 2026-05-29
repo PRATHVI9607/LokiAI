@@ -30,10 +30,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 1 edge to [[_COMMUNITY_ConvState  conversation_sm.py  Enum]]
 - 1 edge to [[_COMMUNITY_ConversationStateMachine  ._arm_timeout()  ._cancel_timeout()]]
 
 ## Top bridge nodes
-- [[AuditLog]] - degree 11, connects to 4 communities
+- [[AuditLog]] - degree 11, connects to 3 communities

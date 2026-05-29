@@ -12,7 +12,7 @@ tags:
 # AutoAgent
 
 ## Connections
-- [[.__init__()_17]] - `method` [EXTRACTED]
+- [[.__init__()_18]] - `method` [EXTRACTED]
 - [[._execute_task()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._plan()]] - `method` [EXTRACTED]

@@ -10,13 +10,13 @@ members: 10
 **Members:** 10 nodes
 
 ## Members
-- [[.__init__()_15]] - code - loki/core/wakeword.py
+- [[.__init__()_16]] - code - loki/core/wakeword.py
 - [[._detect_loop()]] - code - loki/core/wakeword.py
 - [[._is_wakeword()]] - code - loki/core/wakeword.py
 - [[.start()]] - code - loki/core/wakeword.py
 - [[.stop()_1]] - code - loki/core/wakeword.py
-- [[Detects 'Hey Loki' wakeword using Whisper or Porcupine.]] - rationale - loki/core/wakeword.py
-- [[Wakeword detector — Whisper-based Hey Loki detection. Porcupine is optional i]] - rationale - loki/core/wakeword.py
+- [[Detects 'Hey Loki' using a rolling audio buffer + Whisper tiny.en.]] - rationale - loki/core/wakeword.py
+- [[Wakeword detector — rolling-window Whisper-based Hey Loki detection.  Key desi]] - rationale - loki/core/wakeword.py
 - [[WakewordDetector]] - code - loki/core/wakeword.py
 - [[is_running()]] - code - loki/core/wakeword.py
 - [[wakeword.py]] - code - loki/core/wakeword.py
@@ -29,9 +29,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
-- 1 edge to [[_COMMUNITY_VoicePipeline  voice_pipeline.py  .activate()]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 1 edge to [[_COMMUNITY_VoicePipeline  TestVoicePipeline  ._make()]]
 
 ## Top bridge nodes
-- [[WakewordDetector]] - degree 10, connects to 3 communities
+- [[WakewordDetector]] - degree 10, connects to 2 communities

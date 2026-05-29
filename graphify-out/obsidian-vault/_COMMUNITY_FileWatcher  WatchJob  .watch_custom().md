@@ -10,8 +10,8 @@ members: 24
 **Members:** 24 nodes
 
 ## Members
+- [[.__init__()_35]] - code - loki/features/file_watcher.py
 - [[.__init__()_34]] - code - loki/features/file_watcher.py
-- [[.__init__()_33]] - code - loki/features/file_watcher.py
 - [[._job_key()]] - code - loki/features/file_watcher.py
 - [[._loop()]] - code - loki/features/file_watcher.py
 - [[._scan()_1]] - code - loki/features/file_watcher.py
@@ -43,8 +43,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 
 ## Top bridge nodes
-- [[FileWatcher]] - degree 11, connects to 2 communities
+- [[FileWatcher]] - degree 11, connects to 1 community

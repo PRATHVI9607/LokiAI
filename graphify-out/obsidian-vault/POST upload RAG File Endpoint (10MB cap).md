@@ -1,11 +1,11 @@
 ---
 source_file: "loki/ui/server.py"
 type: "code"
-community: "RagEngine / LokiServer (FastAPI) / POST /upload RAG File Endpoint (10M"
+community: "LokiBrain / PlasmaOrb / _call_llm (provider priority)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/RagEngine_/_LokiServer_FastAPI_/_POST_/upload_RAG_File_Endpoint_10M
+  - community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority
 ---
 
 # POST /upload RAG File Endpoint (10MB cap)
@@ -15,4 +15,4 @@ tags:
 - [[RagEngine_1]] - `calls` [EXTRACTED]
 - [[WebSocket ws Endpoint]] - `shares_data_with` [INFERRED]
 
-#graphify/code #graphify/EXTRACTED #community/RagEngine_/_LokiServer_FastAPI_/_POST_/upload_RAG_File_Endpoint_10M
+#graphify/code #graphify/EXTRACTED #community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority
