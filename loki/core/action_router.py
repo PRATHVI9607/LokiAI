@@ -1,11 +1,22 @@
 """
 Action router — maps LLM intents to feature/action handlers.
+Destructive operations are gated behind PendingActionStore — they return a
+confirmation prompt and only execute when the user confirms.
 """
 
 import logging
 from typing import Dict, Any, Optional
 
+from loki.core.pending_actions import PendingActionStore
+
 logger = logging.getLogger(__name__)
+
+# Intents that require explicit user confirmation before executing
+_DESTRUCTIVE_INTENTS = frozenset({
+    "file_delete", "folder_delete", "process_kill", "shell",
+    "git_commit", "update_all", "update_package", "install_package",
+    "focus_mode_enable",  # edits hosts file
+})
 
 
 class ActionRouter:
@@ -15,6 +26,7 @@ class ActionRouter:
         self._undo = undo_stack
         self._features: Dict[str, Any] = features or {}
         self._actions: Dict[str, Any] = actions or {}
+        self._pending = PendingActionStore()
 
     def register_feature(self, name: str, handler: Any) -> None:
         self._features[name] = handler
@@ -28,7 +40,35 @@ class ActionRouter:
 
         logger.info(f"Routing intent: {intent_name} params={list(params.keys())}")
 
+        # Confirmation handler — user said "yes/confirm [token]"
+        if intent_name == "confirm_action":
+            token = params.get("token")
+            action = self._pending.pop(token)
+            if not action:
+                return {"success": False, "message": "No pending action to confirm (it may have expired). Repeat the original command."}
+            logger.info(f"Confirming pending action: {action.intent_name}")
+            return self.route_intent({"intent": action.intent_name, "params": action.params, "_confirmed": True})
+
+        if intent_name == "cancel_action":
+            n = self._pending.cancel_all()
+            return {"success": True, "message": f"Cancelled {n} pending action(s)." if n else "Nothing pending to cancel."}
+
+        # Gate destructive intents behind confirmation unless already confirmed
+        if intent_name in _DESTRUCTIVE_INTENTS and not intent.get("_confirmed"):
+            desc = self._describe_destructive(intent_name, params)
+            action = self._pending.push(intent_name, params, desc)
+            return {
+                "success": True,
+                "pending": True,
+                "token": action.token,
+                "message": f"⚠ Confirm: {desc}\nSay 'confirm {action.token}' or just 'yes' to proceed, 'cancel' to abort.",
+                "data": {"token": action.token, "description": desc},
+            }
+
         handlers = {
+            # Confirmation / cancellation (already handled above, listed for completeness)
+            "confirm_action": lambda p: {"success": False, "message": "Should not reach here."},
+            "cancel_action":  lambda p: {"success": False, "message": "Should not reach here."},
             # File operations
             "file_create": self._handle_file_create,
             "file_delete": self._handle_file_delete,
@@ -189,6 +229,10 @@ class ActionRouter:
             "meeting_minutes": self._handle_meeting_minutes,
             "meeting_action_items": self._handle_meeting_action_items,
             "meeting_summarize": self._handle_meeting_summarize,
+            # Auto agent
+            "agent_run":    self._handle_agent_run,
+            "agent_cancel": self._handle_agent_cancel,
+            "agent_status": self._handle_agent_status,
             # Meta
             "undo": self._handle_undo,
             "chat": lambda p: {"success": True, "message": intent.get("message", "")},
@@ -822,6 +866,22 @@ class ActionRouter:
         f = self._features.get("meeting_transcriber")
         return f.summarize_transcript(p.get("transcript", "")) if f else self._missing("meeting_transcriber")
 
+    # --- Auto Agent ---
+    def _handle_agent_run(self, p):
+        f = self._features.get("auto_agent")
+        return f.run(p.get("goal", "")) if f else self._missing("auto_agent")
+
+    def _handle_agent_cancel(self, p):
+        f = self._features.get("auto_agent")
+        return f.cancel() if f else self._missing("auto_agent")
+
+    def _handle_agent_status(self, p):
+        f = self._features.get("auto_agent")
+        if not f:
+            return self._missing("auto_agent")
+        running = f.is_running()
+        return {"success": True, "message": "Agent is running." if running else "No agent task running."}
+
     # --- Meta ---
     def _handle_undo(self, p):
         if self._undo.is_empty():
@@ -832,3 +892,20 @@ class ActionRouter:
     @staticmethod
     def _missing(name: str) -> Dict[str, Any]:
         return {"success": False, "message": f"Feature '{name}' not initialized."}
+
+    @staticmethod
+    def _describe_destructive(intent_name: str, params: dict) -> str:
+        """Human-readable description of a destructive intent for the confirmation prompt."""
+        desc_map = {
+            "file_delete":    lambda p: f"Delete file '{p.get('path', '?')}'",
+            "folder_delete":  lambda p: f"Delete folder '{p.get('path', '?')}' and all contents",
+            "process_kill":   lambda p: f"Kill process '{p.get('name_or_pid', '?')}'",
+            "shell":          lambda p: f"Run shell command: {p.get('command', '?')[:80]}",
+            "git_commit":     lambda p: f"Git commit: '{p.get('message', '?')[:60]}'",
+            "update_all":     lambda p: "Run winget upgrade --all",
+            "update_package": lambda p: f"Update package '{p.get('package_name', '?')}'",
+            "install_package":lambda p: f"Install package '{p.get('package_name', '?')}'",
+            "focus_mode_enable": lambda p: f"Enable focus mode (edits hosts file) for {p.get('duration_minutes', '?')} min",
+        }
+        fn = desc_map.get(intent_name)
+        return fn(params) if fn else f"Execute {intent_name}"

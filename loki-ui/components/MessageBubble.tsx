@@ -1,7 +1,100 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { type ChatMessage } from "@/hooks/useLoki";
+
+// Lightweight inline markdown renderer — bold, italic, inline code, links
+function inlineRender(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  const re = /(\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    if (m[2])      parts.push(<strong key={m.index}>{m[2]}</strong>);
+    else if (m[3]) parts.push(<em key={m.index}>{m[3]}</em>);
+    else if (m[4]) parts.push(<code key={m.index} className="msg-inline-code">{m[4]}</code>);
+    else if (m[5] && m[6])
+      parts.push(<a key={m.index} href={m[6]} target="_blank" rel="noopener noreferrer" className="msg-link">{m[5]}</a>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return <>{parts}</>;
+}
+
+// Block-level markdown: fenced code, bullet/numbered lists, paragraphs
+function renderMarkdown(text: string): React.ReactNode {
+  const lines = text.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Fenced code block
+    if (line.startsWith("```")) {
+      const lang = line.slice(3).trim();
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith("```")) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      nodes.push(
+        <pre key={`code-${i}`} className="msg-code-block">
+          {lang && <span className="msg-code-lang">{lang}</span>}
+          <code>{codeLines.join("\n")}</code>
+        </pre>
+      );
+      i++;
+      continue;
+    }
+
+    // Unordered list
+    if (/^[-*•]\s/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^[-*•]\s/.test(lines[i])) {
+        items.push(lines[i].replace(/^[-*•]\s/, ""));
+        i++;
+      }
+      nodes.push(
+        <ul key={`ul-${i}`} className="msg-list">
+          {items.map((item, j) => <li key={j}>{inlineRender(item)}</li>)}
+        </ul>
+      );
+      continue;
+    }
+
+    // Ordered list
+    if (/^\d+\.\s/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\d+\.\s/.test(lines[i])) {
+        items.push(lines[i].replace(/^\d+\.\s/, ""));
+        i++;
+      }
+      nodes.push(
+        <ol key={`ol-${i}`} className="msg-list">
+          {items.map((item, j) => <li key={j}>{inlineRender(item)}</li>)}
+        </ol>
+      );
+      continue;
+    }
+
+    // Empty line → spacer
+    if (!line.trim()) {
+      nodes.push(<div key={`sp-${i}`} className="msg-spacer" />);
+      i++;
+      continue;
+    }
+
+    // Normal line
+    nodes.push(<p key={`p-${i}`} className="msg-para">{inlineRender(line)}</p>);
+    i++;
+  }
+
+  return <>{nodes}</>;
+}
 
 export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   if (msg.type === "system_message") {
@@ -18,6 +111,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
   }
 
   const isUser = msg.type === "user_message";
+  const rendered = useMemo(() => renderMarkdown(msg.text), [msg.text]);
 
   return (
     <motion.div
@@ -28,7 +122,7 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
     >
       {!isUser && <div className="msg-avatar" aria-hidden="true" />}
       <div className={`msg-bubble ${isUser ? "msg-bubble-user" : "msg-bubble-loki"}`}>
-        {msg.text}
+        {isUser ? msg.text : rendered}
       </div>
     </motion.div>
   );

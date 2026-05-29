@@ -1,10 +1,14 @@
 """
 Web summarizer — fetch URL content and summarize via LLM.
+SSRF guard: rejects private IPs, loopback, and non-http(s) schemes.
 """
 
+import ipaddress
 import logging
 import re
+import socket
 from typing import Dict, Any, Optional, TYPE_CHECKING
+from urllib.parse import urlparse
 
 if TYPE_CHECKING:
     from loki.core.brain import LokiBrain
@@ -22,6 +26,29 @@ try:
     BS4_AVAILABLE = True
 except ImportError:
     BS4_AVAILABLE = False
+
+
+def _is_ssrf_risk(url: str) -> bool:
+    """Return True if the URL points to a private/internal address (SSRF risk)."""
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            return True
+        host = parsed.hostname or ""
+        if not host:
+            return True
+        # Resolve hostname to IP; reject loopback, private, link-local
+        try:
+            ip = ipaddress.ip_address(host)
+        except ValueError:
+            # hostname — resolve to IP
+            try:
+                ip = ipaddress.ip_address(socket.gethostbyname(host))
+            except Exception:
+                return False  # can't resolve; let requests fail naturally
+        return ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_unspecified
+    except Exception:
+        return True
 
 
 class WebSummarizer:
@@ -48,8 +75,20 @@ class WebSummarizer:
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
 
+        if _is_ssrf_risk(url):
+            logger.warning("Blocked SSRF attempt: %s", url)
+            return {"success": False, "message": "That URL points to a private or internal address — blocked for security."}
+
         try:
-            resp = requests.get(url, headers=self.HEADERS, timeout=self.TIMEOUT)
+            resp = requests.get(
+                url,
+                headers=self.HEADERS,
+                timeout=self.TIMEOUT,
+                allow_redirects=True,
+            )
+            # Re-check resolved URL after redirects
+            if resp.url != url and _is_ssrf_risk(resp.url):
+                return {"success": False, "message": "Redirect led to a private address — blocked."}
             resp.raise_for_status()
         except requests.Timeout:
             return {"success": False, "message": f"Request timed out fetching {url}."}
@@ -83,7 +122,6 @@ class WebSummarizer:
             except Exception as e:
                 logger.error(f"LLM summarization failed: {e}")
 
-        # Fallback: first paragraph extraction
         paragraphs = [p.strip() for p in text.split("\n\n") if len(p.strip()) > 50]
         summary = "\n".join(paragraphs[:3])
         return {"success": True, "message": f"Summary (no LLM):\n{summary}", "data": {"url": url}}

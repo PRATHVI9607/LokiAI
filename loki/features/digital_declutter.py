@@ -38,7 +38,10 @@ class DigitalDeclutter:
             dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
             for fname in files:
                 fp = Path(root) / fname
-                if fp.stat().st_size == 0:
+                try:
+                    if fp.stat().st_size == 0:
+                        continue
+                except OSError:
                     continue
                 h = self._hash_file(fp)
                 if h:

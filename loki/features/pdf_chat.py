@@ -4,7 +4,7 @@ PDF chat — extract text from PDF and answer questions via LLM.
 
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional, TYPE_CHECKING
+from typing import Dict, Any, Optional, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from loki.core.brain import LokiBrain
@@ -26,7 +26,8 @@ class PDFChat:
 
     def __init__(self, brain: Optional["LokiBrain"] = None):
         self._brain = brain
-        self._cache: Dict[str, str] = {}
+        # Cache maps path → (text, page_count) so page_count is always consistent
+        self._cache: Dict[str, Tuple[str, int]] = {}
 
     def ask(self, path: str, question: str) -> Dict[str, Any]:
         if not FITZ_AVAILABLE:
@@ -40,12 +41,12 @@ class PDFChat:
         if pdf_path.suffix.lower() != ".pdf":
             return {"success": False, "message": "Only PDF files are supported."}
 
-        text = self._extract_text(str(pdf_path))
+        text, page_count = self._extract_text(str(pdf_path))
         if not text:
             return {"success": False, "message": "Could not extract text from PDF. It may be scanned/image-based."}
 
         if not self._brain:
-            return {"success": True, "message": f"PDF loaded ({len(text)} chars). No LLM available to answer questions."}
+            return {"success": True, "message": f"PDF loaded ({len(text)} chars, {page_count} pages). No LLM available to answer questions."}
 
         prompt = (
             f"The following is the content of a PDF document. "
@@ -55,23 +56,19 @@ class PDFChat:
 
         try:
             answer = "".join(self._brain.ask(prompt))
-            return {"success": True, "message": answer, "data": {"path": str(pdf_path), "pages": self._page_count}}
+            return {"success": True, "message": answer, "data": {"path": str(pdf_path), "pages": page_count}}
         except Exception as e:
             return {"success": False, "message": f"LLM query failed: {e}"}
 
-    def _extract_text(self, path: str) -> str:
+    def _extract_text(self, path: str) -> Tuple[str, int]:
         if path in self._cache:
             return self._cache[path]
         try:
             doc = fitz.open(path)
-            self._page_count = len(doc)
-            pages = []
-            for page in doc:
-                pages.append(page.get_text())
-            text = "\n".join(pages)
-            self._cache[path] = text
-            return text
+            page_count = len(doc)
+            text = "\n".join(page.get_text() for page in doc)
+            self._cache[path] = (text, page_count)
+            return text, page_count
         except Exception as e:
             logger.error(f"PDF extraction error: {e}")
-            self._page_count = 0
-            return ""
+            return "", 0

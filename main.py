@@ -86,6 +86,7 @@ from loki.features.expense_tracker import ExpenseTracker
 from loki.features.dynamic_ui import DynamicUI
 from loki.features.file_watcher import FileWatcher
 from loki.features.clipboard_sync import ClipboardSync
+from loki.features.auto_agent import AutoAgent
 
 from loki.ui.server import create_loki_server
 
@@ -366,6 +367,7 @@ class LokiApplication:
             media_converter=self.media_converter,
         )
         self.clipboard_sync = ClipboardSync()
+        self.auto_agent = AutoAgent(brain=self.brain)
 
         self.router = ActionRouter(self.undo_stack)
         self.router.register_action("file_ops", self.file_ops)
@@ -417,6 +419,11 @@ class LokiApplication:
         self.router.register_feature("dynamic_ui", self.dynamic_ui)
         self.router.register_feature("file_watcher", self.file_watcher)
         self.router.register_feature("clipboard_sync", self.clipboard_sync)
+        self.router.register_feature("auto_agent", self.auto_agent)
+
+        # Wire auto_agent router now that router is fully initialized
+        self.auto_agent._router = self.router
+        # Give auto_agent a progress callback once server is ready (wired in _wire_callbacks)
 
         self.conversation = ConversationManager(
             self.config, self.server, self.tts, self.brain, self.router, self.audit_log
@@ -447,6 +454,9 @@ class LokiApplication:
         self.server.on_mute_toggle = self._on_mute
         self.server.on_undo = self._on_undo
 
+        # Wire auto_agent progress → server messages
+        self.auto_agent._on_progress = self.server.add_loki_message
+
         logger.info("Callbacks wired")
 
     def _on_wakeword(self) -> None:
@@ -472,13 +482,15 @@ class LokiApplication:
 
     def _on_conversation_ended(self) -> None:
         self.listener.stop_listening()
-        if not self.tts.is_speaking:
-            # TTS is idle — safe to restart wakeword immediately
+        # Check both is_speaking AND queue empty — there's a race window between
+        # speak() putting to queue and the worker thread setting _speaking=True.
+        tts_truly_idle = not self.tts.is_speaking and self.tts._queue.empty()
+        if tts_truly_idle:
             if not self.wakeword._running:
                 self.wakeword.start()
-        # else: TTS is still playing the farewell; _on_speaking_stopped will
-        # restart the wakeword once audio finishes, preventing the wakeword
-        # from hearing Loki's own voice through the microphone
+        # else: TTS still has audio queued or playing; _on_speaking_stopped will
+        # restart wakeword once the queue fully drains (preventing wakeword from
+        # hearing Loki's own farewell through the microphone)
 
     def _on_browser_message(self, text: str) -> None:
         self.conversation.start_conversation()
@@ -506,6 +518,16 @@ class LokiApplication:
         self.listener.stop_listening()
         self.tts.stop()
         self.clipboard.stop_monitoring()
+        # Stop all background services
+        self.file_watcher.stop_all()
+        if self.clipboard_sync.is_running():
+            self.clipboard_sync.stop()
+        if self.auto_agent.is_running():
+            self.auto_agent.cancel()
+        try:
+            self.dynamic_ui.stop_auto_theme()
+        except Exception:
+            pass
 
     def run(self) -> None:
         port = self.config.get("ui", {}).get("port", 7777)

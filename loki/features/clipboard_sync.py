@@ -1,15 +1,17 @@
 """
 ClipboardSync — expose clipboard over localhost HTTP for local browser access.
 
-Binds to 127.0.0.1 (loopback only). Open http://127.0.0.1:7778 in a local
-browser to read or push clipboard content. Not reachable from other devices.
+Binds to 127.0.0.1 (loopback only). A random 8-char session token is required
+on every request — open the URL shown by `get_url()` which embeds the token.
+Token + loopback-only = two layers of access control.
 """
 
 import logging
+import os
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Optional
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import pyperclip
 
@@ -40,16 +42,17 @@ HTML_PAGE = """<!DOCTYPE html>
 <button onclick="loadClip()">Refresh from PC</button>
 <div id="status"></div>
 <script>
+const TOKEN='{token}';
 function setStatus(msg){{document.getElementById('status').textContent=msg;}}
 function loadClip(){{
-  fetch('/clip').then(r=>r.text()).then(t=>{{
+  fetch('/clip?t='+TOKEN).then(r=>r.text()).then(t=>{{
     document.getElementById('clip').value=t;
     setStatus('Refreshed');
   }}).catch(()=>setStatus('Error'));
 }}
 function sendClip(){{
   const text=document.getElementById('clip').value;
-  fetch('/clip',{{method:'POST',body:text,headers:{{'Content-Type':'text/plain'}}}})
+  fetch('/clip?t='+TOKEN,{{method:'POST',body:text,headers:{{'Content-Type':'text/plain'}}}})
     .then(r=>r.text()).then(()=>setStatus('Sent to PC!'))
     .catch(()=>setStatus('Error sending'));
 }}
@@ -58,11 +61,36 @@ function sendClip(){{
 </html>"""
 
 
+def _make_token() -> str:
+    return os.urandom(6).hex()  # 12 hex chars
+
+
 class _Handler(BaseHTTPRequestHandler):
+    """Require ?t=<token> on every request."""
+
+    token: str = ""  # set on server start
+
     def log_message(self, *args):
-        pass  # suppress default request logging
+        pass
+
+    def _check_token(self) -> bool:
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+        return params.get("t", [""])[0] == self.__class__.token
+
+    def _deny(self):
+        body = b"Forbidden: invalid or missing token."
+        self.send_response(403)
+        self.send_header("Content-Type", "text/plain")
+        self.send_header("Content-Length", len(body))
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_GET(self):
+        if not self._check_token():
+            self._deny()
+            return
+
         parsed = urlparse(self.path)
         if parsed.path == "/clip":
             try:
@@ -80,7 +108,10 @@ class _Handler(BaseHTTPRequestHandler):
                 content = pyperclip.paste() or ""
             except Exception:
                 content = ""
-            page = HTML_PAGE.format(content=content.replace("<", "&lt;").replace(">", "&gt;"))
+            page = HTML_PAGE.format(
+                content=content.replace("<", "&lt;").replace(">", "&gt;"),
+                token=self.__class__.token,
+            )
             data = page.encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -89,7 +120,11 @@ class _Handler(BaseHTTPRequestHandler):
             self.wfile.write(data)
 
     def do_POST(self):
-        if self.path == "/clip":
+        if not self._check_token():
+            self._deny()
+            return
+
+        if urlparse(self.path).path == "/clip":
             length = min(int(self.headers.get("Content-Length", 0)), 1 << 20)  # cap at 1 MB
             body = self.rfile.read(length).decode("utf-8", errors="replace")
             try:
@@ -114,11 +149,15 @@ class ClipboardSync:
         self._port = port
         self._server: Optional[HTTPServer] = None
         self._thread: Optional[threading.Thread] = None
+        self._token: str = ""
 
     def start(self) -> dict:
         """Start the clipboard sync HTTP server."""
         if self._server:
             return {"success": True, "message": f"Clipboard sync already running on port {self._port}."}
+
+        self._token = _make_token()
+        _Handler.token = self._token
 
         try:
             self._server = HTTPServer(("127.0.0.1", self._port), _Handler)
@@ -128,12 +167,16 @@ class ClipboardSync:
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True,
                                         name="loki-clipboard-sync")
         self._thread.start()
-        url = f"http://127.0.0.1:{self._port}"
+        url = self._build_url()
+        logger.info("ClipboardSync started: %s", url)
         return {
             "success": True,
-            "message": f"Clipboard sync started on localhost: {url}",
-            "data": {"url": url, "port": self._port, "ip": "127.0.0.1"},
+            "message": f"Clipboard sync active. Open this URL in a local browser:\n{url}",
+            "data": {"url": url, "port": self._port},
         }
+
+    def _build_url(self) -> str:
+        return f"http://127.0.0.1:{self._port}/?t={self._token}"
 
     def stop(self) -> dict:
         """Stop the clipboard sync server."""
@@ -147,7 +190,7 @@ class ClipboardSync:
         """Return the sync URL if running."""
         if not self._server:
             return {"success": False, "message": "Clipboard sync is not running. Start it first."}
-        url = f"http://127.0.0.1:{self._port}"
+        url = self._build_url()
         return {"success": True, "message": f"Clipboard sync URL: {url}", "data": {"url": url}}
 
     def is_running(self) -> bool:

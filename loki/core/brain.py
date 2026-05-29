@@ -218,14 +218,25 @@ INTENTS (task AI prioritize):
 INTENTS (deepfake detection):
 - deepfake_check: params={file_path}
 
+INTENTS (confirmation / safety):
+- confirm_action: params={token?}  (user confirmed a pending destructive action)
+- cancel_action: params={}  (user cancelled pending action)
+
+INTENTS (autonomous agent):
+- agent_run: params={goal}  (execute a multi-step task autonomously)
+- agent_cancel: params={}  (abort running agent task)
+- agent_status: params={}  (check if agent is running)
+
 INTENTS (misc):
 - undo: params={}
 - chat: params={}  (no action, pure conversation)
 
 SECURITY RULES:
-- For destructive ops (file_delete, folder_delete, process_kill), always include a confirmation request in your message.
+- Destructive ops (file_delete, folder_delete, process_kill, shell, git_commit, install_package, update_all)
+  are automatically held for confirmation — you do NOT need to ask twice; route them normally.
 - Never reveal vault contents in the message field.
 - Validate that file paths seem reasonable before confirming.
+- For agent_run, extract the goal from the user's message (strip "agent:" prefix if present).
 
 For pure conversation (no action needed), respond naturally without JSON."""
 

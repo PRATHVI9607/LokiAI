@@ -1,5 +1,6 @@
 """
 File organizer — auto-sort downloads and desktop by file type.
+Restricted to Downloads and Desktop only to prevent repo/project damage.
 """
 
 import shutil
@@ -20,6 +21,12 @@ DEFAULT_RULES = {
     "Data": [".json", ".xml", ".csv", ".yaml", ".yml", ".sql", ".db", ".sqlite"],
 }
 
+# Only these directories are safe to auto-organize
+_SAFE_DIRS = frozenset([
+    Path.home() / "Downloads",
+    Path.home() / "Desktop",
+])
+
 
 class FileOrganizer:
     """Organize files in a directory by type."""
@@ -32,10 +39,35 @@ class FileOrganizer:
                 self._rules[category].extend(exts)
             else:
                 self._rules[category] = exts
+        # Allow tests/config to extend the safe directory whitelist
+        extra_safe = config.get("safe_dirs", [])
+        self._safe_dirs = frozenset([
+            *_SAFE_DIRS,
+            *(Path(d).expanduser().resolve() for d in extra_safe),
+        ])
+
+    def _is_safe_dir(self, target: Path) -> bool:
+        for safe in self._safe_dirs:
+            try:
+                if target == safe or target.is_relative_to(safe):
+                    return True
+            except Exception:
+                if str(target).startswith(str(safe)):
+                    return True
+        return False
 
     def organize(self, directory: str = None) -> Dict[str, Any]:
         if directory:
             target = Path(directory).expanduser().resolve()
+            if not self._is_safe_dir(target):
+                return {
+                    "success": False,
+                    "message": (
+                        f"Safety restriction: file organizer only works on Downloads and Desktop "
+                        f"to prevent accidental damage to projects or system folders. "
+                        f"Got: {target}"
+                    ),
+                }
         else:
             target = Path.home() / "Downloads"
 

@@ -105,10 +105,9 @@ class FileWatcher:
             if event == "deleted":
                 return
             logger.info("Auto-backup triggered: %s (%s)", changed, event)
-            if fp.is_file():
-                self._backup.backup_file(str(changed), destination)
-            else:
-                self._backup.backup_directory(str(changed), destination)
+            # changed is always an individual file from WatchJob._loop;
+            # backup_directory on a file path would fail — always use backup_file
+            self._backup.backup_file(str(changed), destination)
 
         watch_path = fp.parent if fp.is_file() else fp
         ext_filter = {fp.suffix.lower()} if fp.is_file() else None

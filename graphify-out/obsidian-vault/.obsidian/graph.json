@@ -1,17 +1,24 @@
 {
+  "collapse-filter": false,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": true,
   "colorGroups": [
     {
       "query": "tag:#community/ActionRouter_/_._handle_api_mock_generate()_/_._handle_app_close()",
       "color": {
         "a": 1,
-        "rgb": 5142951
+        "rgb": 4614027
       }
     },
     {
       "query": "tag:#community/_missing()_/_._handle_api_mock_data()_/_._handle_app_open()",
       "color": {
         "a": 1,
-        "rgb": 15896107
+        "rgb": 12220987
       }
     },
     {
@@ -505,7 +512,7 @@
       }
     },
     {
-      "query": "tag:#community/__init__.py_/_Loki_\u2014_Elite_AI_Desktop_Assistant",
+      "query": "tag:#community/__init__.py_/_Loki_—_Elite_AI_Desktop_Assistant",
       "color": {
         "a": 1,
         "rgb": 14767961
@@ -1071,5 +1078,17 @@
         "rgb": 14767961
       }
     }
-  ]
+  ],
+  "collapse-display": false,
+  "showArrow": true,
+  "textFadeMultiplier": 0.2,
+  "nodeSizeMultiplier": 0.553326403326403,
+  "lineSizeMultiplier": 0.879313929313929,
+  "collapse-forces": false,
+  "centerStrength": 1,
+  "repelStrength": 20,
+  "linkStrength": 1,
+  "linkDistance": 500,
+  "scale": 0.10376605508457352,
+  "close": true
 }

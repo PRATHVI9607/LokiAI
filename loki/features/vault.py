@@ -105,7 +105,14 @@ class Vault:
         if key not in self._data:
             return {"success": False, "message": f"No entry for '{key}' in vault."}
 
-        return {"success": True, "message": f"Retrieved '{key}'.", "data": self._data[key]}
+        # Copy to clipboard — raw secret is never returned in message or data
+        # to prevent exposure through logs, UI rendering, or future API endpoints.
+        try:
+            import pyperclip
+            pyperclip.copy(self._data[key])
+            return {"success": True, "message": f"Secret '{key}' copied to clipboard.", "data": None}
+        except Exception:
+            return {"success": True, "message": f"Secret '{key}' retrieved (clipboard unavailable).", "data": None}
 
     def list_keys(self) -> Dict[str, Any]:
         if self._key is None:

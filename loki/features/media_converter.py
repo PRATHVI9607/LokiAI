@@ -45,6 +45,13 @@ class MediaConverter:
         if dst == src:
             return {"success": False, "message": "Input and output are the same file."}
 
+        # Auto-create unique name instead of silently overwriting with -y
+        if dst.exists():
+            stem, sfx, i = dst.stem, dst.suffix, 1
+            while dst.exists():
+                dst = dst.parent / f"{stem}_{i}{sfx}"
+                i += 1
+
         # Quality presets
         quality_flags: list[str] = []
         src_ext = src.suffix.lower()
@@ -52,7 +59,7 @@ class MediaConverter:
             quality_map = {"low": ["-crf", "28"], "medium": ["-crf", "23"], "high": ["-crf", "18"]}
             quality_flags = quality_map.get(quality, quality_map["medium"])
 
-        cmd = [self._ffmpeg, "-i", str(src), "-y"] + quality_flags + [str(dst)]
+        cmd = [self._ffmpeg, "-i", str(src)] + quality_flags + [str(dst)]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             if result.returncode != 0:

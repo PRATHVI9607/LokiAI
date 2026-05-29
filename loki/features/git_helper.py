@@ -103,8 +103,19 @@ class GitHelper:
             return {"success": False, "message": "Not in a git repository."}
 
         try:
-            repo.git.add("-A")
+            # Only commit already-staged changes — never auto-stage with -A which
+            # could silently include .env files, credentials, or unintended binaries.
+            staged = [item.a_path for item in repo.index.diff("HEAD")]
+            if not staged:
+                return {
+                    "success": False,
+                    "message": "No staged changes to commit. Stage files explicitly with 'git add <files>' first.",
+                }
             repo.index.commit(message)
-            return {"success": True, "message": f"Committed: '{message}'"}
+            return {
+                "success": True,
+                "message": f"Committed {len(staged)} file(s): '{message}'",
+                "data": {"staged": staged},
+            }
         except Exception as e:
             return {"success": False, "message": f"Commit failed: {e}"}

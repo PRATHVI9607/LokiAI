@@ -109,26 +109,34 @@ class TestSecurityScanner:
 
 
 class TestFileOrganizer:
+    def _organizer(self, tmp_path):
+        # Use safe_dirs override so tests aren't restricted to Downloads/Desktop
+        return FileOrganizer({"safe_dirs": [str(tmp_path)]})
+
     def test_organizes_image(self, tmp_path):
         img = tmp_path / "photo.jpg"
         img.write_bytes(b"\xff\xd8\xff")
-        organizer = FileOrganizer({})
-        result = organizer.organize(str(tmp_path))
+        result = self._organizer(tmp_path).organize(str(tmp_path))
         assert result["success"] is True
         assert (tmp_path / "Images" / "photo.jpg").exists()
 
     def test_organizes_document(self, tmp_path):
         doc = tmp_path / "report.pdf"
         doc.write_bytes(b"%PDF")
-        organizer = FileOrganizer({})
-        result = organizer.organize(str(tmp_path))
+        self._organizer(tmp_path).organize(str(tmp_path))
         assert (tmp_path / "Documents" / "report.pdf").exists()
 
     def test_empty_directory(self, tmp_path):
-        organizer = FileOrganizer({})
-        result = organizer.organize(str(tmp_path))
+        result = self._organizer(tmp_path).organize(str(tmp_path))
         assert result["success"] is True
         assert "already organized" in result["message"].lower()
+
+    def test_unsafe_dir_rejected(self, tmp_path):
+        # Without safe_dirs override, arbitrary dirs are rejected
+        organizer = FileOrganizer({})
+        result = organizer.organize(str(tmp_path))
+        assert result["success"] is False
+        assert "restriction" in result["message"].lower()
 
 
 class TestVault:
@@ -139,7 +147,9 @@ class TestVault:
         assert result_store["success"] is True
         result_get = v.retrieve("key1")
         assert result_get["success"] is True
-        assert result_get["data"] == "secret_value"
+        # Raw secret is no longer returned in data — it's sent to clipboard only
+        assert result_get["data"] is None
+        assert "key1" in result_get["message"]
 
     def test_get_missing_key(self, tmp_path):
         v = Vault(tmp_path / "vault.dat")
