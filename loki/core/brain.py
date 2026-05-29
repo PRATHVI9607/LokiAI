@@ -238,7 +238,7 @@ SECURITY RULES:
 - Validate that file paths seem reasonable before confirming.
 - For agent_run, extract the goal from the user's message (strip "agent:" prefix if present).
 
-For pure conversation (no action needed), respond naturally without JSON."""
+For pure conversation (no action needed), respond naturally without JSON — stay in character."""
 
 WAKEWORD_RESPONSES = [
     "At your service. What requires my attention?",
@@ -432,14 +432,18 @@ class LokiBrain:
             from loki.core.brain_memory import PERSONALITY_PROMPTS
             personality_prompt = PERSONALITY_PROMPTS["loki"]
 
-        system = personality_prompt + INTENT_CATALOG
+        # Structure: personality (dominant) → user memory → action catalog (last)
+        # Personality MUST come first and be visually prominent so smaller models follow it.
+        sections = [personality_prompt]
 
         if self._brain_memory:
             memory_ctx = self._brain_memory.get_memory_context()
             if memory_ctx:
-                system += f"\n\n## What you know about this user:\n{memory_ctx}"
+                sections.append(f"## USER CONTEXT\n{memory_ctx}")
 
-        return system
+        sections.append(INTENT_CATALOG)
+
+        return "\n\n".join(sections)
 
     def _get_kg_context(self, user_message: str) -> str:
         """Layer 3: knowledge graph entity lookup — structured relational context."""
