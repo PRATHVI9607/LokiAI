@@ -980,3 +980,71 @@ html, body, #__next {
 .rune-glow { text-shadow: 0 0 14px rgba(0,229,255,0.4), 0 0 36px rgba(255,46,151,0.15); color: rgba(0,229,255,0.18); }
 .dormant-rune { color: rgba(0,229,255,0.3); }
 .dormant-label { color: rgba(0,229,255,0.4); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v3.1 — chrome refinement: slimmer, floating, premium glass
+══════════════════════════════════════════════════════════════════════════ */
+
+/* Header → slim floating glass bar, lets the orb breathe behind it */
+.app-header {
+  height: 52px;
+  padding: 0 20px;
+  background: linear-gradient(180deg, rgba(8,8,22,0.55), rgba(8,8,22,0.18));
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+  border-bottom: 1px solid rgba(0,229,255,0.10);
+  box-shadow: none;
+}
+.loki-logo { font-size: 1.15rem; letter-spacing: 0.28em; }
+.header-divider { height: 18px; opacity: 0.5; }
+
+/* Status + personality chips → smaller, lighter */
+.status-pill { padding: 4px 10px; background: rgba(10,14,36,0.4); border-width: 1px; }
+.status-label { font-size: 0.62rem; }
+.personality-btn { padding: 4px 9px; background: rgba(0,229,255,0.05); }
+.personality-btn-label { font-size: 0.64rem; }
+
+/* Messages area: more breathing room, centered column, narrower for readability */
+.messages-area { padding: 30px 8% 14px; gap: 18px; }
+@media (max-width: 900px) { .messages-area { padding: 24px 16px 12px; } }
+
+/* Input bar → slim floating dock with a soft glass capsule, not a heavy bar */
+.input-bar {
+  padding: 14px 8% 18px;
+  background: linear-gradient(0deg, rgba(6,6,18,0.6), transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-top: none;
+  box-shadow: none;
+}
+@media (max-width: 900px) { .input-bar { padding: 12px 14px 16px; } }
+
+.input-row {
+  background: rgba(10,12,30,0.7);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(0,229,255,0.18);
+  border-radius: 18px;
+  padding: 6px 6px 6px 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.45), 0 0 30px rgba(0,229,255,0.05);
+}
+/* field sits flush inside the capsule — drop its own border */
+.input-row .input-field {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 9px 12px;
+}
+.input-row .input-field:focus { background: transparent; box-shadow: none; }
+
+/* Send button → compact circular-ish */
+.send-btn { padding: 9px 16px; border-radius: 14px; font-size: 0.8rem; }
+
+/* Action row → floats under the capsule, subtle */
+.action-row { margin-top: 10px; justify-content: center; opacity: 0.85; }
+.action-btn { padding: 5px 11px; font-size: 0.68rem; background: rgba(10,14,36,0.35); }
+
+/* Header divider + logo subtle glow toned down so it's not garish */
+.loki-logo { filter: drop-shadow(0 0 7px rgba(0,229,255,0.35)); }
+
+/* Give the chat a faint dark scrim ONLY behind text columns for readability
+   over the bright orb core — via the message cards' own blur (already set). */
