@@ -299,6 +299,7 @@ class LokiBrain:
         self._max_tokens = config.get("max_tokens", 600)
         self._temperature = config.get("temperature", 0.70)
         self._max_turns = config.get("max_turns", 20)
+        self._prefer_local = config.get("prefer_local", False)  # try Ollama first when reachable
         # thinking=True adds 30–90s latency — off by default for voice assistant
         self._nvidia_thinking = config.get("nvidia_thinking", False)
 
@@ -394,8 +395,28 @@ class LokiBrain:
         self._load_history()
         self._log_provider_status()
 
+        # Warm up the local model in the background so the first real query is fast
+        # (a cold 7B model takes ~20-30s to load into VRAM; warming hides that).
+        if self._prefer_local and self._ollama_available:
+            threading.Thread(target=self._warmup_ollama, daemon=True, name="loki-ollama-warmup").start()
+
+    def _warmup_ollama(self) -> None:
+        try:
+            logger.info(f"warming up {self._ollama_model}…")
+            t0 = time.time()
+            self._ollama_infer_client.chat.completions.create(
+                model=self._ollama_model,
+                messages=[{"role": "user", "content": "hi"}],
+                max_tokens=1,
+            )
+            logger.info(f"{self._ollama_model} warm and ready ({time.time() - t0:.0f}s)")
+        except Exception as e:
+            logger.debug(f"Ollama warmup skipped: {e}")
+
     def _log_provider_status(self) -> None:
-        if self._nvidia_client:
+        if self._prefer_local and self._ollama_available:
+            primary = f"Ollama LOCAL ({self._ollama_model}) → cloud fallback"
+        elif self._nvidia_client:
             primary = f"NVIDIA NIM Kimi K2.6 → fallback: OpenRouter ({self._fast_models[0]})"
         elif self._openrouter_client:
             primary = f"OpenRouter → {self._fast_models[0]}"
@@ -500,8 +521,35 @@ class LokiBrain:
 
     # ─── Inference ────────────────────────────────────────────────────────────
 
+    def _call_ollama(self, messages: List[Dict], mt: int) -> str:
+        """Call the local Ollama model. Returns '' on failure."""
+        if not (self._ollama_available and self._ollama_infer_client):
+            return ""
+        try:
+            resp = self._ollama_infer_client.chat.completions.create(
+                model=self._ollama_model,
+                messages=messages,
+                max_tokens=mt,
+                temperature=self._temperature,
+                extra_body={"keep_alive": "30m"},  # keep model in VRAM between turns
+            )
+            text = resp.choices[0].message.content or ""
+            if text.strip():
+                logger.debug(f"Response from Ollama ({self._ollama_model})")
+                return text
+        except Exception as e:
+            logger.warning(f"Ollama: {e}")
+        return ""
+
     def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
         mt = max_tokens or self._max_tokens
+
+        # ── 0. Local Ollama FIRST when prefer_local — no quota, no network ────
+        if self._prefer_local:
+            local = self._call_ollama(messages, mt)
+            if local:
+                return local
+            # local failed/empty — fall through to cloud providers
 
         # ── 1. NVIDIA NIM — Kimi K2.6 (PRIMARY — your key is set) ──────────────
         if self._nvidia_client:
@@ -570,21 +618,11 @@ class LokiBrain:
             except Exception as e:
                 logger.warning(f"Kimi Moonshot: {e}")
 
-        # ── 4. Ollama local ───────────────────────────────────────────────────
-        if self._ollama_available and self._ollama_infer_client:
-            try:
-                resp = self._ollama_infer_client.chat.completions.create(
-                    model=self._ollama_model,
-                    messages=messages,
-                    max_tokens=mt,
-                    temperature=self._temperature,
-                )
-                text = resp.choices[0].message.content or ""
-                if text.strip():
-                    logger.debug(f"Response from Ollama ({self._ollama_model})")
-                    return text
-            except Exception as e:
-                logger.warning(f"Ollama: {e}")
+        # ── 4. Ollama local (skip if prefer_local already tried it above) ─────
+        if not self._prefer_local:
+            local = self._call_ollama(messages, mt)
+            if local:
+                return local
 
         return ""
 

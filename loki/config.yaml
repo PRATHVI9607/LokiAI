@@ -20,8 +20,10 @@ llm:
   # Kimi Moonshot direct (set KIMI_API_KEY in .env to enable)
   kimi_model: kimi-k2
 
-  # Ollama local fallback (run: ollama serve && ollama pull phi3:mini)
-  ollama_model: phi3:mini
+  # Ollama local — fast, free, no rate limits, no network needed
+  ollama_model: qwen2.5-coder:7b   # reliable + in-character (gemma4 is flaky on chat endpoint)
+  prefer_local: true               # try local Ollama FIRST when reachable — avoids
+                                   # cloud rate-limits and NVIDIA NIM timeouts entirely
 
   max_tokens: 600
   temperature: 0.70
