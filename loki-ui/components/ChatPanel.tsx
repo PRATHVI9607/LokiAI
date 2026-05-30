@@ -29,8 +29,12 @@ interface ChatPanelProps {
   isMuted: boolean;
   personality: Personality;
   indexedFiles: FileEntry[];
+  pendingConfirm: string | null;
   onSend: (text: string) => void;
   onFeedback: (messageId: string, outcomeId: string, rating: "up" | "down") => void;
+  onStopSpeaking: () => void;
+  onConfirm: (yes: boolean) => void;
+  onInsights: () => void;
   onToggleMute: () => void;
   onUndo: () => void;
   onClear: () => void;
@@ -40,8 +44,9 @@ interface ChatPanelProps {
 
 export default function ChatPanel({
   messages, status, transcript, isMuted, personality,
-  indexedFiles,
-  onSend, onFeedback, onToggleMute, onUndo, onClear, onFilePanel, onPersonalityChange,
+  indexedFiles, pendingConfirm,
+  onSend, onFeedback, onStopSpeaking, onConfirm, onInsights,
+  onToggleMute, onUndo, onClear, onFilePanel, onPersonalityChange,
 }: ChatPanelProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -232,6 +237,29 @@ export default function ChatPanel({
             )}
           </AnimatePresence>
 
+          {/* Destructive-op confirmation card */}
+          <AnimatePresence>
+            {pendingConfirm && (
+              <motion.div
+                className="confirm-card"
+                initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                transition={{ duration: 0.2 }}
+                role="alertdialog"
+                aria-label="Confirm action"
+              >
+                <p className="confirm-text">{pendingConfirm}</p>
+                <div className="confirm-actions">
+                  <button type="button" className="confirm-btn confirm-no"
+                    onClick={() => onConfirm(false)}>Cancel</button>
+                  <button type="button" className="confirm-btn confirm-yes"
+                    onClick={() => onConfirm(true)}>Confirm</button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Live transcript */}
           <AnimatePresence>
             {transcript && status === "listening" && (
@@ -257,6 +285,8 @@ export default function ChatPanel({
           onUndo={onUndo}
           onClear={onClear}
           onFileClick={onFilePanel}
+          onStopSpeaking={onStopSpeaking}
+          onInsights={onInsights}
           isMuted={isMuted}
           status={status}
           filesCount={indexedFiles.length}

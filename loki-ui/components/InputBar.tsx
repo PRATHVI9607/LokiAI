@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, type KeyboardEvent } from "react";
-import { ArrowUp, Mic, MicOff, RotateCcw, Trash2, Paperclip } from "lucide-react";
+import { ArrowUp, Mic, MicOff, RotateCcw, Trash2, Paperclip, Square, BarChart3 } from "lucide-react";
 import { type Status } from "@/hooks/useLoki";
 
 interface InputBarProps {
@@ -10,6 +10,8 @@ interface InputBarProps {
   onUndo: () => void;
   onClear: () => void;
   onFileClick: () => void;
+  onStopSpeaking: () => void;
+  onInsights: () => void;
   isMuted: boolean;
   status: Status;
   filesCount: number;
@@ -19,13 +21,14 @@ interface InputBarProps {
 const ICON = { strokeWidth: 1.5 };
 
 export default function InputBar({
-  onSend, onToggleMute, onUndo, onClear, onFileClick,
+  onSend, onToggleMute, onUndo, onClear, onFileClick, onStopSpeaking, onInsights,
   isMuted, status, filesCount,
 }: InputBarProps) {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const isOffline = status === "offline";
   const isListening = status === "listening";
+  const isSpeaking = status === "speaking";
 
   const submit = () => {
     const trimmed = value.trim();
@@ -87,7 +90,21 @@ export default function InputBar({
           <span>Undo</span>
         </button>
 
-        <button type="button" onClick={onClear} aria-label="Clear chat" className="pill pill-danger ml-auto">
+        {isSpeaking && (
+          <button type="button" onClick={onStopSpeaking} aria-label="Stop speaking"
+            className="pill pill-stop">
+            <Square size={12} {...ICON} />
+            <span>Stop</span>
+          </button>
+        )}
+
+        <button type="button" onClick={onInsights} aria-label="Open insights"
+          className={`pill ${isSpeaking ? "" : "ml-auto"}`}>
+          <BarChart3 size={13} {...ICON} />
+          <span>Insights</span>
+        </button>
+
+        <button type="button" onClick={onClear} aria-label="Clear chat" className="pill pill-danger">
           <Trash2 size={13} {...ICON} />
           <span>Clear</span>
         </button>

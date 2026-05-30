@@ -305,6 +305,10 @@ class LokiServer:
             payload["provider"] = provider      # which engine answered (UI indicator)
         self._broadcast_sync(payload)
 
+    def request_confirm(self, text: str) -> None:
+        """Ask the UI to show a Yes/No card for a destructive op pending confirmation."""
+        self._broadcast_sync({"type": "confirm", "text": text})
+
     def set_status(self, status: str) -> None:
         self._broadcast_sync({"type": "status", "status": status})
 

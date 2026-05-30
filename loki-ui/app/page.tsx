@@ -6,18 +6,22 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useLoki } from "@/hooks/useLoki";
 import ChatPanel from "@/components/ChatPanel";
 import FilePanel from "@/components/FilePanel";
+import InsightsPanel from "@/components/InsightsPanel";
 
 const VideoOrb = dynamic(() => import("@/components/VideoOrb"), { ssr: false });
 
 export default function Home() {
   const {
     messages, status, transcript, isMuted, isVisible,
-    personality, indexedFiles, ragAvailable,
-    sendMessage, sendFeedback, toggleMute, requestUndo, clearMessages,
+    personality, indexedFiles, ragAvailable, pendingConfirm,
+    sendMessage, sendFeedback, stopSpeaking, answerConfirm,
+    fetchStats, fetchAudit,
+    toggleMute, requestUndo, clearMessages,
     uploadFile, deleteFile, setPersonality,
   } = useLoki();
 
   const [showFiles, setShowFiles] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
   const layerRef = useRef<HTMLDivElement>(null);
 
   // Set aria-hidden imperatively — JSX {expression} in ARIA attrs is flagged by axe
@@ -76,6 +80,14 @@ export default function Home() {
               onClose={() => setShowFiles(false)}
             />
           )}
+          {showInsights && (
+            <InsightsPanel
+              fetchStats={fetchStats}
+              fetchAudit={fetchAudit}
+              onUndo={requestUndo}
+              onClose={() => setShowInsights(false)}
+            />
+          )}
         </AnimatePresence>
 
         <ChatPanel
@@ -85,8 +97,12 @@ export default function Home() {
           isMuted={isMuted}
           personality={personality}
           indexedFiles={indexedFiles}
+          pendingConfirm={pendingConfirm}
           onSend={sendMessage}
           onFeedback={sendFeedback}
+          onStopSpeaking={stopSpeaking}
+          onConfirm={answerConfirm}
+          onInsights={() => setShowInsights((v) => !v)}
           onToggleMute={toggleMute}
           onUndo={requestUndo}
           onClear={clearMessages}

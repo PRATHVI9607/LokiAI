@@ -5,6 +5,14 @@ import { motion } from "framer-motion";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { type ChatMessage } from "@/hooks/useLoki";
 
+// Human-friendly label for the provider that answered this turn
+function PROVIDER_LABEL(p: string): string {
+  if (p === "fast_path") return "instant";
+  if (p === "ollama") return "local";
+  if (p.startsWith("openrouter")) return "openrouter";
+  return p;
+}
+
 // Lightweight inline markdown renderer — bold, italic, inline code, links
 function inlineRender(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
@@ -133,6 +141,11 @@ export default function MessageBubble({ msg, onFeedback }: MessageBubbleProps) {
       <div className="msg-head">
         <span className={`msg-dot ${isUser ? "is-user" : "is-loki"}`} aria-hidden="true" />
         <span className="msg-sender">{isUser ? "You" : "Loki"}</span>
+        {!isUser && msg.provider && msg.provider !== "none" && (
+          <span className="msg-provider" title="Which engine answered">
+            {PROVIDER_LABEL(msg.provider)}
+          </span>
+        )}
       </div>
       <div className="msg-content">
         {isUser ? <p className="msg-para">{msg.text}</p> : rendered}

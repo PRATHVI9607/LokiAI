@@ -289,8 +289,13 @@ class ConversationStateMachine:
             response=result_msg,
         )
 
-        # Pending confirmation — speak the confirm prompt, wait for the user
+        # Pending confirmation — speak the confirm prompt AND show a Yes/No card,
+        # then wait for the user (voice "yes"/"no" or the button both work).
         if result.get("pending"):
+            try:
+                self._server.request_confirm(result_msg)
+            except Exception:
+                pass
             self._emit_response(result_msg, speak=True)
             with self._lock:
                 self._state = ConvState.LISTENING
