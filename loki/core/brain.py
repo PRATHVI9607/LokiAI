@@ -651,22 +651,64 @@ class LokiBrain:
 
     # ─── Public ask interface ─────────────────────────────────────────────────
 
-    @staticmethod
-    def _fast_intent(text: str) -> Optional[str]:
-        """Deterministic fast-path for common device commands — bypasses the LLM
+    # well-known sites → open directly in the browser
+    _SITES = {
+        "youtube": "youtube.com", "gmail": "mail.google.com", "google": "google.com",
+        "github": "github.com", "reddit": "reddit.com", "twitter": "twitter.com",
+        "x": "x.com", "facebook": "facebook.com", "instagram": "instagram.com",
+        "whatsapp": "web.whatsapp.com", "netflix": "netflix.com", "amazon": "amazon.com",
+        "wikipedia": "wikipedia.org", "linkedin": "linkedin.com", "chatgpt": "chat.openai.com",
+        "maps": "maps.google.com", "drive": "drive.google.com",
+    }
+    # filler words stripped when extracting a search topic
+    _FILLER = {"a", "an", "the", "tab", "with", "something", "some", "stuff", "for", "about",
+               "on", "in", "there", "please", "pls", "can", "you", "u", "and", "open", "go",
+               "to", "of", "me", "show", "find", "search", "look", "up", "play", "watch", "new"}
+
+    @classmethod
+    def _fast_intent(cls, text: str) -> Optional[str]:
+        """Deterministic fast-path for common device/web commands — bypasses the LLM
         so PC control works 100% reliably even with a weak local model. Returns a
         JSON intent string (which parse_intent then handles) or None to fall through."""
         t = text.lower().strip().rstrip("?.!")
         m = None
 
-        # open / launch app
-        m = re.search(r"\b(?:open|launch|start|run)\s+(?:the\s+|my\s+|app\s+)?(.+)", t)
-        if m and "website" not in t and "file" not in t:
-            app = m.group(1).strip()
-            # url → browser
-            if re.search(r"\.(com|org|net|io|ai|dev|co|gov|edu)\b", app) or app.startswith("http"):
-                return json.dumps({"intent": "browser_open", "params": {"url": app}, "message": "Opening it."})
-            return json.dumps({"intent": "app_open", "params": {"name": app}, "message": f"Opening {app}."})
+        def topic_after(keyword: str) -> str:
+            """Pull the meaningful search topic out of a messy command."""
+            tail = t.split(keyword, 1)[-1]
+            words = [w for w in re.findall(r"[a-z0-9']+", tail) if w not in cls._FILLER]
+            return " ".join(words).strip()
+
+        # ── YOUTUBE — search/play a topic, or just open it ──────────────────
+        if "youtube" in t:
+            topic = topic_after("youtube")
+            # also catch "pokemon ... youtube" (topic before the word)
+            if not topic:
+                head = t.split("youtube", 1)[0]
+                topic = " ".join(w for w in re.findall(r"[a-z0-9']+", head) if w not in cls._FILLER)
+            if topic:
+                return json.dumps({"intent": "browser_search", "params": {"query": topic, "engine": "youtube"},
+                                   "message": f"Searching YouTube for {topic}."})
+            return json.dumps({"intent": "browser_open", "params": {"url": "youtube.com"}, "message": "Opening YouTube."})
+
+        # ── search the web (explicit) ───────────────────────────────────────
+        m = re.search(r"\b(?:google|search(?:\s+the\s+web)?|look up)\s+(?:for\s+)?(.+)", t)
+        if m and "youtube" not in t:
+            return json.dumps({"intent": "browser_search", "params": {"query": m.group(1).strip()}, "message": "Searching."})
+
+        # ── open a known site or a URL ──────────────────────────────────────
+        m = re.search(r"\b(?:open|go to|visit|launch)\s+(?:the\s+|my\s+|app\s+|website\s+)?(.+)", t)
+        if m:
+            tgt = m.group(1).strip()
+            # explicit url
+            if re.search(r"\.(com|org|net|io|ai|dev|co|gov|edu|uk)\b", tgt) or tgt.startswith("http"):
+                return json.dumps({"intent": "browser_open", "params": {"url": tgt}, "message": "Opening it."})
+            # known website word (e.g. "open reddit")
+            first = tgt.split()[0] if tgt.split() else tgt
+            if first in cls._SITES:
+                return json.dumps({"intent": "browser_open", "params": {"url": cls._SITES[first]}, "message": f"Opening {first}."})
+            # otherwise it's an app
+            return json.dumps({"intent": "app_open", "params": {"name": tgt}, "message": f"Opening {tgt}."})
 
         # close / quit app
         m = re.search(r"\b(?:close|quit|exit|kill|stop)\s+(?:the\s+|my\s+|app\s+)?(.+)", t)
@@ -698,11 +740,6 @@ class LokiBrain:
         # processes
         if re.search(r"\b(?:list|show|what).*(?:process|running app|task)", t):
             return json.dumps({"intent": "process_list", "params": {}, "message": "Listing processes."})
-
-        # web search
-        m = re.search(r"\b(?:search|google|look up)\s+(?:the\s+web\s+for\s+|for\s+)?(.+)", t)
-        if m:
-            return json.dumps({"intent": "browser_search", "params": {"query": m.group(1).strip()}, "message": "Searching."})
 
         return None
 
