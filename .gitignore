@@ -73,3 +73,6 @@ graphify-out/cache/
 # Large video assets (kept local; not committed)
 loki-ui/videos/
 loki-ui/public/videos/
+
+# uv GPU virtual env (local)
+.venv-gpu/

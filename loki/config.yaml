@@ -21,7 +21,9 @@ llm:
   kimi_model: kimi-k2
 
   # Ollama local — fast, free, no rate limits, no network needed
-  ollama_model: qwen2.5-coder:7b   # reliable + in-character (gemma4 is flaky on chat endpoint)
+  ollama_model: qwen2.5-coder:7b      # primary local model (kept as you asked)
+  ollama_fallback_model: phi3:mini    # smaller model that fits fully in 4GB VRAM →
+                                      # used if the 7B is slow/times out (GPU-fast)
   prefer_local: true               # try local Ollama FIRST when reachable — avoids
                                    # cloud rate-limits and NVIDIA NIM timeouts entirely
   ollama_timeout: 60               # max seconds to wait for a local response before
@@ -32,7 +34,7 @@ llm:
 
 whisper:
   model: base.en
-  device: cpu
+  device: auto       # auto = GPU (CUDA) if available, else CPU
   language: en
 
 wakeword:

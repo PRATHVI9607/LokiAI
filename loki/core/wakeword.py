@@ -70,8 +70,15 @@ class WakewordDetector:
 
         if self._method == "whisper" and WHISPER_AVAILABLE:
             try:
-                self._model = whisper.load_model("tiny.en")
-                logger.info("Wakeword Whisper model loaded (tiny.en)")
+                device = "cpu"
+                try:
+                    import torch
+                    if torch.cuda.is_available():
+                        device = "cuda"
+                except Exception:
+                    pass
+                self._model = whisper.load_model("tiny.en", device=device)
+                logger.info(f"Wakeword Whisper model loaded (tiny.en, {device})")
             except Exception as e:
                 logger.error(f"Wakeword Whisper load failed: {e}")
 

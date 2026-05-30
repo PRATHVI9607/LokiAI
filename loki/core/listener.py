@@ -43,6 +43,20 @@ except ImportError:
     logger.warning("openai-whisper not available — pip install openai-whisper")
 
 
+def _whisper_device(pref: str) -> str:
+    """Resolve the Whisper device. 'auto' → cuda if available, else cpu."""
+    if pref == "cuda":
+        return "cuda"
+    if pref == "cpu":
+        return "cpu"
+    # auto
+    try:
+        import torch
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    except Exception:
+        return "cpu"
+
+
 class SpeechListener:
     """Listens to microphone, detects speech via VAD, transcribes with Whisper."""
 
@@ -77,10 +91,11 @@ class SpeechListener:
 
         if WHISPER_AVAILABLE:
             model_name = whisper_cfg.get("model", "base.en")
-            logger.info(f"Loading Whisper model: {model_name}")
+            device = _whisper_device(whisper_cfg.get("device", "auto"))
+            logger.info(f"Loading Whisper model: {model_name} on {device.upper()}")
             try:
-                self._model = whisper.load_model(model_name)
-                logger.info("Whisper model loaded successfully")
+                self._model = whisper.load_model(model_name, device=device)
+                logger.info(f"Whisper model loaded successfully ({device})")
             except Exception as e:
                 logger.error(f"Whisper load failed: {e}")
 

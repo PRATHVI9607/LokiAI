@@ -38,6 +38,7 @@ from loki.actions.shell_exec import ShellExec
 from loki.actions.system_ctrl import SystemCtrl
 from loki.actions.app_ctrl import AppCtrl
 from loki.actions.browser_ctrl import BrowserCtrl
+from loki.actions.computer_control import ComputerControl
 
 from loki.features.file_search import FileSearch
 from loki.features.system_monitor import SystemMonitor
@@ -226,6 +227,7 @@ class LokiApplication:
 
         # Remaining / enhancement features
         self.screenshot_search = ScreenshotSearch(brain=self.brain)
+        self.computer_control = ComputerControl(screenshot_search=self.screenshot_search)
         self.calendar_manager = CalendarManager(brain=self.brain)
         self.expense_tracker = ExpenseTracker(brain=self.brain)
         self.dynamic_ui = DynamicUI()
@@ -242,6 +244,7 @@ class LokiApplication:
         self.router.register_action("system_ctrl", self.sys_ctrl)
         self.router.register_action("app_ctrl", self.app_ctrl)
         self.router.register_action("browser_ctrl", self.browser)
+        self.router.register_action("computer_control", self.computer_control)
         self.router.register_feature("file_search", self.file_search)
         self.router.register_feature("system_monitor", self.sys_monitor)
         self.router.register_feature("process_manager", self.proc_manager)

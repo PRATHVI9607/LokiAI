@@ -233,6 +233,15 @@ class ActionRouter:
             "agent_run":    self._handle_agent_run,
             "agent_cancel": self._handle_agent_cancel,
             "agent_status": self._handle_agent_status,
+            # Computer control (mouse/keyboard/screen)
+            "computer_click":      self._handle_computer_click,
+            "computer_move":       self._handle_computer_move,
+            "computer_scroll":     self._handle_computer_scroll,
+            "computer_type":       self._handle_computer_type,
+            "computer_press":      self._handle_computer_press,
+            "computer_click_text": self._handle_computer_click_text,
+            "computer_action":     self._handle_computer_action,
+            "screen_read":         self._handle_screen_read_cc,
             # Meta
             "undo": self._handle_undo,
             "chat": lambda p: {"success": True, "message": intent.get("message", "")},
@@ -881,6 +890,42 @@ class ActionRouter:
             return self._missing("auto_agent")
         running = f.is_running()
         return {"success": True, "message": "Agent is running." if running else "No agent task running."}
+
+    # --- Computer control ---
+    def _handle_computer_click(self, p):
+        cc = self._actions.get("computer_control")
+        return cc.click(p.get("x"), p.get("y"), p.get("button", "left"), bool(p.get("double", False))) if cc else self._missing("computer_control")
+
+    def _handle_computer_move(self, p):
+        cc = self._actions.get("computer_control")
+        return cc.move(int(p.get("x", 0)), int(p.get("y", 0))) if cc else self._missing("computer_control")
+
+    def _handle_computer_scroll(self, p):
+        cc = self._actions.get("computer_control")
+        return cc.scroll(int(p.get("amount", -500))) if cc else self._missing("computer_control")
+
+    def _handle_computer_type(self, p):
+        cc = self._actions.get("computer_control")
+        return cc.type_text(p.get("text", "")) if cc else self._missing("computer_control")
+
+    def _handle_computer_press(self, p):
+        cc = self._actions.get("computer_control")
+        return cc.press(p.get("key", "")) if cc else self._missing("computer_control")
+
+    def _handle_computer_click_text(self, p):
+        cc = self._actions.get("computer_control")
+        return cc.click_text(p.get("target", "")) if cc else self._missing("computer_control")
+
+    def _handle_computer_action(self, p):
+        cc = self._actions.get("computer_control")
+        return cc.hotkey_action(p.get("action", "")) if cc else self._missing("computer_control")
+
+    def _handle_screen_read_cc(self, p):
+        cc = self._actions.get("computer_control")
+        if cc:
+            return cc.read_screen()
+        feat = self._features.get("screenshot_search")
+        return feat.capture_and_read() if feat else self._missing("computer_control")
 
     # --- Meta ---
     def _handle_undo(self, p):

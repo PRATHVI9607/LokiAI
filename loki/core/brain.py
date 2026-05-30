@@ -252,6 +252,16 @@ INTENTS (autonomous agent):
 - agent_cancel: params={}  (abort running agent task)
 - agent_status: params={}  (check if agent is running)
 
+INTENTS (computer control — operate the machine like a person):
+- computer_type: params={text}  (type text into the focused window)
+- computer_press: params={key}  (a key or hotkey: "enter", "ctrl+s", "alt+tab")
+- computer_scroll: params={amount}  (negative = down, positive = up)
+- computer_click: params={x?, y?, button?, double?}  (click at coords or current pos)
+- computer_click_text: params={target}  (find on-screen text and click it)
+- computer_action: params={action}  (minimize, maximize, show desktop, switch window,
+  close window, lock, copy, paste, save, select all, new tab, close tab, screenshot)
+- screen_read: params={}  (OCR and read what's currently on screen)
+
 INTENTS (misc):
 - undo: params={}
 - chat: params={}  (no action, pure conversation)
@@ -388,6 +398,7 @@ class LokiBrain:
         # ─── Provider 3: Ollama (local) ────────────────────────────────────────
         self._ollama_infer_client: Optional[Any] = None
         self._ollama_model = config.get("ollama_model", "phi3:mini")
+        self._ollama_fallback_model = config.get("ollama_fallback_model", "")
         self._ollama_available = False
         try:
             probe = OpenAI(
@@ -548,20 +559,26 @@ class LokiBrain:
         """Call the local Ollama model. Returns '' on failure."""
         if not (self._ollama_available and self._ollama_infer_client):
             return ""
-        try:
-            resp = self._ollama_infer_client.chat.completions.create(
-                model=self._ollama_model,
-                messages=messages,
-                max_tokens=mt,
-                temperature=self._temperature,
-                extra_body={"keep_alive": "30m"},  # keep model in VRAM between turns
-            )
-            text = resp.choices[0].message.content or ""
-            if text.strip():
-                logger.debug(f"Response from Ollama ({self._ollama_model})")
-                return text
-        except Exception as e:
-            logger.warning(f"Ollama: {e}")
+        # Try the primary model; on slowness/failure fall back to the smaller,
+        # GPU-resident model (fits fully in 4GB VRAM → fast).
+        models = [self._ollama_model]
+        if self._ollama_fallback_model and self._ollama_fallback_model != self._ollama_model:
+            models.append(self._ollama_fallback_model)
+        for model in models:
+            try:
+                resp = self._ollama_infer_client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    max_tokens=mt,
+                    temperature=self._temperature,
+                    extra_body={"keep_alive": "30m"},  # keep model in VRAM between turns
+                )
+                text = resp.choices[0].message.content or ""
+                if text.strip():
+                    logger.debug(f"Response from Ollama ({model})")
+                    return text
+            except Exception as e:
+                logger.warning(f"Ollama {model}: {e}")
         return ""
 
     def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
@@ -740,6 +757,38 @@ class LokiBrain:
         # processes
         if re.search(r"\b(?:list|show|what).*(?:process|running app|task)", t):
             return json.dumps({"intent": "process_list", "params": {}, "message": "Listing processes."})
+
+        # ── COMPUTER CONTROL — act like a person at the keyboard ────────────
+        # read the screen
+        if re.search(r"\b(?:read|what.?s on|whats on|describe).*(?:screen|display)\b", t):
+            return json.dumps({"intent": "screen_read", "params": {}, "message": "Reading the screen."})
+        # type text  →  type "hello"  /  type hello world
+        m = re.search(r'\btype\s+(?:out\s+)?["\']?(.+?)["\']?$', t)
+        if m:
+            return json.dumps({"intent": "computer_type", "params": {"text": m.group(1)}, "message": "Typing."})
+        # press a key / hotkey  →  press enter / press ctrl+s
+        m = re.search(r"\bpress\s+(?:the\s+)?(.+)", t)
+        if m:
+            return json.dumps({"intent": "computer_press", "params": {"key": m.group(1).replace(" plus ", "+").strip()}, "message": "Pressing."})
+        # scroll
+        if re.search(r"\bscroll\s+up\b", t):
+            return json.dumps({"intent": "computer_scroll", "params": {"amount": 500}, "message": "Scrolling up."})
+        if re.search(r"\bscroll\s+down\b", t) or t == "scroll":
+            return json.dumps({"intent": "computer_scroll", "params": {"amount": -500}, "message": "Scrolling down."})
+        # click on text  →  click on Submit / click the Save button
+        m = re.search(r"\bclick\s+(?:on\s+|the\s+)?(.+?)(?:\s+button)?$", t)
+        if m and m.group(1) not in ("here", "it"):
+            return json.dumps({"intent": "computer_click_text", "params": {"target": m.group(1).strip()}, "message": "Clicking."})
+        # desktop actions
+        for phrase, act in [
+            ("show desktop", "show desktop"), ("minimize", "minimize"), ("maximize", "maximize"),
+            ("switch window", "switch window"), ("close window", "close window"),
+            ("lock the screen", "lock"), ("lock screen", "lock"), ("take a screenshot", "screenshot"),
+            ("screenshot", "screenshot"), ("select all", "select all"), ("new tab", "new tab"),
+            ("close tab", "close tab"), ("paste", "paste"), ("copy that", "copy"), ("save this", "save"),
+        ]:
+            if phrase in t:
+                return json.dumps({"intent": "computer_action", "params": {"action": act}, "message": f"{act.title()}."})
 
         return None
 
