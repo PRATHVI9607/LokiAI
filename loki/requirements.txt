@@ -61,3 +61,4 @@ pytest-asyncio>=0.23.0
 pytest-cov>=4.1.0
 pyautogui>=0.9.54
 pytesseract>=0.3.10
+python-multipart>=0.0.9
