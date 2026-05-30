@@ -4,6 +4,7 @@ No API key required.
 """
 
 import logging
+import time
 import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime
@@ -12,6 +13,8 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
+_FEED_TTL_SEC = 600  # cache each feed for 10 min — headlines don't change by the second
 
 FEEDS: dict[str, list[str]] = {
     "technology": [
@@ -39,7 +42,14 @@ FEEDS: dict[str, list[str]] = {
 
 
 class NewsAggregator:
+    def __init__(self):
+        # url -> (fetched_at, headlines). Avoids hammering feeds on repeat asks.
+        self._cache: dict[str, tuple[float, list[str]]] = {}
+
     def _fetch_feed(self, url: str, max_items: int = 5) -> list[str]:
+        cached = self._cache.get(url)
+        if cached and (time.time() - cached[0]) < _FEED_TTL_SEC:
+            return cached[1][:max_items]
         headlines = []
         try:
             resp = requests.get(url, headers=HEADERS, timeout=6)
@@ -62,6 +72,8 @@ class NewsAggregator:
                         break
         except Exception as e:
             logger.warning(f"Feed fetch failed {url}: {e}")
+        if headlines:
+            self._cache[url] = (time.time(), headlines)
         return headlines
 
     def get_headlines(self, category: str = "technology", count: int = 5) -> dict:

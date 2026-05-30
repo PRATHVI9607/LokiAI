@@ -15,7 +15,9 @@ import asyncio
 import json
 import logging
 import os
+import time
 import webbrowser
+from collections import deque
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
@@ -27,6 +29,27 @@ from fastapi.responses import JSONResponse
 logger = logging.getLogger(__name__)
 
 UI_DIST = Path(__file__).parent.parent.parent / "loki-ui" / "out"
+
+
+class RateLimiter:
+    """Sliding-window rate limiter. Generous defaults — the server binds to
+    localhost, so this only guards against a runaway/malicious local client
+    flooding the socket, not legitimate use."""
+
+    def __init__(self, max_events: int, window_sec: float):
+        self._max = max_events
+        self._window = window_sec
+        self._events: deque = deque()
+
+    def allow(self) -> bool:
+        now = time.monotonic()
+        cutoff = now - self._window
+        while self._events and self._events[0] < cutoff:
+            self._events.popleft()
+        if len(self._events) >= self._max:
+            return False
+        self._events.append(now)
+        return True
 
 
 class ConnectionManager:
@@ -90,6 +113,7 @@ class LokiServer:
         self._outcome_log = None
         self._bandit = None
         self._brain = None
+        self._upload_limiter = RateLimiter(max_events=20, window_sec=60.0)  # 20 uploads/min
 
         # Callbacks
         self.on_user_message: Optional[Callable[[str], None]] = None
@@ -122,9 +146,18 @@ class LokiServer:
         @app.websocket("/ws")
         async def websocket_endpoint(ws: WebSocket):
             await self._manager.connect(ws)
+            # Per-connection guard: at most 30 inbound messages/sec. A normal user
+            # sends a handful; this only trips on a runaway client.
+            limiter = RateLimiter(max_events=30, window_sec=1.0)
             try:
                 while True:
                     raw = await ws.receive_text()
+                    if not limiter.allow():
+                        logger.warning("WS message rate limit exceeded — dropping message")
+                        continue
+                    if len(raw) > 100_000:  # 100 KB cap on a single control message
+                        logger.warning("WS message too large — dropping")
+                        continue
                     try:
                         msg = json.loads(raw)
                     except json.JSONDecodeError:
@@ -135,6 +168,8 @@ class LokiServer:
 
         @app.post("/upload")
         async def upload_file(file: UploadFile = File(...)):
+            if not self._upload_limiter.allow():
+                raise HTTPException(429, "Too many uploads — slow down a moment.")
             if not self._rag_engine:
                 raise HTTPException(503, "RAG engine not initialized")
             if not self._rag_engine.is_available:

@@ -84,7 +84,9 @@ class FileOrganizer:
         errors = []
 
         for item in target.iterdir():
-            if item.is_dir() or item.name.startswith("."):
+            # Skip dirs, hidden files, and symlinks — moving a symlink's target
+            # out from under it (or following a loop) is never what the user wants.
+            if item.is_dir() or item.is_symlink() or item.name.startswith("."):
                 continue
 
             ext = item.suffix.lower()

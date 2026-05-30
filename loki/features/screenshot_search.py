@@ -16,6 +16,8 @@ import tempfile
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING
 
+from loki.core.prompt_utils import wrap_untrusted, UNTRUSTED_PREAMBLE
+
 if TYPE_CHECKING:
     from loki.core.brain import LokiBrain
 
@@ -297,8 +299,9 @@ class ScreenshotSearch:
             return {"success": True,
                     "message": "I captured the screen but couldn't read any text, and no vision model is reachable."}
         if self._brain:
-            prompt = (f"This text was read off the user's screen via OCR. Answer their question.\n\n"
-                      f"Question: {q}\n\nScreen text:\n{text[:2500]}")
+            prompt = (f"{UNTRUSTED_PREAMBLE}\n\n"
+                      f"This text was read off the user's screen via OCR. Answer their question.\n\n"
+                      f"Question: {q}\n\n{wrap_untrusted(text[:2500], 'screen')}")
             ans = self._llm(prompt)
             if ans:
                 return {"success": True, "message": ans, "data": {"mode": "ocr", "text": text}}

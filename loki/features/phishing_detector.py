@@ -9,6 +9,8 @@ import socket
 from typing import Optional, TYPE_CHECKING
 from urllib.parse import urlparse
 
+from loki.core.prompt_utils import wrap_untrusted, UNTRUSTED_PREAMBLE
+
 if TYPE_CHECKING:
     from loki.core.brain import LokiBrain
 
@@ -181,8 +183,9 @@ class PhishingDetector:
         if risk >= 4 and self._brain:
             snippet = email_text[:600].replace("\n", " ")
             prompt = (
+                f"{UNTRUSTED_PREAMBLE}\n\n"
                 f"Analyze this email excerpt for phishing. Give a verdict: Safe / Suspicious / Likely Phishing.\n\n"
-                f"EMAIL:\n{snippet}\n\nSignals found: {signals}\n\nOne-sentence verdict:"
+                f"{wrap_untrusted(snippet, 'email')}\n\nSignals found: {signals}\n\nOne-sentence verdict:"
             )
             llm_verdict = self._llm(prompt)
         else:

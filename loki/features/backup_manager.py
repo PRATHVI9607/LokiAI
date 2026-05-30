@@ -12,6 +12,27 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_BACKUP_ROOT = Path.home() / "LokiBackups"
 
+# Refuse to write backups into OS/system locations — a bad destination should
+# never let Loki scribble timestamped copies into Windows, Program Files, etc.
+_FORBIDDEN_DEST_ROOTS = [
+    Path("C:/Windows"), Path("C:/Program Files"), Path("C:/Program Files (x86)"),
+    Path("C:/ProgramData"), Path("/etc"), Path("/usr"), Path("/bin"), Path("/System"),
+]
+
+
+def _dest_is_safe(dest: Path) -> bool:
+    try:
+        resolved = dest.resolve()
+    except Exception:
+        return False
+    for root in _FORBIDDEN_DEST_ROOTS:
+        try:
+            if resolved == root or root in resolved.parents:
+                return False
+        except Exception:
+            continue
+    return True
+
 
 class BackupManager:
     def __init__(self, backup_root: Optional[str] = None):
@@ -24,6 +45,8 @@ class BackupManager:
             return {"success": False, "message": f"File not found: {path}"}
 
         dst_dir = Path(destination).expanduser().resolve() if destination else self._root / src.parent.name
+        if not _dest_is_safe(dst_dir):
+            return {"success": False, "message": "Refusing to back up into a system directory."}
         dst_dir.mkdir(parents=True, exist_ok=True)
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -48,6 +71,8 @@ class BackupManager:
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         dst_base = Path(destination).expanduser().resolve() if destination else self._root
+        if not _dest_is_safe(dst_base):
+            return {"success": False, "message": "Refusing to back up into a system directory."}
         dst = dst_base / f"{src.name}_{ts}"
 
         try:

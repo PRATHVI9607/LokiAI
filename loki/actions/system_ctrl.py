@@ -104,9 +104,16 @@ class SystemCtrl:
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
                 return {"success": True, "message": f"Wi-Fi {action}."}
+            # netsh reports elevation failures via stderr (non-zero rc), not an
+            # exception — translate that into a clear, actionable message.
+            err = (result.stderr or result.stdout or "").lower()
+            if "elevat" in err or "administrator" in err or "access is denied" in err:
+                return {"success": False,
+                        "message": "Wi-Fi toggle needs admin rights. Run Loki as administrator and try again."}
             return {"success": False, "message": f"Wi-Fi toggle failed: {result.stderr[:100]}"}
         except PermissionError:
-            return {"success": False, "message": "Requires administrator privileges."}
+            return {"success": False,
+                    "message": "Wi-Fi toggle needs admin rights. Run Loki as administrator and try again."}
         except Exception as e:
             return {"success": False, "message": f"Wi-Fi control failed: {e}"}
 

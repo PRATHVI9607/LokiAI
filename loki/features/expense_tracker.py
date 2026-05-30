@@ -12,6 +12,8 @@ from email.parser import BytesParser, Parser
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING
 
+from loki.core.prompt_utils import wrap_untrusted, UNTRUSTED_PREAMBLE
+
 if TYPE_CHECKING:
     from loki.core.brain import LokiBrain
 
@@ -115,9 +117,10 @@ class ExpenseTracker:
         # Use LLM for better extraction if available
         if self._brain and (not info["amount"] or info["vendor"] == "Unknown"):
             prompt = (
+                f"{UNTRUSTED_PREAMBLE}\n\n"
                 f"Extract expense info from this receipt/email text as JSON.\n"
                 f"Fields: date (YYYY-MM-DD), vendor, amount (number), currency (3-letter), category, description\n\n"
-                f"TEXT:\n{email_text[:1500]}\n\nReturn only valid JSON."
+                f"{wrap_untrusted(email_text[:1500], 'receipt')}\n\nReturn only valid JSON."
             )
             import json, re as _re
             raw = self._llm(prompt)

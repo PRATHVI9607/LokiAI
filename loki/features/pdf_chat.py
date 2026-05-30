@@ -6,6 +6,8 @@ import logging
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple, TYPE_CHECKING
 
+from loki.core.prompt_utils import wrap_untrusted, UNTRUSTED_PREAMBLE
+
 if TYPE_CHECKING:
     from loki.core.brain import LokiBrain
 
@@ -49,9 +51,10 @@ class PDFChat:
             return {"success": True, "message": f"PDF loaded ({len(text)} chars, {page_count} pages). No LLM available to answer questions."}
 
         prompt = (
+            f"{UNTRUSTED_PREAMBLE}\n\n"
             f"The following is the content of a PDF document. "
             f"Answer this question based ONLY on the document content: '{question}'\n\n"
-            f"Document content:\n{text[:self.MAX_CHARS]}"
+            f"{wrap_untrusted(text[:self.MAX_CHARS], 'pdf')}"
         )
 
         try:

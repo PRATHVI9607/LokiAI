@@ -25,8 +25,19 @@ class FocusMode:
             "youtube.com", "reddit.com", "twitter.com", "facebook.com",
             "instagram.com", "tiktok.com", "twitch.tv", "netflix.com",
         ])
-        self._active = False
         self._timer: Optional[threading.Timer] = None
+        # Derive state from the hosts file, not just memory — if a previous run
+        # crashed with focus on, the markers persist and we must still see it as
+        # active so the user can turn it off after a restart (issue #8 / #40).
+        self._active = self._markers_present()
+        if self._active:
+            logger.info("Focus mode markers found in hosts file from a previous session — still active.")
+
+    def _markers_present(self) -> bool:
+        try:
+            return HOSTS_MARKER_START in self._hosts_path.read_text(encoding="utf-8")
+        except Exception:
+            return False
 
     def enable(self, duration_minutes: Optional[int] = None) -> Dict[str, Any]:
         if self._active:
@@ -47,7 +58,9 @@ class FocusMode:
         return {"success": True, "message": f"Focus mode enabled. {len(self._default_sites)} sites blocked. Say 'disable focus mode' to stop."}
 
     def disable(self) -> Dict[str, Any]:
-        if not self._active:
+        # Disable if memory OR the hosts file says focus is on — covers the
+        # post-crash case where markers persist but _active was reset.
+        if not self._active and not self._markers_present():
             return {"success": False, "message": "Focus mode is not active."}
 
         if self._timer:

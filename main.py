@@ -118,6 +118,15 @@ def _free_port(port: int) -> None:
         pass  # psutil unavailable or permission denied — uvicorn will surface the real error
 
 
+def _verify_ollama(ollama_url: str, timeout: float = 2.0) -> bool:
+    """Quick reachability probe for a local Ollama server."""
+    try:
+        import requests
+        return requests.get(f"{ollama_url}/api/tags", timeout=timeout).status_code == 200
+    except Exception:
+        return False
+
+
 class LokiApplication:
     """Main application coordinator — FastAPI + uvicorn, no Qt."""
 
@@ -156,6 +165,16 @@ class LokiApplication:
         else:
             ollama_port = 11434
         ollama_url = f"http://localhost:{ollama_port}"
+        # Fail-soft startup probe: if prefer_local is on but Ollama isn't up, say so
+        # clearly once at startup rather than silently falling back to slower cloud LLMs.
+        if self.config.get("llm", {}).get("prefer_local"):
+            if _verify_ollama(ollama_url):
+                logger.info(f"Ollama reachable at {ollama_url} — local LLM ready")
+            else:
+                logger.warning(
+                    f"Ollama NOT reachable at {ollama_url} — prefer_local is on but Loki "
+                    f"will use cloud LLMs (slower). Start it with 'ollama serve'."
+                )
         self.rag_engine = RagEngine(memory_dir, ollama_url=ollama_url)
 
         self.brain = LokiBrain(

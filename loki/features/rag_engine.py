@@ -46,6 +46,9 @@ class RagEngine:
         self._dir = Path(memory_dir)
         self._dir.mkdir(parents=True, exist_ok=True)
         self._ollama_url = ollama_url.rstrip("/")
+        # Reuse one connection (keep-alive) across embedding calls — avoids a fresh
+        # TCP+HTTP handshake per request when indexing many chunks.
+        self._session = requests.Session()
 
         self._chroma_ok = False
         self._embed_ok = False
@@ -76,7 +79,7 @@ class RagEngine:
 
     def _check_embed(self) -> None:
         try:
-            resp = requests.get(f"{self._ollama_url}/api/tags", timeout=3)
+            resp = self._session.get(f"{self._ollama_url}/api/tags", timeout=3)
             if resp.status_code == 200:
                 models = [m["name"] for m in resp.json().get("models", [])]
                 if any("nomic-embed-text" in m for m in models):
@@ -103,7 +106,7 @@ class RagEngine:
         last_err: Optional[Exception] = None
         for attempt in range(1, self._EMBED_RETRIES + 1):
             try:
-                resp = requests.post(
+                resp = self._session.post(
                     f"{self._ollama_url}/api/embed",
                     json={"model": "nomic-embed-text", "input": texts},
                     timeout=90,

@@ -3,12 +3,29 @@ Task manager — add, list, complete, delete tasks with priority scoring.
 """
 
 import logging
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 from loki.core.memory import MemoryManager
 
 logger = logging.getLogger(__name__)
 
 PRIORITY_WEIGHTS = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+_MAX_FUTURE_DAYS = 36500  # ~100 years — anything beyond this is almost certainly a typo
+
+
+def _validate_due(due: str) -> Optional[str]:
+    """Return an error message if `due` is unparseable / past / absurd, else None."""
+    try:
+        due_dt = datetime.fromisoformat(due)
+    except ValueError:
+        return f"I couldn't read the due date '{due}' — use a format like 2026-06-01 or 2026-06-01T15:00."
+    now = datetime.now()
+    # tolerate same-day past times (e.g. "today"); reject clearly-past dates
+    if due_dt.date() < now.date():
+        return "That due date is in the past."
+    if due_dt > now + timedelta(days=_MAX_FUTURE_DAYS):
+        return "That due date is unreasonably far in the future."
+    return None
 
 
 class TaskManager:
@@ -22,6 +39,12 @@ class TaskManager:
             return {"success": False, "message": "Task title required."}
 
         priority = priority.lower() if priority.lower() in PRIORITY_WEIGHTS else "medium"
+
+        if due:
+            err = _validate_due(due)
+            if err:
+                return {"success": False, "message": err}
+
         task = self._memory.add_task(title, priority, due)
 
         msg = f"Task #{task['id']} added: '{title}' [{priority}]"

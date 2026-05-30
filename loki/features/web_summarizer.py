@@ -12,6 +12,8 @@ import socket
 from typing import Dict, Any, Optional, TYPE_CHECKING
 from urllib.parse import urlparse
 
+from loki.core.prompt_utils import wrap_untrusted, UNTRUSTED_PREAMBLE
+
 if TYPE_CHECKING:
     from loki.core.brain import LokiBrain
 
@@ -150,9 +152,10 @@ class WebSummarizer:
 
         if self._brain:
             prompt = (
+                f"{UNTRUSTED_PREAMBLE}\n\n"
                 f"Summarize the following web page content in 3-5 concise bullet points. "
                 f"Be direct and extract only the most important information.\n\n"
-                f"URL: {url}\n\nContent:\n{text}"
+                f"URL: {url}\n\n{wrap_untrusted(text, 'webpage')}"
             )
             try:
                 summary = "".join(self._brain.ask(prompt))

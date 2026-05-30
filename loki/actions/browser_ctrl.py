@@ -4,11 +4,30 @@ Browser control — open URLs and search queries safely.
 
 import re
 import logging
+import threading
 import webbrowser
 from typing import Dict, Any
 from urllib.parse import quote_plus, urlparse
 
 logger = logging.getLogger(__name__)
+
+
+def _open_with_timeout(url: str, timeout: float = 4.0) -> bool:
+    """Open a URL but don't hang forever if the default browser misbehaves.
+    Returns True if the open call returned in time."""
+    done = {"ok": False}
+
+    def _run():
+        try:
+            webbrowser.open(url)
+            done["ok"] = True
+        except Exception as e:
+            logger.error(f"webbrowser.open failed: {e}")
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    t.join(timeout)
+    return done["ok"]
 
 SEARCH_ENGINES = {
     "google": "https://www.google.com/search?q=",
@@ -39,12 +58,10 @@ class BrowserCtrl:
             logger.warning(f"Blocked URL scheme: {parsed.scheme}")
             return {"success": False, "message": "That URL scheme is not permitted."}
 
-        try:
-            webbrowser.open(url)
+        if _open_with_timeout(url):
             logger.info(f"Opened URL: {url[:80]}")
             return {"success": True, "message": f"Opening {url[:50]}..."}
-        except Exception as e:
-            return {"success": False, "message": f"Failed to open URL: {e}"}
+        return {"success": False, "message": "The browser didn't respond in time."}
 
     def search(self, query: str, engine: str = "google") -> Dict[str, Any]:
         if not query or not query.strip():
@@ -54,8 +71,6 @@ class BrowserCtrl:
         encoded = quote_plus(query.strip())
         url = base_url + encoded
 
-        try:
-            webbrowser.open(url)
+        if _open_with_timeout(url):
             return {"success": True, "message": f"Searching {engine} for '{query[:40]}'."}
-        except Exception as e:
-            return {"success": False, "message": f"Search failed: {e}"}
+        return {"success": False, "message": "The browser didn't respond in time."}
