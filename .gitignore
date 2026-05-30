@@ -76,3 +76,8 @@ loki-ui/public/videos/
 
 # uv GPU virtual env (local)
 .venv-gpu/
+
+# Google OAuth secrets — NEVER commit (per-user credentials + cached token)
+loki/credentials/
+google_credentials.json
+google_token.json

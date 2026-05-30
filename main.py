@@ -89,6 +89,7 @@ from loki.features.dynamic_ui import DynamicUI
 from loki.features.file_watcher import FileWatcher
 from loki.features.clipboard_sync import ClipboardSync
 from loki.features.proactive_monitor import ProactiveMonitor
+from loki.features.google_integration import GoogleIntegration
 from loki.features.auto_agent import AutoAgent
 
 from loki.ui.server import create_loki_server
@@ -243,6 +244,7 @@ class LokiApplication:
             on_alert=self._on_proactive_alert,
             is_busy=lambda: self.conversation.is_active,
         )
+        self.google = GoogleIntegration(memory_dir)
 
         self.router = ActionRouter(self.undo_stack)
         self.router.register_action("file_ops", self.file_ops)
@@ -288,6 +290,7 @@ class LokiApplication:
         self.router.register_feature("meeting_transcriber", self.meeting_transcriber)
         self.router.register_feature("footprint_auditor", self.footprint_auditor)
         self.router.register_feature("browser_history", self.browser_history)
+        self.router.register_feature("google", self.google)
         # Remaining / enhancement features
         self.router.register_feature("screenshot_search", self.screenshot_search)
         self.router.register_feature("calendar_manager", self.calendar_manager)

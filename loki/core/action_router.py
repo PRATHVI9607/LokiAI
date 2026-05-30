@@ -243,6 +243,10 @@ class ActionRouter:
             "computer_click_text": self._handle_computer_click_text,
             "computer_action":     self._handle_computer_action,
             # (screen_read is defined once in the Screen & Visual section above)
+            # Google (Gmail + Calendar)
+            "calendar_today":  self._handle_calendar_today,
+            "calendar_next":   self._handle_calendar_next,
+            "email_unread":    self._handle_email_unread,
             # Meta
             "undo": self._handle_undo,
             "chat": lambda p: {"success": True, "message": intent.get("message", "")},
@@ -730,6 +734,19 @@ class ActionRouter:
     def _handle_screen_ask(self, p):
         f = self._features.get("screenshot_search")
         return f.ask_screen(p.get("question", "")) if f else self._missing("screenshot_search")
+
+    # --- Google (Gmail + Calendar) ---
+    def _handle_calendar_today(self, p):
+        g = self._features.get("google")
+        return g.upcoming_events(int(p.get("days", 1))) if g else self._missing("google")
+
+    def _handle_calendar_next(self, p):
+        g = self._features.get("google")
+        return g.next_meeting() if g else self._missing("google")
+
+    def _handle_email_unread(self, p):
+        g = self._features.get("google")
+        return g.unread_summary(int(p.get("count", 5))) if g else self._missing("google")
 
     def _handle_screen_translate(self, p):
         f = self._features.get("screenshot_search")

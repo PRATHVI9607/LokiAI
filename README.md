@@ -86,6 +86,7 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 | **Backup Manager** | Timestamped file and directory backups; auto-trigger on file change via File Watcher |
 | **Digital Declutter** | Find duplicate files (MD5), large files, and files not touched in N days |
 | **Meeting Transcriber** | Whisper-based transcription + structured minutes generation |
+| **Google (Gmail + Calendar)** | *"What's on my calendar today?"*, *"any new email?"*, *"when's my next meeting?"* — live read of your real Google account (one-time OAuth, see below) |
 
 ### Media & Files
 
@@ -157,6 +158,21 @@ For file search/RAG also `ollama pull nomic-embed-text`.
 
 `config.yaml` lets you tune the model chain, `prefer_local`, `ollama_fallback_model`,
 `ollama_timeout`, and `whisper.device` (auto/cuda/cpu).
+
+### Google (Gmail + Calendar) — one-time OAuth
+
+Loki reads your **real** calendar and inbox once you connect your Google account. This
+is optional — without it, calendar/email commands just reply with these setup steps and
+nothing else breaks. To activate:
+
+1. Open [console.cloud.google.com](https://console.cloud.google.com) → create a project.
+2. **APIs & Services → Enable APIs** → enable **Gmail API** and **Google Calendar API**.
+3. **Credentials → Create Credentials → OAuth client ID → Desktop app**. Download the JSON.
+4. Save it as `loki/credentials/google_credentials.json`.
+5. Ask Loki *"what's on my calendar today?"* — a browser opens once for consent; the token
+   is cached at `loki/credentials/google_token.json` so you only authorize once.
+
+Both files are gitignored (read-only `calendar.readonly` + `gmail.readonly` scopes).
 
 Edit `loki/config.yaml` to customise:
 

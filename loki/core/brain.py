@@ -207,6 +207,11 @@ INTENTS (calendar):
 - calendar_suggest_slot: params={event_title, duration_minutes?, ics_path?}
 - calendar_import: params={ics_path}
 
+INTENTS (Google — live Gmail + Calendar of the user's real account):
+- calendar_today: params={days?}  ("what's on my calendar", "my schedule today", "what do I have on")
+- calendar_next: params={}        ("what's my next meeting", "when's my next event")
+- email_unread: params={count?}   ("any new email", "unread mail", "check my inbox")
+
 INTENTS (expenses):
 - expense_extract: params={text}
 - expense_from_file: params={file_path}
@@ -782,6 +787,14 @@ class LokiBrain:
         # processes
         if re.search(r"\b(?:list|show|what).*(?:process|running app|task)", t):
             return json.dumps({"intent": "process_list", "params": {}, "message": "Listing processes."})
+
+        # ── GOOGLE — calendar + gmail ───────────────────────────────────────
+        if re.search(r"\b(?:my )?(?:calendar|schedule|agenda)\b|what.?s on (?:today|my day)|what do i have (?:today|on)", t):
+            return json.dumps({"intent": "calendar_today", "params": {"days": 1}, "message": "Checking your calendar."})
+        if re.search(r"\bnext (?:meeting|event|appointment)\b|when.?s my next", t):
+            return json.dumps({"intent": "calendar_next", "params": {}, "message": "Checking."})
+        if re.search(r"\b(?:any )?(?:new |unread )?(?:e?mail|inbox|messages)\b", t) and "search" not in t:
+            return json.dumps({"intent": "email_unread", "params": {}, "message": "Checking your inbox."})
 
         # ── VISION — look at the screen and answer ─────────────────────────
         # "what's on my screen", "what's this error", "look at my screen", "what am I looking at"

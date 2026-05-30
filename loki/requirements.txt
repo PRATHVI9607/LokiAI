@@ -47,6 +47,11 @@ cryptography>=41.0.0
 # File watching
 watchdog>=3.0.0
 
+# Google integration (Gmail + Calendar) — optional, activates when you add OAuth creds
+google-api-python-client>=2.100.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
 # ML (Whisper dependency)
 numpy>=1.24.0
 torch>=2.1.0
