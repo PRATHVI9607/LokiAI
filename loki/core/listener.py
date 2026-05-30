@@ -81,10 +81,8 @@ class SpeechListener:
 
         # Worker queue: callback puts completed frame-lists here; worker runs Whisper
         self._work_queue: queue.Queue = queue.Queue(maxsize=8)
-        self._worker: threading.Thread = threading.Thread(
-            target=self._transcribe_worker, daemon=True, name="loki-stt-worker"
-        )
-        self._worker.start()
+        self._worker: Optional[threading.Thread] = None
+        self._ensure_worker()
 
         self.on_transcript: Optional[Callable[[str], None]] = None
         self.on_listening_started: Optional[Callable] = None
@@ -106,9 +104,22 @@ class SpeechListener:
     def is_listening(self) -> bool:
         return self._listening
 
+    def _ensure_worker(self) -> None:
+        """Start the transcription worker if it isn't running. Called at init and
+        before each listen session so a worker that died unexpectedly is revived
+        instead of leaving the mic silently deaf."""
+        if self._worker is None or not self._worker.is_alive():
+            if self._worker is not None:
+                logger.warning("STT worker not alive — restarting it.")
+            self._worker = threading.Thread(
+                target=self._transcribe_worker, daemon=True, name="loki-stt-worker"
+            )
+            self._worker.start()
+
     def start_listening(self) -> None:
         if self._listening:
             return
+        self._ensure_worker()  # revive the worker if a prior crash killed it
         self._listening = True
         self._thread = threading.Thread(target=self._listen_loop, daemon=True)
         self._thread.start()
@@ -223,23 +234,30 @@ class SpeechListener:
     def _transcribe_worker(self) -> None:
         """Drain the work queue and run Whisper on each frame list.
         Completely separate from the audio capture thread — no callback blocking.
-        Stale frames queued before stop_listening() are silently dropped."""
-        while True:
-            try:
-                frames = self._work_queue.get(timeout=1.0)
-            except queue.Empty:
-                continue
-            try:
-                # Drop if we stopped listening before this frame was picked up —
-                # prevents stale audio firing on_transcript after conversation ends
-                if self._listening:
-                    self._transcribe(frames)
-                else:
-                    logger.debug("Dropped stale audio frame (not listening)")
-            except Exception as e:
-                logger.error(f"Transcription worker error: {e}", exc_info=True)
-            finally:
-                self._work_queue.task_done()
+        Stale frames queued before stop_listening() are silently dropped.
+
+        The inner try/except keeps per-clip errors from killing the loop; the
+        outer try/except guarantees that if the thread ever does die, it's logged
+        loudly so _ensure_worker() can revive it on the next session."""
+        try:
+            while True:
+                try:
+                    frames = self._work_queue.get(timeout=1.0)
+                except queue.Empty:
+                    continue
+                try:
+                    # Drop if we stopped listening before this frame was picked up —
+                    # prevents stale audio firing on_transcript after conversation ends
+                    if self._listening:
+                        self._transcribe(frames)
+                    else:
+                        logger.debug("Dropped stale audio frame (not listening)")
+                except Exception as e:
+                    logger.error(f"Transcription worker error: {e}", exc_info=True)
+                finally:
+                    self._work_queue.task_done()
+        except Exception as e:
+            logger.critical(f"STT worker thread crashed and will be restarted: {e}", exc_info=True)
 
     def _transcribe(self, frames: list[bytes]) -> None:
         if not frames or not self._model:

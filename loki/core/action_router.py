@@ -477,7 +477,8 @@ class ActionRouter:
 
     def _handle_task_add(self, p):
         feat = self._features.get("task_manager")
-        return feat.add(p.get("title", ""), p.get("priority", "medium"), p.get("due")) if feat else self._missing("task_manager")
+        return feat.add(p.get("title", ""), p.get("priority", "medium"), p.get("due"),
+                        p.get("recurrence")) if feat else self._missing("task_manager")
 
     def _handle_task_list(self, p):
         feat = self._features.get("task_manager")

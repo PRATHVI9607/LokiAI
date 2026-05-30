@@ -34,22 +34,28 @@ class TaskManager:
     def __init__(self, memory: MemoryManager):
         self._memory = memory
 
-    def add(self, title: str, priority: str = "medium", due: Optional[str] = None) -> Dict[str, Any]:
+    def add(self, title: str, priority: str = "medium", due: Optional[str] = None,
+            recurrence: Optional[str] = None) -> Dict[str, Any]:
         if not title:
             return {"success": False, "message": "Task title required."}
 
         priority = priority.lower() if priority.lower() in PRIORITY_WEIGHTS else "medium"
+
+        if recurrence is not None and recurrence not in ("daily", "weekly", "monthly"):
+            return {"success": False, "message": "Recurrence must be daily, weekly, or monthly."}
 
         if due:
             err = _validate_due(due)
             if err:
                 return {"success": False, "message": err}
 
-        task = self._memory.add_task(title, priority, due)
+        task = self._memory.add_task(title, priority, due, recurrence)
 
         msg = f"Task #{task['id']} added: '{title}' [{priority}]"
         if due:
             msg += f" — due {due}"
+        if recurrence:
+            msg += f" (repeats {recurrence})"
         return {"success": True, "message": msg, "data": task}
 
     def list_tasks(self, filter_type: Optional[str] = None) -> Dict[str, Any]:

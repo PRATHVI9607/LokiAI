@@ -60,12 +60,14 @@ class MemoryManager:
         self._save_json(self._profile_file, self._profile)
 
     # Tasks
-    def add_task(self, title: str, priority: str = "medium", due: Optional[str] = None) -> Dict:
+    def add_task(self, title: str, priority: str = "medium", due: Optional[str] = None,
+                 recurrence: Optional[str] = None) -> Dict:
         task = {
             "id": self._next_task_id(),
             "title": title,
             "priority": priority,
             "due": due,
+            "recurrence": recurrence,   # None | "daily" | "weekly" | "monthly"
             "completed": False,
             "created": datetime.now().isoformat(),
         }
@@ -78,11 +80,35 @@ class MemoryManager:
             return self._tasks
         return [t for t in self._tasks if not t["completed"]]
 
+    @staticmethod
+    def _next_due(due: Optional[str], recurrence: str) -> Optional[str]:
+        """Advance a due date by one recurrence period. Returns ISO date/datetime."""
+        from datetime import timedelta
+        base = None
+        if due:
+            try:
+                base = datetime.fromisoformat(due)
+            except ValueError:
+                base = None
+        base = base or datetime.now()
+        if recurrence == "daily":
+            base = base + timedelta(days=1)
+        elif recurrence == "weekly":
+            base = base + timedelta(weeks=1)
+        elif recurrence == "monthly":
+            base = base + timedelta(days=30)
+        return base.isoformat(timespec="seconds")
+
     def complete_task(self, task_id: int) -> bool:
         for task in self._tasks:
             if task["id"] == task_id:
                 task["completed"] = True
                 task["completed_at"] = datetime.now().isoformat()
+                # Recurring task → spawn the next occurrence automatically.
+                rec = task.get("recurrence")
+                if rec in ("daily", "weekly", "monthly"):
+                    self.add_task(task["title"], task.get("priority", "medium"),
+                                  self._next_due(task.get("due"), rec), recurrence=rec)
                 self._save_json(self._tasks_file, self._tasks)
                 return True
         return False

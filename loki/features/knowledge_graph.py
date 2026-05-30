@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 
 SUPPORTED_EXTS = {".txt", ".md", ".rst", ".py", ".js", ".ts", ".json", ".yaml", ".yml"}
 
+# Cap graph size so months of ingestion can't bloat memory / the JSON file.
+MAX_EDGES = 5000
+MAX_NODES = 3000
+
 
 class KnowledgeGraph:
     def __init__(self, brain: Optional["LokiBrain"] = None, graph_path: Optional[str] = None):
@@ -39,7 +43,24 @@ class KnowledgeGraph:
             except Exception:
                 pass
 
+    def _prune(self):
+        """Keep the graph bounded: trim oldest edges past MAX_EDGES, then drop
+        nodes no longer referenced by any edge if still over MAX_NODES."""
+        if len(self._edges) > MAX_EDGES:
+            self._edges = self._edges[-MAX_EDGES:]  # edges are appended chronologically
+        if len(self._nodes) > MAX_NODES:
+            referenced = set()
+            for e in self._edges:
+                referenced.add(e.get("from"))
+                referenced.add(e.get("to"))
+            # keep referenced nodes; if still too many, keep an arbitrary capped subset
+            kept = {k: v for k, v in self._nodes.items() if k in referenced}
+            if len(kept) > MAX_NODES:
+                kept = dict(list(kept.items())[-MAX_NODES:])
+            self._nodes = kept
+
     def _save(self):
+        self._prune()
         try:
             self._graph_path.write_text(
                 json.dumps({"nodes": self._nodes, "edges": self._edges}, indent=2, ensure_ascii=False),

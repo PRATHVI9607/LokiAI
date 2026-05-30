@@ -8,9 +8,28 @@ Noisy third-party loggers (httpx, comtypes, urllib3, openai, etc.) are
 suppressed to WARNING so the terminal only shows Loki's own activity.
 """
 
+import json
 import logging
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
+
+
+class JsonFormatter(logging.Formatter):
+    """One JSON object per log line — for aggregation/ingestion (issue #9).
+    Secrets in the message are masked via log_utils.redact()."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        from loki.core.log_utils import redact
+        payload = {
+            "ts": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": redact(record.getMessage()),
+        }
+        if record.exc_info:
+            payload["exc"] = self.formatException(record.exc_info)
+        return json.dumps(payload, ensure_ascii=False)
 
 # ── ANSI colors (auto-disabled if terminal doesn't support them) ──────────────
 class C:
@@ -137,11 +156,16 @@ def setup_logging(config: dict, log_path: Path) -> None:
     root.addHandler(term)
 
     # ── File handler: full detail, always DEBUG, no color ──
+    # Opt into structured JSON logs (logging.json: true) for log aggregation;
+    # otherwise the human-readable text format.
     fileh = logging.FileHandler(log_path, encoding="utf-8")
     fileh.setLevel(logging.DEBUG)
-    fileh.setFormatter(logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-    ))
+    if log_cfg.get("json", False):
+        fileh.setFormatter(JsonFormatter())
+    else:
+        fileh.setFormatter(logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        ))
     root.addHandler(fileh)
 
     # ── Silence noisy third-party loggers on the terminal ──

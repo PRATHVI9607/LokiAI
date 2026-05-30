@@ -95,6 +95,13 @@ class ConversationStateMachine:
     # ── Conversation lifecycle ───────────────────────────────────────────
 
     def start_conversation(self) -> None:
+        # Join any lingering worker from a previous turn before starting fresh —
+        # prevents two _process_worker threads from racing on brain memory.
+        prev = self._process_thread
+        if prev and prev.is_alive() and threading.current_thread() is not prev:
+            prev.join(timeout=5.0)
+            if prev.is_alive():
+                logger.warning("Previous process thread still running after join timeout.")
         with self._lock:
             if self._state != ConvState.IDLE:
                 # Already active — just re-arm the timeout if we're listening

@@ -109,7 +109,7 @@ INTENTS (intelligence):
 INTENTS (productivity):
 - focus_mode_enable: params={duration_minutes?}
 - focus_mode_disable: params={}
-- task_add: params={title, priority?, due?}
+- task_add: params={title, priority?, due?, recurrence?}  recurrence = daily|weekly|monthly for repeating tasks
 - task_list: params={filter?}
 - task_complete: params={id}
 - task_delete: params={id}
@@ -455,6 +455,9 @@ class LokiBrain:
                                                # (for the outcome logger / future bandit)
         self._bandit = None                    # ProviderBandit, injected by main.py —
                                                # reorders cloud providers by learned reward
+        self._llm_lock = threading.Lock()      # serialize provider calls — the OpenAI
+                                               # clients aren't guaranteed thread-safe and
+                                               # features can call ask() concurrently
 
         self._load_history()
         self._log_provider_status()
@@ -697,6 +700,12 @@ class LokiBrain:
         return ""
 
     def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
+        # Serialize all provider calls — cheap insurance against concurrent feature
+        # calls racing a non-thread-safe HTTP client. Single-user, so serial is fine.
+        with self._llm_lock:
+            return self._call_llm_locked(messages, max_tokens)
+
+    def _call_llm_locked(self, messages: List[Dict], max_tokens: int = None) -> str:
         mt = max_tokens or self._max_tokens
         calls = {
             "ollama": self._try_ollama,

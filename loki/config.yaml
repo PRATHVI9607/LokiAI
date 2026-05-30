@@ -151,3 +151,5 @@ logging:
                        # WARNING = quiet (errors only)
   color: true          # color-coded terminal output (auto-off if not a TTY)
   file: loki.log       # full DEBUG detail always written here regardless of level
+  json: false          # true = write the file log as one JSON object per line
+                       # (for log aggregation); secrets are auto-redacted
