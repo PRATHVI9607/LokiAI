@@ -88,6 +88,7 @@ from loki.features.expense_tracker import ExpenseTracker
 from loki.features.dynamic_ui import DynamicUI
 from loki.features.file_watcher import FileWatcher
 from loki.features.clipboard_sync import ClipboardSync
+from loki.features.proactive_monitor import ProactiveMonitor
 from loki.features.auto_agent import AutoAgent
 
 from loki.ui.server import create_loki_server
@@ -237,6 +238,11 @@ class LokiApplication:
         )
         self.clipboard_sync = ClipboardSync()
         self.auto_agent = AutoAgent(brain=self.brain)
+        self.proactive = ProactiveMonitor(
+            self.config,
+            on_alert=self._on_proactive_alert,
+            is_busy=lambda: self.conversation.is_active,
+        )
 
         self.router = ActionRouter(self.undo_stack)
         self.router.register_action("file_ops", self.file_ops)
@@ -350,6 +356,12 @@ class LokiApplication:
         success = self.undo_stack.pop_and_undo()
         self.server.add_loki_message("Done. Reversed." if success else "Undo failed. Some things are permanent.")
 
+    def _on_proactive_alert(self, text: str, speak: bool) -> None:
+        """Loki noticed something and is speaking up unprompted."""
+        self.server.add_loki_message(text)
+        if speak and self.tts.is_idle:
+            self.tts.speak(text)
+
     # ── Lifecycle ───────────────────────────────────────────────────────
 
     def shutdown(self) -> None:
@@ -358,6 +370,7 @@ class LokiApplication:
         self.tts.stop()
         self.clipboard.stop_monitoring()
         self.file_watcher.stop_all()
+        self.proactive.stop()
         if self.clipboard_sync.is_running():
             self.clipboard_sync.stop()
         if self.auto_agent.is_running():
@@ -372,6 +385,8 @@ class LokiApplication:
 
         # Activate voice pipeline (wakeword starts)
         self.voice.activate()
+        # Start the proactive watcher (unprompted system/time observations)
+        self.proactive.start()
 
         name = self.memory.get_user_name()
         logger.info(f"Loki online. Welcome back, {name}.")

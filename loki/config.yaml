@@ -87,6 +87,15 @@ actions:
 undo:
   max_depth: 25
 
+# Proactive intelligence — Loki speaks up unprompted (the "alive" engine)
+proactive:
+  enabled: true
+  check_interval: 20          # seconds between background checks
+  cpu_threshold: 90           # % sustained CPU before alerting
+  ram_threshold: 90           # % sustained RAM
+  sustain_seconds: 180        # how long a condition must hold before Loki mentions it
+  work_session_minutes: 90    # nudge a break after this long unbroken
+
 features:
   file_search:
     max_results: 20
