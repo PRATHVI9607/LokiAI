@@ -69,3 +69,7 @@ graphify-out/cache/
 # Distribution
 *.whl
 *.tar.gz
+
+# Large video assets (kept local; not committed)
+loki-ui/videos/
+loki-ui/public/videos/
