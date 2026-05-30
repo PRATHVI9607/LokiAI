@@ -28,6 +28,7 @@ from loki.core.action_router import ActionRouter
 from loki.core.undo_stack import UndoStack
 from loki.core.memory import MemoryManager
 from loki.core.audit import AuditLog
+from loki.core.outcome_log import OutcomeLog
 from loki.core.voice_pipeline import VoicePipeline
 from loki.core.conversation_sm import ConversationStateMachine
 from loki.core.log_setup import setup_logging, banner as log_banner, flow as log_flow
@@ -141,6 +142,7 @@ class LokiApplication:
         # KORTEX-inspired components
         self.brain_memory = BrainMemory(memory_dir)
         self.audit_log = AuditLog(memory_dir)
+        self.outcome_log = OutcomeLog(memory_dir)  # passive training-data capture (RL step #1)
         llm_port = self.config.get("llm", {}).get("ollama_port")
         wakeword_port = self.config.get("wakeword", {}).get("ollama_port")
         if llm_port is not None:
@@ -305,7 +307,8 @@ class LokiApplication:
 
         # Conversation state machine (replaces ConversationManager)
         self.conversation = ConversationStateMachine(
-            self.config, self.server, self.tts, self.brain, self.router, self.audit_log
+            self.config, self.server, self.tts, self.brain, self.router,
+            self.audit_log, self.outcome_log,
         )
 
         # Voice pipeline — exclusive mic management (wakeword ↔ listener)

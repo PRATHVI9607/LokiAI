@@ -44,6 +44,7 @@ loki/memory/rag_index.json
 loki/memory/uploads/
 loki/memory/chroma/
 loki/memory/audit.jsonl
+loki/memory/outcomes.jsonl
 loki/memory/tasks.json
 
 # Next.js build output

@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from loki.core.tts import LokiTTS
     from loki.core.action_router import ActionRouter
     from loki.core.audit import AuditLog
+    from loki.core.outcome_log import OutcomeLog
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ class ConversationStateMachine:
         brain: "LokiBrain",
         router: "ActionRouter",
         audit_log: Optional["AuditLog"] = None,
+        outcome_log: Optional["OutcomeLog"] = None,
     ):
         self._cfg = config
         self._server = server
@@ -67,6 +69,8 @@ class ConversationStateMachine:
         self._brain = brain
         self._router = router
         self._audit = audit_log
+        self._outcomes = outcome_log
+        self._last_outcome_id: Optional[str] = None  # for feedback attachment
 
         self._state = ConvState.IDLE
         self._lock = threading.Lock()
@@ -189,6 +193,8 @@ class ConversationStateMachine:
     # ── Worker thread (LLM + action) ─────────────────────────────────────
 
     def _process_worker(self, text: str) -> None:
+        import time as _time
+        _start = _time.time()
         try:
             response = ""
             for chunk in self._brain.ask(text):
@@ -197,15 +203,46 @@ class ConversationStateMachine:
             if not response.strip():
                 response = "Hmm. That query produced nothing of substance. Try again."
 
+            # Snapshot signals for the outcome logger (latency, which provider answered,
+            # whether the deterministic fast-path or the LLM produced this).
+            provider = getattr(self._brain, "last_provider", "unknown")
+            self._pending_outcome = {
+                "transcript": text,
+                "latency_ms": int((_time.time() - _start) * 1000),
+                "provider": provider,
+                "source": "fast_path" if provider == "fast_path" else "llm",
+            }
+
             intent = self._brain.parse_intent(response)
             if intent and intent.get("intent") and intent["intent"] != "chat":
                 self._handle_intent(intent)
             else:
+                self._record_outcome(intent="chat", params={}, success=True, response=response)
                 self._emit_response(response)
 
         except Exception as e:
             logger.error("Process worker error: %s", e, exc_info=True)
+            self._record_outcome(intent="error", params={}, success=False, response=str(e)[:200])
             self._emit_response("Something went awry. Even gods have bad days.")
+
+    def _record_outcome(self, intent: str, params: dict, success: bool, response: str = "") -> None:
+        """Passive training-data capture — never alters behaviour. Safe no-op if unset."""
+        if not self._outcomes:
+            return
+        p = getattr(self, "_pending_outcome", None) or {}
+        try:
+            self._last_outcome_id = self._outcomes.log(
+                transcript=p.get("transcript", ""),
+                intent=intent,
+                params=params,
+                success=success,
+                latency_ms=p.get("latency_ms", 0),
+                provider=p.get("provider", "unknown"),
+                source=p.get("source", "llm"),
+                response=response,
+            )
+        except Exception as e:
+            logger.debug("outcome log skipped: %s", e)
 
     def _handle_intent(self, intent: Dict) -> None:
         intent_name = intent.get("intent", "")
@@ -225,6 +262,14 @@ class ConversationStateMachine:
                 success=result.get("success", False),
                 result_summary=result_msg,
             )
+
+        # Passive training-data capture (RL step #1) — every intent outcome.
+        self._record_outcome(
+            intent=intent_name,
+            params=intent.get("params", {}),
+            success=result.get("success", False),
+            response=result_msg,
+        )
 
         # Pending confirmation — speak the confirm prompt, wait for the user
         if result.get("pending"):

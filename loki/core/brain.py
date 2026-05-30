@@ -436,6 +436,8 @@ class LokiBrain:
         self._exchange_count = 0
         self._history_lock = threading.Lock()  # guards _conversation_history mutations
         self._maint_running = False            # prevents overlapping maintenance runs
+        self.last_provider = "none"            # which provider answered the last query
+                                               # (for the outcome logger / future bandit)
 
         self._load_history()
         self._log_provider_status()
@@ -599,6 +601,7 @@ class LokiBrain:
         if self._prefer_local:
             local = self._call_ollama(messages, mt)
             if local:
+                self.last_provider = "ollama"
                 return local
             # local failed/empty — fall through to cloud providers
 
@@ -631,6 +634,7 @@ class LokiBrain:
                 if text:
                     mode = "thinking" if self._nvidia_thinking else "fast"
                     logger.debug(f"Response from NVIDIA NIM ({mode})")
+                    self.last_provider = "nvidia"
                     return text
             except Exception as e:
                 logger.warning(f"NVIDIA NIM: {e}")
@@ -649,6 +653,7 @@ class LokiBrain:
                     text = resp.choices[0].message.content or ""
                     if text.strip():
                         logger.debug(f"Response from OpenRouter ({model})")
+                        self.last_provider = f"openrouter:{model}"
                         return text
                 except Exception as e:
                     logger.warning(f"OpenRouter {model}: {e}")
@@ -665,6 +670,7 @@ class LokiBrain:
                 text = resp.choices[0].message.content or ""
                 if text.strip():
                     logger.debug("Response from Kimi Moonshot")
+                    self.last_provider = "kimi"
                     return text
             except Exception as e:
                 logger.warning(f"Kimi Moonshot: {e}")
@@ -673,8 +679,10 @@ class LokiBrain:
         if not self._prefer_local:
             local = self._call_ollama(messages, mt)
             if local:
+                self.last_provider = "ollama"
                 return local
 
+        self.last_provider = "none"
         return ""
 
     # ─── Public ask interface ─────────────────────────────────────────────────
@@ -871,6 +879,7 @@ class LokiBrain:
         fast = self._fast_intent(user_message)
         if fast:
             logger.debug("Fast-path intent matched (bypassed LLM)")
+            self.last_provider = "fast_path"
             yield fast
             self._store_turn(user_message, fast)
             return
