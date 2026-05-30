@@ -39,8 +39,30 @@ logger = logging.getLogger(__name__)
 
 INTENT_CATALOG = """
 
-CAPABILITIES — respond with JSON for any PC action:
-{"intent": "<intent>", "params": {}, "message": "brief acknowledgment"}
+# ACTION MODE — CRITICAL
+You are NOT a chatbot that explains how to do things. You CONTROL this Windows PC directly.
+When the user asks you to DO anything on the computer (open/close apps, set volume/brightness,
+manage files, run a search, check the system, etc.), you MUST reply with ONLY a single JSON
+object — no prose before or after, no markdown fence, no explanation:
+
+{"intent": "<intent_name>", "params": {...}, "message": "<short in-character acknowledgment>"}
+
+NEVER explain how the user could do it themselves. NEVER say "you can open it by..." or "I can't".
+If an intent below matches, EMIT THE JSON. You can actually perform it.
+
+EXAMPLES (follow this exactly):
+User: open calculator          → {"intent": "app_open", "params": {"name": "calculator"}, "message": "Opening calculator."}
+User: open chrome              → {"intent": "app_open", "params": {"name": "chrome"}, "message": "Launching Chrome."}
+User: close notepad            → {"intent": "app_close", "params": {"name": "notepad"}, "message": "Closing notepad."}
+User: what is my volume        → {"intent": "volume_get", "params": {}, "message": "Checking volume."}
+User: set volume to 30         → {"intent": "volume_set", "params": {"percent": 30}, "message": "Volume to 30%."}
+User: dim the screen to 40     → {"intent": "brightness_set", "params": {"percent": 40}, "message": "Brightness to 40%."}
+User: how's my system / cpu    → {"intent": "system_monitor", "params": {}, "message": "Reading system stats."}
+User: list running processes   → {"intent": "process_list", "params": {}, "message": "Listing processes."}
+User: search the web for x     → {"intent": "browser_search", "params": {"query": "x"}, "message": "Searching."}
+User: open youtube.com         → {"intent": "browser_open", "params": {"url": "youtube.com"}, "message": "Opening it."}
+
+Only for genuine conversation (greetings, questions, banter) do you reply as plain text in character.
 
 INTENTS (file operations):
 - file_create: params={path, content?}
@@ -629,12 +651,75 @@ class LokiBrain:
 
     # ─── Public ask interface ─────────────────────────────────────────────────
 
+    @staticmethod
+    def _fast_intent(text: str) -> Optional[str]:
+        """Deterministic fast-path for common device commands — bypasses the LLM
+        so PC control works 100% reliably even with a weak local model. Returns a
+        JSON intent string (which parse_intent then handles) or None to fall through."""
+        t = text.lower().strip().rstrip("?.!")
+        m = None
+
+        # open / launch app
+        m = re.search(r"\b(?:open|launch|start|run)\s+(?:the\s+|my\s+|app\s+)?(.+)", t)
+        if m and "website" not in t and "file" not in t:
+            app = m.group(1).strip()
+            # url → browser
+            if re.search(r"\.(com|org|net|io|ai|dev|co|gov|edu)\b", app) or app.startswith("http"):
+                return json.dumps({"intent": "browser_open", "params": {"url": app}, "message": "Opening it."})
+            return json.dumps({"intent": "app_open", "params": {"name": app}, "message": f"Opening {app}."})
+
+        # close / quit app
+        m = re.search(r"\b(?:close|quit|exit|kill|stop)\s+(?:the\s+|my\s+|app\s+)?(.+)", t)
+        if m and "process" not in t:
+            return json.dumps({"intent": "app_close", "params": {"name": m.group(1).strip()}, "message": "Closing it."})
+
+        # volume set
+        m = re.search(r"\b(?:set\s+)?volume\s+(?:to\s+)?(\d{1,3})", t) or re.search(r"\b(\d{1,3})\s*(?:percent\s+)?volume", t)
+        if m:
+            return json.dumps({"intent": "volume_set", "params": {"percent": int(m.group(1))}, "message": f"Volume to {m.group(1)}%."})
+        # volume get
+        if re.search(r"\b(?:what|check|current|how loud).*volume|^volume$|my volume", t):
+            return json.dumps({"intent": "volume_get", "params": {}, "message": "Checking volume."})
+        # mute
+        if re.search(r"\b(?:mute|silence)\b", t):
+            return json.dumps({"intent": "volume_set", "params": {"percent": 0}, "message": "Muting."})
+
+        # brightness set
+        m = re.search(r"\b(?:set\s+)?brightness\s+(?:to\s+)?(\d{1,3})", t) or re.search(r"\b(?:dim|brighten).*?(\d{1,3})", t)
+        if m:
+            return json.dumps({"intent": "brightness_set", "params": {"percent": int(m.group(1))}, "message": f"Brightness to {m.group(1)}%."})
+        if re.search(r"\b(?:what|check|current).*brightness|^brightness$|my brightness", t):
+            return json.dumps({"intent": "brightness_get", "params": {}, "message": "Checking brightness."})
+
+        # system stats
+        if re.search(r"\b(?:cpu|ram|memory|system stat|system health|how.*(?:pc|computer|system|machine).*(?:doing|running)|resource usage|disk space)\b", t):
+            return json.dumps({"intent": "system_monitor", "params": {}, "message": "Reading system stats."})
+
+        # processes
+        if re.search(r"\b(?:list|show|what).*(?:process|running app|task)", t):
+            return json.dumps({"intent": "process_list", "params": {}, "message": "Listing processes."})
+
+        # web search
+        m = re.search(r"\b(?:search|google|look up)\s+(?:the\s+web\s+for\s+|for\s+)?(.+)", t)
+        if m:
+            return json.dumps({"intent": "browser_search", "params": {"query": m.group(1).strip()}, "message": "Searching."})
+
+        return None
+
     def ask(self, user_message: str, is_wakeword: bool = False) -> Generator[str, None, None]:
         if is_wakeword:
             yield random.choice(WAKEWORD_RESPONSES)
             return
 
         logger.debug(f"User message: {user_message[:100]}")
+
+        # Deterministic fast-path for common PC commands — reliable regardless of model
+        fast = self._fast_intent(user_message)
+        if fast:
+            logger.debug("Fast-path intent matched (bypassed LLM)")
+            yield fast
+            self._store_turn(user_message, fast)
+            return
 
         # Gather all context layers in parallel (fast: KG is in-memory, RAG hits ChromaDB)
         kg_context = self._get_kg_context(user_message)
