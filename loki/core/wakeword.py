@@ -70,13 +70,8 @@ class WakewordDetector:
 
         if self._method == "whisper" and WHISPER_AVAILABLE:
             try:
-                device = "cpu"
-                try:
-                    import torch
-                    if torch.cuda.is_available():
-                        device = "cuda"
-                except Exception:
-                    pass
+                from loki.core.listener import _whisper_device
+                device = _whisper_device(self._config.get("device", "auto"))
                 self._model = whisper.load_model("tiny.en", device=device)
                 logger.info(f"Wakeword Whisper model loaded (tiny.en, {device})")
             except Exception as e:

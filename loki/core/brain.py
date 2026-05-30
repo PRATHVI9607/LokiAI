@@ -260,7 +260,7 @@ INTENTS (computer control — operate the machine like a person):
 - computer_click_text: params={target}  (find on-screen text and click it)
 - computer_action: params={action}  (minimize, maximize, show desktop, switch window,
   close window, lock, copy, paste, save, select all, new tab, close tab, screenshot)
-- screen_read: params={}  (OCR and read what's currently on screen)
+  (to read the screen, use screen_read from the Screen & Visual section)
 
 INTENTS (misc):
 - undo: params={}

@@ -241,7 +241,7 @@ class ActionRouter:
             "computer_press":      self._handle_computer_press,
             "computer_click_text": self._handle_computer_click_text,
             "computer_action":     self._handle_computer_action,
-            "screen_read":         self._handle_screen_read_cc,
+            # (screen_read is defined once in the Screen & Visual section above)
             # Meta
             "undo": self._handle_undo,
             "chat": lambda p: {"success": True, "message": intent.get("message", "")},
@@ -919,13 +919,6 @@ class ActionRouter:
     def _handle_computer_action(self, p):
         cc = self._actions.get("computer_control")
         return cc.hotkey_action(p.get("action", "")) if cc else self._missing("computer_control")
-
-    def _handle_screen_read_cc(self, p):
-        cc = self._actions.get("computer_control")
-        if cc:
-            return cc.read_screen()
-        feat = self._features.get("screenshot_search")
-        return feat.capture_and_read() if feat else self._missing("computer_control")
 
     # --- Meta ---
     def _handle_undo(self, p):

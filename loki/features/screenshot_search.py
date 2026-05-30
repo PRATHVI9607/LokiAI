@@ -101,6 +101,64 @@ def _ocr_tesseract(png_bytes: bytes) -> str:
         return ""
 
 
+def _word_boxes_winrt(png_bytes: bytes) -> list:
+    """Word bounding boxes via Windows WinRT OCR (built-in, no install needed).
+    Returns [{'t': text, 'x', 'y', 'w', 'h'}] in screen pixels."""
+    import json as _json
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
+            f.write(png_bytes)
+            tmp_path = f.name
+        ps = f"""
+Add-Type -AssemblyName System.Runtime.WindowsRuntime
+$null = [Windows.Media.Ocr.OcrEngine, Windows.Foundation, ContentType=WindowsRuntime]
+$null = [Windows.Storage.StorageFile, Windows.Foundation, ContentType=WindowsRuntime]
+function Await($t) {{ $n=[System.WindowsRuntimeSystemExtensions]::AsTask($t); $n.Wait()|Out-Null; $n.Result }}
+$engine=[Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages()
+$file=Await([Windows.Storage.StorageFile]::GetFileFromPathAsync('{tmp_path.replace(chr(92), "/")}'))
+$stream=Await($file.OpenReadAsync())
+$decoder=Await([Windows.Graphics.Imaging.BitmapDecoder]::CreateAsync($stream))
+$bitmap=Await($decoder.GetSoftwareBitmapAsync())
+$result=Await($engine.RecognizeAsync($bitmap))
+$words=@()
+foreach($line in $result.Lines){{ foreach($w in $line.Words){{
+  $r=$w.BoundingRect
+  $words+=[PSCustomObject]@{{t=$w.Text;x=[int]$r.X;y=[int]$r.Y;w=[int]$r.Width;h=[int]$r.Height}}
+}}}}
+$words | ConvertTo-Json -Compress
+"""
+        result = subprocess.run(
+            ["powershell", "-NoProfile", "-Command", ps],
+            capture_output=True, text=True, timeout=15, encoding="utf-8", errors="replace",
+        )
+        out = (result.stdout or "").strip()
+        if not out:
+            return []
+        data = _json.loads(out)
+        return data if isinstance(data, list) else [data]
+    except Exception as e:
+        logger.debug(f"WinRT word-box OCR failed: {e}")
+        return []
+
+
+def _word_boxes_tesseract(png_bytes: bytes) -> list:
+    """Word bounding boxes via pytesseract image_to_data (needs Tesseract binary)."""
+    try:
+        import pytesseract
+        from PIL import Image
+        img = Image.open(io.BytesIO(png_bytes))
+        d = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+        out = []
+        for i, txt in enumerate(d["text"]):
+            if txt and txt.strip():
+                out.append({"t": txt, "x": d["left"][i], "y": d["top"][i],
+                            "w": d["width"][i], "h": d["height"][i]})
+        return out
+    except Exception as e:
+        logger.debug(f"tesseract word-box OCR failed: {e}")
+        return []
+
+
 class ScreenshotSearch:
     def __init__(self, brain: Optional["LokiBrain"] = None):
         self._brain = brain
@@ -117,6 +175,42 @@ class ScreenshotSearch:
             return text
         # Fallback to pytesseract
         return _ocr_tesseract(png_bytes)
+
+    def locate_text(self, target: str) -> dict:
+        """Find on-screen text and return the click center {x, y} in screen pixels.
+        Uses Windows WinRT OCR (built-in) first, then pytesseract. Matches the
+        whole phrase if present, else the best single word."""
+        if not target or not target.strip():
+            return {"success": False, "message": "No target text."}
+        png = _capture_screen()
+        if not png:
+            return {"success": False, "message": "Couldn't capture the screen."}
+
+        boxes = _word_boxes_winrt(png) or _word_boxes_tesseract(png)
+        if not boxes:
+            return {"success": False, "message": "OCR found no readable text (install Tesseract for better results)."}
+
+        tgt = target.lower().strip()
+        tgt_words = tgt.split()
+
+        # 1. try to match a contiguous run of words equal to the phrase
+        n = len(tgt_words)
+        if n > 1:
+            for i in range(len(boxes) - n + 1):
+                run = boxes[i:i+n]
+                if " ".join(b["t"].lower() for b in run) == tgt:
+                    xs = [b["x"] for b in run] + [b["x"] + b["w"] for b in run]
+                    ys = [b["y"] for b in run] + [b["y"] + b["h"] for b in run]
+                    cx, cy = (min(xs) + max(xs)) // 2, (min(ys) + max(ys)) // 2
+                    return {"success": True, "message": f"Found '{target}'.", "data": {"x": cx, "y": cy}}
+
+        # 2. single-word / substring match (first occurrence)
+        for b in boxes:
+            if tgt in b["t"].lower() or b["t"].lower() in tgt:
+                cx, cy = b["x"] + b["w"] // 2, b["y"] + b["h"] // 2
+                return {"success": True, "message": f"Found '{b['t']}'.", "data": {"x": cx, "y": cy}}
+
+        return {"success": False, "message": f"Couldn't find '{target}' on screen."}
 
     def capture_and_read(self, region: Optional[str] = None) -> dict:
         """Capture the screen (or a region) and extract all visible text via OCR."""
