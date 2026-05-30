@@ -10,7 +10,7 @@ members: 6
 **Members:** 6 nodes
 
 ## Members
-- [[.__init__()_26]] - code - loki/features/daily_briefing.py
+- [[.__init__()_28]] - code - loki/features/daily_briefing.py
 - [[.generate()]] - code - loki/features/daily_briefing.py
 - [[DailyBriefing]] - code - loki/features/daily_briefing.py
 - [[DailyBriefing — morning brief combining tasks, system health, datetime, and new]] - rationale - loki/features/daily_briefing.py

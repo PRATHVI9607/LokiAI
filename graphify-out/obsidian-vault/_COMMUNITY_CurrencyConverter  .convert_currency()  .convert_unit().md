@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_25]] - code - loki/features/currency_converter.py
+- [[.__init__()_27]] - code - loki/features/currency_converter.py
 - [[._ask()_3]] - code - loki/features/currency_converter.py
 - [[._fetch_rates()]] - code - loki/features/currency_converter.py
 - [[.convert_currency()]] - code - loki/features/currency_converter.py

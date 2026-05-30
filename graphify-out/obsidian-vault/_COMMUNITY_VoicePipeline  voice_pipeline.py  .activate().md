@@ -1,19 +1,20 @@
 ---
 type: community
-cohesion: 0.10
-members: 21
+cohesion: 0.09
+members: 22
 ---
 
 # VoicePipeline / voice_pipeline.py / .activate()
 
-**Cohesion:** 0.10 - loosely connected
-**Members:** 21 nodes
+**Cohesion:** 0.09 - loosely connected
+**Members:** 22 nodes
 
 ## Members
-- [[.__init__()_14]] - code - loki/core/voice_pipeline.py
+- [[.__init__()_17]] - code - loki/core/voice_pipeline.py
 - [[._handle_partial()]] - code - loki/core/voice_pipeline.py
 - [[._handle_transcript()]] - code - loki/core/voice_pipeline.py
 - [[._handle_wakeword()]] - code - loki/core/voice_pipeline.py
+- [[._start_listener_safe()]] - code - loki/core/voice_pipeline.py
 - [[.activate()]] - code - loki/core/voice_pipeline.py
 - [[.deactivate()]] - code - loki/core/voice_pipeline.py
 - [[.resume_listening()]] - code - loki/core/voice_pipeline.py
@@ -23,9 +24,9 @@ members: 21
 - [[Conversation ended hand mic back to wakeword detector.]] - rationale - loki/core/voice_pipeline.py
 - [[Exclusive-mic manager wakeword ↔ listener handoff.]] - rationale - loki/core/voice_pipeline.py
 - [[Full STT transcript ready release listener mic, fire callback.]] - rationale - loki/core/voice_pipeline.py
-- [[Partial wakeword transcript (for live transcript display).]] - rationale - loki/core/voice_pipeline.py
 - [[Shut down both components.]] - rationale - loki/core/voice_pipeline.py
 - [[Start wakeword detection. Call once on app start.]] - rationale - loki/core/voice_pipeline.py
+- [[Timer callback — only starts listener if still active and not already running.]] - rationale - loki/core/voice_pipeline.py
 - [[VoicePipeline]] - code - loki/core/voice_pipeline.py
 - [[VoicePipeline — owns the microphone.  Only one component can hold the mic at a t]] - rationale - loki/core/voice_pipeline.py
 - [[Wakeword detected release wakeword mic, hand to listener.]] - rationale - loki/core/voice_pipeline.py
@@ -40,17 +41,14 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_SpeechListener  WakewordDetector  ._transcribe_worker()]]
+- 3 edges to [[_COMMUNITY_FakeTTS  TestClipboardSyncToken  TestTTSDrain]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 2 edges to [[_COMMUNITY_SpeechListener  WakewordDetector  _whisper_device()]]
 - 2 edges to [[_COMMUNITY_TestVoicePipeline  ._make()  .test_activate_starts_wakeword()]]
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
-- 1 edge to [[_COMMUNITY_FakeTTS  test_voice_and_security.py  .drain_and_fire()]]
-- 1 edge to [[_COMMUNITY_LokiTTS  TestTTSDrain  ._queue_worker()]]
 - 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle]]
 - 1 edge to [[_COMMUNITY_PendingActionStore  TestPendingActions  .is_expired()]]
 - 1 edge to [[_COMMUNITY_ProcessManager  TestProcessManagerExactMatch  process_manager.py]]
 - 1 edge to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
-- 1 edge to [[_COMMUNITY_ClipboardSync  TestClipboardSyncToken  .stop()]]
 
 ## Top bridge nodes
-- [[VoicePipeline]] - degree 24, connects to 11 communities
+- [[VoicePipeline]] - degree 25, connects to 8 communities

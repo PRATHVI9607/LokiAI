@@ -13,6 +13,7 @@ tags:
 
 ## Connections
 - [[ChatPanel.tsx]] - `imports_from` [EXTRACTED]
+- [[ICON]] - `contains` [EXTRACTED]
 - [[InputBar()]] - `contains` [EXTRACTED]
 - [[InputBarProps]] - `contains` [EXTRACTED]
 - [[Status]] - `imports` [EXTRACTED]

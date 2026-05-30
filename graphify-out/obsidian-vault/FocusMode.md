@@ -12,7 +12,7 @@ tags:
 # FocusMode
 
 ## Connections
-- [[.__init__()_36]] - `method` [EXTRACTED]
+- [[.__init__()_38]] - `method` [EXTRACTED]
 - [[._auto_disable()]] - `method` [EXTRACTED]
 - [[._block_sites()]] - `method` [EXTRACTED]
 - [[._flush_dns()]] - `method` [EXTRACTED]

@@ -27,17 +27,18 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 3 edges to [[_COMMUNITY_FakeTTS  ProcessManager  TestProcessManagerExactMatch]]
 - 2 edges to [[_COMMUNITY_ConversationStateMachine  ._arm_timeout()  ._cancel_timeout()]]
+- 2 edges to [[_COMMUNITY_FakeTTS  TestClipboardSyncToken  TestTTSDrain]]
 - 1 edge to [[_COMMUNITY_FileOps  ShellExec  TestFileOps]]
 - 1 edge to [[_COMMUNITY_ActionRouter  ._handle_agent_cancel()  ._handle_agent_run()]]
 - 1 edge to [[_COMMUNITY_ConvState  conversation_sm.py  Enum]]
 - 1 edge to [[_COMMUNITY_PendingActionStore  TestPendingActions  .is_expired()]]
 - 1 edge to [[_COMMUNITY_LokiTTS  ._queue_worker()  ._speak_edge()]]
-- 1 edge to [[_COMMUNITY_VoicePipeline  TestVoicePipeline  ._make()]]
-- 1 edge to [[_COMMUNITY_ClipboardSync  TestClipboardSyncToken  .stop()]]
+- 1 edge to [[_COMMUNITY_VoicePipeline  voice_pipeline.py  .activate()]]
+- 1 edge to [[_COMMUNITY_ClipboardSync  .start()  clipboard_sync.py]]
+- 1 edge to [[_COMMUNITY_ProcessManager  TestProcessManagerExactMatch  process_manager.py]]
 - 1 edge to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
 
 ## Top bridge nodes
-- [[TestConversationStateMachine]] - degree 18, connects to 10 communities
+- [[TestConversationStateMachine]] - degree 18, connects to 11 communities
 - [[._make_sm()]] - degree 9, connects to 2 communities

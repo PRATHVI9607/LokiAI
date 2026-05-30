@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_49]] - code - loki/features/software_updater.py
+- [[.__init__()_51]] - code - loki/features/software_updater.py
 - [[._check_winget()]] - code - loki/features/software_updater.py
 - [[._run()]] - code - loki/features/software_updater.py
 - [[.check_updates()]] - code - loki/features/software_updater.py

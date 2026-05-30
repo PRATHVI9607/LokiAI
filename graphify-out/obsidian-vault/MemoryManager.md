@@ -12,7 +12,7 @@ tags:
 # MemoryManager
 
 ## Connections
-- [[.__init__()_11]] - `method` [EXTRACTED]
+- [[.__init__()_13]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._load_json()]] - `method` [EXTRACTED]
 - [[._next_task_id()]] - `method` [EXTRACTED]

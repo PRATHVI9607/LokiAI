@@ -2,7 +2,7 @@
 source_file: "main.py"
 type: "code"
 community: "LokiApplication / ._init_all() / .__init__()"
-location: "L114"
+location: "L115"
 tags:
   - graphify/code
   - graphify/INFERRED
@@ -34,6 +34,7 @@ tags:
 - [[ClipboardManager]] - `uses` [INFERRED]
 - [[ClipboardSync]] - `uses` [INFERRED]
 - [[CodeAssistant]] - `uses` [INFERRED]
+- [[ComputerControl]] - `uses` [INFERRED]
 - [[ConversationStateMachine]] - `uses` [INFERRED]
 - [[CurrencyConverter]] - `uses` [INFERRED]
 - [[DailyBriefing]] - `uses` [INFERRED]

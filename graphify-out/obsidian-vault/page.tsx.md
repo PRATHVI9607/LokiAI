@@ -15,7 +15,7 @@ tags:
 - [[ChatPanel.tsx]] - `imports_from` [EXTRACTED]
 - [[FilePanel.tsx]] - `imports_from` [EXTRACTED]
 - [[Home()]] - `contains` [EXTRACTED]
-- [[PlasmaOrb]] - `contains` [EXTRACTED]
+- [[VideoOrb]] - `contains` [EXTRACTED]
 - [[useLoki()]] - `imports` [EXTRACTED]
 - [[useLoki.ts]] - `imports_from` [EXTRACTED]
 

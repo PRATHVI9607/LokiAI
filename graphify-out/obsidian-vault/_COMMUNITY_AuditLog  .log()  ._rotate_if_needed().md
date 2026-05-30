@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_5]] - code - loki/core/audit.py
+- [[.__init__()_7]] - code - loki/core/audit.py
 - [[._rotate_if_needed()]] - code - loki/core/audit.py
 - [[._sanitize()]] - code - loki/core/audit.py
 - [[.get_recent()]] - code - loki/core/audit.py

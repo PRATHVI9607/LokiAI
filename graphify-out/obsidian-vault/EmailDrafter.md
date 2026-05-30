@@ -12,7 +12,7 @@ tags:
 # EmailDrafter
 
 ## Connections
-- [[.__init__()_28]] - `method` [EXTRACTED]
+- [[.__init__()_30]] - `method` [EXTRACTED]
 - [[._ask()_4]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.draft()]] - `method` [EXTRACTED]

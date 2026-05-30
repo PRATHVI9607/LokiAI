@@ -1,11 +1,11 @@
 ---
 source_file: "loki/data/command_allowlist.txt"
 type: "document"
-community: "Loki AI Desktop Assistant / Shell Command Allowlist Security Bo / Security Rules (NEVER violate)"
+community: "Shell Command Allowlist Security Bo / Shell Safety Layer 1: Allowlist Pre / Shell Execution (allowlist + blockl"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Loki_AI_Desktop_Assistant_/_Shell_Command_Allowlist_Security_Bo_/_Security_Rules_NEVER_violate
+  - community/Shell_Command_Allowlist_Security_Bo_/_Shell_Safety_Layer_1_Allowlist_Pre_/_Shell_Execution_allowlist__blockl
 ---
 
 # Allowlist: Package Manager Commands (winget/choco/scoop)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Shell Command Allowlist Security Boundary]] - `references` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Loki_AI_Desktop_Assistant_/_Shell_Command_Allowlist_Security_Bo_/_Security_Rules_NEVER_violate
+#graphify/document #graphify/EXTRACTED #community/Shell_Command_Allowlist_Security_Bo_/_Shell_Safety_Layer_1_Allowlist_Pre_/_Shell_Execution_allowlist__blockl

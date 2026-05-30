@@ -12,7 +12,7 @@ tags:
 # SystemMonitor
 
 ## Connections
-- [[.__init__()_50]] - `method` [EXTRACTED]
+- [[.__init__()_52]] - `method` [EXTRACTED]
 - [[._get_gpu_stats()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.get_stats()_2]] - `method` [EXTRACTED]

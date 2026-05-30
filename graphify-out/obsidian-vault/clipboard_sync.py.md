@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/clipboard_sync.py"
 type: "code"
-community: "ClipboardSync / TestClipboardSyncToken / .stop()"
+community: "ClipboardSync / .start() / clipboard_sync.py"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ClipboardSync_/_TestClipboardSyncToken_/_stop
+  - community/ClipboardSync_/_start_/_clipboard_syncpy
 ---
 
 # clipboard_sync.py
@@ -17,4 +17,4 @@ tags:
 - [[_Handler]] - `contains` [EXTRACTED]
 - [[_make_token()]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ClipboardSync_/_TestClipboardSyncToken_/_stop
+#graphify/code #graphify/EXTRACTED #community/ClipboardSync_/_start_/_clipboard_syncpy

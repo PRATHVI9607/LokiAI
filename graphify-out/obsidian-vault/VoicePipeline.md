@@ -1,18 +1,18 @@
 ---
 source_file: "loki/core/voice_pipeline.py"
 type: "code"
-community: "VoicePipeline / TestVoicePipeline / ._make()"
+community: "VoicePipeline / voice_pipeline.py / .activate()"
 location: "L26"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/VoicePipeline_/_TestVoicePipeline_/__make
+  - community/VoicePipeline_/_voice_pipelinepy_/_activate
 ---
 
 # VoicePipeline
 
 ## Connections
-- [[.__init__()_15]] - `method` [EXTRACTED]
+- [[.__init__()_17]] - `method` [EXTRACTED]
 - [[._handle_partial()]] - `method` [EXTRACTED]
 - [[._handle_transcript()]] - `method` [EXTRACTED]
 - [[._handle_wakeword()]] - `method` [EXTRACTED]
@@ -38,4 +38,4 @@ tags:
 - [[WakewordDetector]] - `uses` [INFERRED]
 - [[voice_pipeline.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/VoicePipeline_/_TestVoicePipeline_/__make
+#graphify/code #graphify/INFERRED #community/VoicePipeline_/_voice_pipelinepy_/_activate

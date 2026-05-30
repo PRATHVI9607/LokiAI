@@ -1,18 +1,19 @@
 ---
 source_file: "loki/actions/app_ctrl.py"
 type: "code"
-community: "AppCtrl / app_ctrl.py / .close_app()"
+community: "AppCtrl / .open_app() / ._find_shortcut()"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/AppCtrl_/_app_ctrlpy_/_close_app
+  - community/AppCtrl_/_open_app_/__find_shortcut
 ---
 
 # app_ctrl.py
 
 ## Connections
-- [[App control — open and close applications.]] - `rationale_for` [EXTRACTED]
+- [[App control — open and close ANY application on the system.  Resolution order wh]] - `rationale_for` [EXTRACTED]
 - [[AppCtrl]] - `contains` [EXTRACTED]
+- [[_which()]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/AppCtrl_/_app_ctrlpy_/_close_app
+#graphify/code #graphify/EXTRACTED #community/AppCtrl_/_open_app_/__find_shortcut

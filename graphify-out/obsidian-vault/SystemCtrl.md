@@ -12,7 +12,7 @@ tags:
 # SystemCtrl
 
 ## Connections
-- [[.__init__()_3]] - `method` [EXTRACTED]
+- [[.__init__()_5]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.get_brightness()]] - `method` [EXTRACTED]
 - [[.get_volume()]] - `method` [EXTRACTED]

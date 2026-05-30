@@ -12,7 +12,7 @@ tags:
 # ActionRouter
 
 ## Connections
-- [[.__init__()_4]] - `method` [EXTRACTED]
+- [[.__init__()_6]] - `method` [EXTRACTED]
 - [[._handle_agent_cancel()]] - `method` [EXTRACTED]
 - [[._handle_agent_run()]] - `method` [EXTRACTED]
 - [[._handle_agent_status()]] - `method` [EXTRACTED]
@@ -46,6 +46,13 @@ tags:
 - [[._handle_code_convert()]] - `method` [EXTRACTED]
 - [[._handle_code_refactor()]] - `method` [EXTRACTED]
 - [[._handle_commit_message()]] - `method` [EXTRACTED]
+- [[._handle_computer_action()]] - `method` [EXTRACTED]
+- [[._handle_computer_click()]] - `method` [EXTRACTED]
+- [[._handle_computer_click_text()]] - `method` [EXTRACTED]
+- [[._handle_computer_move()]] - `method` [EXTRACTED]
+- [[._handle_computer_press()]] - `method` [EXTRACTED]
+- [[._handle_computer_scroll()]] - `method` [EXTRACTED]
+- [[._handle_computer_type()]] - `method` [EXTRACTED]
 - [[._handle_currency_convert()]] - `method` [EXTRACTED]
 - [[._handle_daily_briefing()]] - `method` [EXTRACTED]
 - [[._handle_declutter_dups()]] - `method` [EXTRACTED]

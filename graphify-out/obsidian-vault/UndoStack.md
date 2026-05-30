@@ -12,7 +12,7 @@ tags:
 # UndoStack
 
 ## Connections
-- [[.__init__()_14]] - `method` [EXTRACTED]
+- [[.__init__()_16]] - `method` [EXTRACTED]
 - [[.__len__()]] - `method` [EXTRACTED]
 - [[._builtin_undo()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]

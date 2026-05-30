@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "Loki AI Desktop Assistant / Shell Command Allowlist Security Bo / Security Rules (NEVER violate)"
+community: "Action Return Contract {success, me / Rationale: message field always saf"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/Loki_AI_Desktop_Assistant_/_Shell_Command_Allowlist_Security_Bo_/_Security_Rules_NEVER_violate
+  - community/Action_Return_Contract_success_me_/_Rationale_message_field_always_saf
 ---
 
 # Rationale: message field always safe to speak aloud (secrets only in data field)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[Action Return Contract {success, message, data}]] - `rationale_for` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/Loki_AI_Desktop_Assistant_/_Shell_Command_Allowlist_Security_Bo_/_Security_Rules_NEVER_violate
+#graphify/document #graphify/EXTRACTED #community/Action_Return_Contract_success_me_/_Rationale_message_field_always_saf

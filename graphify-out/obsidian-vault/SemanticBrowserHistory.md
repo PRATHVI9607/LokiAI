@@ -12,7 +12,7 @@ tags:
 # SemanticBrowserHistory
 
 ## Connections
-- [[.__init__()_48]] - `method` [EXTRACTED]
+- [[.__init__()_50]] - `method` [EXTRACTED]
 - [[._find_history_db()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_6]] - `method` [EXTRACTED]

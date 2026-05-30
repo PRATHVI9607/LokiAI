@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/git_helper.py"
 type: "code"
-community: "GitHelper / ._get_repo() / .commit()"
+community: "GitHelper / GhostWriter / ._ask()"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/GitHelper_/__get_repo_/_commit
+  - community/GitHelper_/_GhostWriter_/__ask
 ---
 
 # git_helper.py
@@ -15,4 +15,4 @@ tags:
 - [[Git helper — status, diff, commit message generation, commit execution.]] - `rationale_for` [EXTRACTED]
 - [[GitHelper]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/GitHelper_/__get_repo_/_commit
+#graphify/code #graphify/EXTRACTED #community/GitHelper_/_GhostWriter_/__ask

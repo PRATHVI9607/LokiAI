@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "code"
-community: "VoicePipeline / TestVoicePipeline / ._make()"
+community: "TestVoicePipeline / ._make() / .test_activate_starts_wakeword()"
 location: "L285"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/VoicePipeline_/_TestVoicePipeline_/__make
+  - community/TestVoicePipeline_/__make_/_test_activate_starts_wakeword
 ---
 
 # TestVoicePipeline
@@ -30,4 +30,4 @@ tags:
 - [[WebSummarizer]] - `uses` [INFERRED]
 - [[test_voice_and_security.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/VoicePipeline_/_TestVoicePipeline_/__make
+#graphify/code #graphify/INFERRED #community/TestVoicePipeline_/__make_/_test_activate_starts_wakeword

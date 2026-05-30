@@ -2,7 +2,7 @@
 source_file: "loki/core/action_router.py"
 type: "code"
 community: "action_router.py / .route_intent() / _describe_destructive()"
-location: "L897"
+location: "L935"
 tags:
   - graphify/code
   - graphify/EXTRACTED

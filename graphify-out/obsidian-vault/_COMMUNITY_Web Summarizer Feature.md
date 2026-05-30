@@ -1,18 +1,15 @@
 ---
 type: community
-cohesion: 0.50
-members: 4
+cohesion: 1.00
+members: 1
 ---
 
 # Web Summarizer Feature
 
-**Cohesion:** 0.50 - moderately connected
-**Members:** 4 nodes
+**Cohesion:** 1.00 - tightly connected
+**Members:** 1 nodes
 
 ## Members
-- [[CitationGenerator Feature (APAMLAChicagoIEEE)]] - document - LokiPRD.md
-- [[Requirement requests + beautifulsoup4 + lxml (Web features)]] - document - loki/requirements.txt
-- [[Tech Stack requests + beautifulsoup4 for Web]] - document - README.md
 - [[Web Summarizer Feature]] - document - LokiPRD.md
 
 ## Live Query (requires Dataview plugin)

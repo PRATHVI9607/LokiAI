@@ -10,7 +10,7 @@ members: 9
 **Members:** 9 nodes
 
 ## Members
-- [[.__init__()_31]] - code - loki/features/fact_checker.py
+- [[.__init__()_33]] - code - loki/features/fact_checker.py
 - [[._ask()_6]] - code - loki/features/fact_checker.py
 - [[._search_web()]] - code - loki/features/fact_checker.py
 - [[.check()]] - code - loki/features/fact_checker.py

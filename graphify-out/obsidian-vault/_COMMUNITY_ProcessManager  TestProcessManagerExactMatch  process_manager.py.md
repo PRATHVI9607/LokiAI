@@ -28,21 +28,20 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
+- 4 edges to [[_COMMUNITY_FakeTTS  TestClipboardSyncToken  TestTTSDrain]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 2 edges to [[_COMMUNITY_PendingActionStore  TestPendingActions  .is_expired()]]
-- 2 edges to [[_COMMUNITY_LokiTTS  TestTTSDrain  ._queue_worker()]]
-- 2 edges to [[_COMMUNITY_ClipboardSync  TestClipboardSyncToken  .stop()]]
-- 2 edges to [[_COMMUNITY_FakeTTS  test_voice_and_security.py  .drain_and_fire()]]
 - 2 edges to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  BrowserCtrl  DailyBriefing]]
 - 1 edge to [[_COMMUNITY_FileOps  ShellExec  TestFileOps]]
-- 1 edge to [[_COMMUNITY_ActionRouter  ._handle_api_mock_data()  ._handle_api_mock_generate()]]
+- 1 edge to [[_COMMUNITY_ActionRouter  ._handle_agent_cancel()  ._handle_agent_run()]]
 - 1 edge to [[_COMMUNITY_ConvState  conversation_sm.py  Enum]]
 - 1 edge to [[_COMMUNITY_ConversationStateMachine  ._arm_timeout()  ._cancel_timeout()]]
+- 1 edge to [[_COMMUNITY_LokiTTS  ._queue_worker()  ._speak_edge()]]
 - 1 edge to [[_COMMUNITY_VoicePipeline  voice_pipeline.py  .activate()]]
+- 1 edge to [[_COMMUNITY_ClipboardSync  .start()  clipboard_sync.py]]
 - 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle]]
 - 1 edge to [[_COMMUNITY_TestVoicePipeline  ._make()  .test_activate_starts_wakeword()]]
 
 ## Top bridge nodes
 - [[TestProcessManagerExactMatch]] - degree 13, connects to 10 communities
-- [[ProcessManager]] - degree 16, connects to 9 communities
+- [[ProcessManager]] - degree 16, connects to 6 communities

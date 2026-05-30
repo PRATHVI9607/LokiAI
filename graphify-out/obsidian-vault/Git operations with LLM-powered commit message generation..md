@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/git_helper.py"
 type: "rationale"
-community: "GitHelper / ._get_repo() / .commit()"
+community: "GitHelper / GhostWriter / ._ask()"
 location: "L23"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/GitHelper_/__get_repo_/_commit
+  - community/GitHelper_/_GhostWriter_/__ask
 ---
 
 # Git operations with LLM-powered commit message generation.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[GitHelper]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/GitHelper_/__get_repo_/_commit
+#graphify/rationale #graphify/EXTRACTED #community/GitHelper_/_GhostWriter_/__ask

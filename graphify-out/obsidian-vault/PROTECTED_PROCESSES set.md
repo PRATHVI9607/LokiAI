@@ -1,12 +1,12 @@
 ---
 source_file: "loki/features/process_manager.py"
 type: "code"
-community: "AutoAgent._execute_task / PendingActionStore / _DESTRUCTIVE_INTENTS Frozenset"
+community: "ProcessManager.kill / PROTECTED_PROCESSES set"
 location: "PROTECTED_PROCESSES"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+  - community/ProcessManagerkill_/_PROTECTED_PROCESSES_set
 ---
 
 # PROTECTED_PROCESSES set
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[ProcessManager.kill]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+#graphify/code #graphify/EXTRACTED #community/ProcessManagerkill_/_PROTECTED_PROCESSES_set

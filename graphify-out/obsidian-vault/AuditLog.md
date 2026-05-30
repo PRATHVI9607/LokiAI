@@ -12,7 +12,7 @@ tags:
 # AuditLog
 
 ## Connections
-- [[.__init__()_5]] - `method` [EXTRACTED]
+- [[.__init__()_7]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._rotate_if_needed()]] - `method` [EXTRACTED]
 - [[._sanitize()]] - `method` [EXTRACTED]

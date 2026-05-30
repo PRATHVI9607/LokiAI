@@ -10,7 +10,7 @@ members: 12
 **Members:** 12 nodes
 
 ## Members
-- [[.__init__()_17]] - code - loki/features/api_mocker.py
+- [[.__init__()_19]] - code - loki/features/api_mocker.py
 - [[._ask()]] - code - loki/features/api_mocker.py
 - [[._strip_fences()]] - code - loki/features/api_mocker.py
 - [[.generate_mock()]] - code - loki/features/api_mocker.py

@@ -2,7 +2,7 @@
 source_file: "main.py"
 type: "code"
 community: "LokiApplication / ._init_all() / .__init__()"
-location: "L409"
+location: "L422"
 tags:
   - graphify/code
   - graphify/EXTRACTED

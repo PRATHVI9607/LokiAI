@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_39]] - code - loki/features/grammar_polisher.py
+- [[.__init__()_41]] - code - loki/features/grammar_polisher.py
 - [[._ask()_8]] - code - loki/features/grammar_polisher.py
 - [[.change_tone()]] - code - loki/features/grammar_polisher.py
 - [[.polish()]] - code - loki/features/grammar_polisher.py

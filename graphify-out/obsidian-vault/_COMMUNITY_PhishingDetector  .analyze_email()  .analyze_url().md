@@ -10,7 +10,7 @@ members: 13
 **Members:** 13 nodes
 
 ## Members
-- [[.__init__()_44]] - code - loki/features/phishing_detector.py
+- [[.__init__()_46]] - code - loki/features/phishing_detector.py
 - [[._heuristic_url()]] - code - loki/features/phishing_detector.py
 - [[._llm()_4]] - code - loki/features/phishing_detector.py
 - [[.analyze_email()]] - code - loki/features/phishing_detector.py

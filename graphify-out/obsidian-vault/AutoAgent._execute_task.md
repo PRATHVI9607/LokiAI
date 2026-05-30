@@ -1,21 +1,18 @@
 ---
 source_file: "loki/features/auto_agent.py"
 type: "code"
-community: "AutoAgent._execute_task / PendingActionStore / _DESTRUCTIVE_INTENTS Frozenset"
-location: "def _execute_task"
+community: "ActionRouter / AutoAgent (Multi-Step Automation En / AppCtrl (Open Any App)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+  - community/ActionRouter_/_AutoAgent_Multi-Step_Automation_En_/_AppCtrl_Open_Any_App
 ---
 
 # AutoAgent._execute_task
 
 ## Connections
-- [[ActionRouter.route_intent]] - `calls` [EXTRACTED]
-- [[AutoAgent.SAFE_INTENTS whitelist]] - `references` [EXTRACTED]
-- [[AutoAgent._abort threading.Event]] - `references` [EXTRACTED]
-- [[AutoAgent._plan]] - `calls` [EXTRACTED]
-- [[AutoAgent.run]] - `calls` [EXTRACTED]
+- [[ActionRouter_1]] - `calls` [EXTRACTED]
+- [[AutoAgent (Multi-Step Automation Engine)]] - `implements` [EXTRACTED]
+- [[_STEP_DELAY (per-step launch delays)]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+#graphify/code #graphify/EXTRACTED #community/ActionRouter_/_AutoAgent_Multi-Step_Automation_En_/_AppCtrl_Open_Any_App

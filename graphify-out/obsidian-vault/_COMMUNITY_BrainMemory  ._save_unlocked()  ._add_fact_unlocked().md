@@ -10,7 +10,7 @@ members: 22
 **Members:** 22 nodes
 
 ## Members
-- [[.__init__()_7]] - code - loki/core/brain_memory.py
+- [[.__init__()_9]] - code - loki/core/brain_memory.py
 - [[._add_fact_unlocked()]] - code - loki/core/brain_memory.py
 - [[._load()]] - code - loki/core/brain_memory.py
 - [[._save_unlocked()]] - code - loki/core/brain_memory.py

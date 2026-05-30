@@ -10,7 +10,7 @@ members: 23
 **Members:** 23 nodes
 
 ## Members
-- [[.__init__()_27]] - code - loki/features/dynamic_ui.py
+- [[.__init__()_29]] - code - loki/features/dynamic_ui.py
 - [[._get_period_theme()]] - code - loki/features/dynamic_ui.py
 - [[._write_state()]] - code - loki/features/dynamic_ui.py
 - [[.apply_mood_theme()]] - code - loki/features/dynamic_ui.py

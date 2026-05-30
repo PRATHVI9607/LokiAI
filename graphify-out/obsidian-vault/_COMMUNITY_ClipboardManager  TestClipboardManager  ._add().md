@@ -10,7 +10,7 @@ members: 17
 **Members:** 17 nodes
 
 ## Members
-- [[.__init__()_22]] - code - loki/features/clipboard_manager.py
+- [[.__init__()_24]] - code - loki/features/clipboard_manager.py
 - [[._add()]] - code - loki/features/clipboard_manager.py
 - [[._monitor_loop()]] - code - loki/features/clipboard_manager.py
 - [[.clear()_1]] - code - loki/features/clipboard_manager.py

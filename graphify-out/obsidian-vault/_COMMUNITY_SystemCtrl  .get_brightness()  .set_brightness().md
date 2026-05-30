@@ -10,7 +10,7 @@ members: 11
 **Members:** 11 nodes
 
 ## Members
-- [[.__init__()_3]] - code - loki/actions/system_ctrl.py
+- [[.__init__()_5]] - code - loki/actions/system_ctrl.py
 - [[.get_brightness()]] - code - loki/actions/system_ctrl.py
 - [[.get_volume()]] - code - loki/actions/system_ctrl.py
 - [[.set_brightness()]] - code - loki/actions/system_ctrl.py

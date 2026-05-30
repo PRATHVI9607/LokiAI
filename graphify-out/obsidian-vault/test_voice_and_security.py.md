@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "code"
-community: "FakeTTS / ProcessManager / TestProcessManagerExactMatch"
+community: "FakeTTS / TestClipboardSyncToken / TestTTSDrain"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch
+  - community/FakeTTS_/_TestClipboardSyncToken_/_TestTTSDrain
 ---
 
 # test_voice_and_security.py
@@ -24,4 +24,4 @@ tags:
 - [[is_idle()_1]] - `contains` [EXTRACTED]
 - [[is_speaking()_1]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch
+#graphify/code #graphify/EXTRACTED #community/FakeTTS_/_TestClipboardSyncToken_/_TestTTSDrain

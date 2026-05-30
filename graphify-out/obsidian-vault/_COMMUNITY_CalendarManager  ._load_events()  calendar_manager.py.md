@@ -10,7 +10,7 @@ members: 20
 **Members:** 20 nodes
 
 ## Members
-- [[.__init__()_20]] - code - loki/features/calendar_manager.py
+- [[.__init__()_22]] - code - loki/features/calendar_manager.py
 - [[._llm()]] - code - loki/features/calendar_manager.py
 - [[._load_events()]] - code - loki/features/calendar_manager.py
 - [[.find_conflicts()]] - code - loki/features/calendar_manager.py

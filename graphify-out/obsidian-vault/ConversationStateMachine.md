@@ -12,7 +12,7 @@ tags:
 # ConversationStateMachine
 
 ## Connections
-- [[.__init__()_8]] - `method` [EXTRACTED]
+- [[.__init__()_10]] - `method` [EXTRACTED]
 - [[._arm_timeout()]] - `method` [EXTRACTED]
 - [[._cancel_timeout()]] - `method` [EXTRACTED]
 - [[._emit_response()]] - `method` [EXTRACTED]

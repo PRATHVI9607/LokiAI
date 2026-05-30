@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_42]] - code - loki/features/meeting_transcriber.py
+- [[.__init__()_44]] - code - loki/features/meeting_transcriber.py
 - [[._ensure_model()]] - code - loki/features/meeting_transcriber.py
 - [[._llm()_3]] - code - loki/features/meeting_transcriber.py
 - [[.extract_action_items()]] - code - loki/features/meeting_transcriber.py

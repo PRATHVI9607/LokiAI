@@ -2,7 +2,7 @@
 source_file: "loki/core/brain.py"
 type: "rationale"
 community: ".ask() / ._build_messages() / ._get_kg_context()"
-location: "L485"
+location: "L518"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

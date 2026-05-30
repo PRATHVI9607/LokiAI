@@ -15,8 +15,8 @@ tags:
 - [[ChatPanel.tsx]] - `imports` [EXTRACTED]
 - [[InputBar.tsx]] - `imports` [EXTRACTED]
 - [[PlasmaOrb.tsx]] - `imports` [EXTRACTED]
-- [[RuneCanvas.tsx]] - `imports` [EXTRACTED]
 - [[StatusOrb.tsx]] - `imports` [EXTRACTED]
+- [[VideoOrb.tsx]] - `imports` [EXTRACTED]
 - [[useLoki.ts]] - `contains` [EXTRACTED]
 
 #graphify/code #graphify/EXTRACTED #community/useLokits_/_ChatPaneltsx_/_PlasmaOrbtsx

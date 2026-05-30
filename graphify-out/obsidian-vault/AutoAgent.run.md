@@ -1,17 +1,17 @@
 ---
 source_file: "loki/features/auto_agent.py"
 type: "code"
-community: "AutoAgent._execute_task / PendingActionStore / _DESTRUCTIVE_INTENTS Frozenset"
-location: "def run"
+community: "LokiBrain / LokiBrain._fast_intent (determinist / TerminalFormatter (color-coded tags"
 tags:
   - graphify/code
-  - graphify/EXTRACTED
-  - community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+  - graphify/INFERRED
+  - community/LokiBrain_/_LokiBrain_fast_intent_determinist_/_TerminalFormatter_color-coded_tags
 ---
 
 # AutoAgent.run
 
 ## Connections
-- [[AutoAgent._execute_task]] - `calls` [EXTRACTED]
+- [[AutoAgent (Multi-Step Automation Engine)]] - `implements` [EXTRACTED]
+- [[LokiBrain._fast_intent (deterministic fast-path)]] - `conceptually_related_to` [INFERRED]
 
-#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+#graphify/code #graphify/INFERRED #community/LokiBrain_/_LokiBrain_fast_intent_determinist_/_TerminalFormatter_color-coded_tags

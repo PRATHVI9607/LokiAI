@@ -1,18 +1,18 @@
 ---
 source_file: "loki/features/git_helper.py"
 type: "code"
-community: "GitHelper / ._get_repo() / .commit()"
+community: "GitHelper / GhostWriter / ._ask()"
 location: "L22"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/GitHelper_/__get_repo_/_commit
+  - community/GitHelper_/_GhostWriter_/__ask
 ---
 
 # GitHelper
 
 ## Connections
-- [[.__init__()_38]] - `method` [EXTRACTED]
+- [[.__init__()_40]] - `method` [EXTRACTED]
 - [[._get_repo()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.commit()]] - `method` [EXTRACTED]
@@ -23,4 +23,4 @@ tags:
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[git_helper.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/GitHelper_/__get_repo_/_commit
+#graphify/code #graphify/EXTRACTED #community/GitHelper_/_GhostWriter_/__ask

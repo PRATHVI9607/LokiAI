@@ -2,7 +2,7 @@
 source_file: "loki/core/brain.py"
 type: "rationale"
 community: "._call_llm() / ._compress_old_turns() / ._save_history()"
-location: "L526"
+location: "L559"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

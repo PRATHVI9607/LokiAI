@@ -2,7 +2,7 @@
 source_file: "loki/core/brain.py"
 type: "code"
 community: "LokiBrain / DailyBriefing / CodeAssistant"
-location: "L266"
+location: "L298"
 tags:
   - graphify/code
   - graphify/EXTRACTED
@@ -12,7 +12,7 @@ tags:
 # LokiBrain
 
 ## Connections
-- [[.__init__()_6]] - `method` [EXTRACTED]
+- [[.__init__()_8]] - `method` [EXTRACTED]
 - [[._build_messages()]] - `method` [EXTRACTED]
 - [[._build_system_prompt()]] - `method` [EXTRACTED]
 - [[._call_llm()]] - `method` [EXTRACTED]
@@ -71,7 +71,6 @@ tags:
 - [[PhishingDetector]] - `uses` [INFERRED]
 - [[PhishingDetector_1]] - `calls` [EXTRACTED]
 - [[ScreenshotSearch]] - `uses` [INFERRED]
-- [[ScreenshotSearch_1]] - `references` [EXTRACTED]
 - [[SemanticBrowserHistory]] - `uses` [INFERRED]
 - [[SemanticBrowserHistory_1]] - `calls` [EXTRACTED]
 - [[WebSummarizer]] - `uses` [INFERRED]

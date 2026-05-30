@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_14]] - code - loki/core/undo_stack.py
+- [[.__init__()_16]] - code - loki/core/undo_stack.py
 - [[.__len__()]] - code - loki/core/undo_stack.py
 - [[._builtin_undo()]] - code - loki/core/undo_stack.py
 - [[._restore_tree()]] - code - loki/core/undo_stack.py

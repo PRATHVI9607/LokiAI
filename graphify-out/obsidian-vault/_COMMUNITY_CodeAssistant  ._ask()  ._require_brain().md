@@ -10,7 +10,7 @@ members: 14
 **Members:** 14 nodes
 
 ## Members
-- [[.__init__()_24]] - code - loki/features/code_assistant.py
+- [[.__init__()_26]] - code - loki/features/code_assistant.py
 - [[._ask()_2]] - code - loki/features/code_assistant.py
 - [[._require_brain()]] - code - loki/features/code_assistant.py
 - [[.analyze()]] - code - loki/features/code_assistant.py

@@ -12,8 +12,8 @@ tags:
 # ConnectionManager
 
 ## Connections
-- [[.__init__()_55]] - `method` [EXTRACTED]
-- [[.__init__()_56]] - `calls` [EXTRACTED]
+- [[.__init__()_57]] - `method` [EXTRACTED]
+- [[.__init__()_58]] - `calls` [EXTRACTED]
 - [[.broadcast()]] - `method` [EXTRACTED]
 - [[.connect()]] - `method` [EXTRACTED]
 - [[.disconnect()]] - `method` [EXTRACTED]

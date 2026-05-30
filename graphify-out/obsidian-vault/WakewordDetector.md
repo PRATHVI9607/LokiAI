@@ -1,18 +1,18 @@
 ---
 source_file: "loki/core/wakeword.py"
 type: "code"
-community: "WakewordDetector / wakeword.py / ._detect_loop()"
+community: "SpeechListener / WakewordDetector / _whisper_device()"
 location: "L43"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WakewordDetector_/_wakewordpy_/__detect_loop
+  - community/SpeechListener_/_WakewordDetector_/__whisper_device
 ---
 
 # WakewordDetector
 
 ## Connections
-- [[.__init__()_16]] - `method` [EXTRACTED]
+- [[.__init__()_18]] - `method` [EXTRACTED]
 - [[._detect_loop()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._is_wakeword()]] - `method` [EXTRACTED]
@@ -23,4 +23,4 @@ tags:
 - [[VoicePipeline]] - `uses` [INFERRED]
 - [[wakeword.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WakewordDetector_/_wakewordpy_/__detect_loop
+#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_WakewordDetector_/__whisper_device

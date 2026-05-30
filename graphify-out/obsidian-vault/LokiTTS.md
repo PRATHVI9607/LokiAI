@@ -12,7 +12,7 @@ tags:
 # LokiTTS
 
 ## Connections
-- [[.__init__()_13]] - `method` [EXTRACTED]
+- [[.__init__()_15]] - `method` [EXTRACTED]
 - [[._init_pyttsx3()]] - `method` [EXTRACTED]
 - [[._play_audio()]] - `method` [EXTRACTED]
 - [[._queue_worker()]] - `method` [EXTRACTED]

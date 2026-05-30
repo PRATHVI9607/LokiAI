@@ -10,7 +10,7 @@ members: 12
 **Members:** 12 nodes
 
 ## Members
-- [[.__init__()_21]] - code - loki/features/citation_generator.py
+- [[.__init__()_23]] - code - loki/features/citation_generator.py
 - [[._ask()_1]] - code - loki/features/citation_generator.py
 - [[._fetch_metadata()]] - code - loki/features/citation_generator.py
 - [[._format()]] - code - loki/features/citation_generator.py

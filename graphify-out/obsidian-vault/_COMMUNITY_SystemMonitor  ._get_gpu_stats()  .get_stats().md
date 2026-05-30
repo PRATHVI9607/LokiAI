@@ -10,7 +10,7 @@ members: 8
 **Members:** 8 nodes
 
 ## Members
-- [[.__init__()_50]] - code - loki/features/system_monitor.py
+- [[.__init__()_52]] - code - loki/features/system_monitor.py
 - [[._get_gpu_stats()]] - code - loki/features/system_monitor.py
 - [[.get_stats()_2]] - code - loki/features/system_monitor.py
 - [[.get_top_processes()]] - code - loki/features/system_monitor.py

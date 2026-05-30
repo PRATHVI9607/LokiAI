@@ -12,7 +12,7 @@ tags:
 # ShellExec
 
 ## Connections
-- [[.__init__()_2]] - `method` [EXTRACTED]
+- [[.__init__()_4]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._is_allowed()]] - `method` [EXTRACTED]
 - [[.execute()]] - `method` [EXTRACTED]

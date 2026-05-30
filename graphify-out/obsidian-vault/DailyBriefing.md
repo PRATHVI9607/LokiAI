@@ -12,7 +12,7 @@ tags:
 # DailyBriefing
 
 ## Connections
-- [[.__init__()_26]] - `method` [EXTRACTED]
+- [[.__init__()_28]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.generate()]] - `method` [EXTRACTED]
 - [[LokiApplication]] - `uses` [INFERRED]

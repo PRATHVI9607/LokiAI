@@ -10,7 +10,7 @@ members: 23
 **Members:** 23 nodes
 
 ## Members
-- [[.__init__()_40]] - code - loki/features/knowledge_graph.py
+- [[.__init__()_42]] - code - loki/features/knowledge_graph.py
 - [[._extract_entities()]] - code - loki/features/knowledge_graph.py
 - [[._llm()_2]] - code - loki/features/knowledge_graph.py
 - [[._load()_1]] - code - loki/features/knowledge_graph.py

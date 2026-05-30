@@ -12,7 +12,7 @@ tags:
 # BrainMemory
 
 ## Connections
-- [[.__init__()_7]] - `method` [EXTRACTED]
+- [[.__init__()_9]] - `method` [EXTRACTED]
 - [[._add_fact_unlocked()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._load()]] - `method` [EXTRACTED]

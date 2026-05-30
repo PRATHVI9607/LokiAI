@@ -12,7 +12,7 @@ tags:
 # FileWatcher
 
 ## Connections
-- [[.__init__()_35]] - `method` [EXTRACTED]
+- [[.__init__()_37]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._job_key()]] - `method` [EXTRACTED]
 - [[.list_watchers()]] - `method` [EXTRACTED]

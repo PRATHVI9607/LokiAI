@@ -1,18 +1,18 @@
 ---
 source_file: "loki/features/ghostwriter.py"
 type: "code"
-community: "GhostWriter / ._ask() / .bullets_to_prose()"
+community: "GitHelper / GhostWriter / ._ask()"
 location: "L14"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/GhostWriter_/__ask_/_bullets_to_prose
+  - community/GitHelper_/_GhostWriter_/__ask
 ---
 
 # GhostWriter
 
 ## Connections
-- [[.__init__()_37]] - `method` [EXTRACTED]
+- [[.__init__()_39]] - `method` [EXTRACTED]
 - [[._ask()_7]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.bullets_to_prose()]] - `method` [EXTRACTED]
@@ -22,4 +22,4 @@ tags:
 - [[LokiBrain]] - `uses` [INFERRED]
 - [[ghostwriter.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/GhostWriter_/__ask_/_bullets_to_prose
+#graphify/code #graphify/EXTRACTED #community/GitHelper_/_GhostWriter_/__ask

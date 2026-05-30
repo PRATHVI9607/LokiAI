@@ -10,7 +10,7 @@ members: 13
 **Members:** 13 nodes
 
 ## Members
-- [[.__init__()_47]] - code - loki/features/security_scanner.py
+- [[.__init__()_49]] - code - loki/features/security_scanner.py
 - [[._iter_files()]] - code - loki/features/security_scanner.py
 - [[._os_walk()]] - code - loki/features/security_scanner.py
 - [[._scan_file()]] - code - loki/features/security_scanner.py

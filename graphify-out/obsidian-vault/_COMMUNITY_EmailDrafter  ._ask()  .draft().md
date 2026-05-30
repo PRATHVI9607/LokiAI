@@ -10,7 +10,7 @@ members: 9
 **Members:** 9 nodes
 
 ## Members
-- [[.__init__()_28]] - code - loki/features/email_drafter.py
+- [[.__init__()_30]] - code - loki/features/email_drafter.py
 - [[._ask()_4]] - code - loki/features/email_drafter.py
 - [[.draft()]] - code - loki/features/email_drafter.py
 - [[.reply()]] - code - loki/features/email_drafter.py

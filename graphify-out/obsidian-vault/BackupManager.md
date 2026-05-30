@@ -12,7 +12,7 @@ tags:
 # BackupManager
 
 ## Connections
-- [[.__init__()_19]] - `method` [EXTRACTED]
+- [[.__init__()_21]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.backup_directory()]] - `method` [EXTRACTED]
 - [[.backup_file()]] - `method` [EXTRACTED]

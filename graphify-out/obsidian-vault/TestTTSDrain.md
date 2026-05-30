@@ -1,12 +1,12 @@
 ---
 source_file: "loki/tests/test_voice_and_security.py"
 type: "code"
-community: "FakeTTS / ProcessManager / TestProcessManagerExactMatch"
+community: "FakeTTS / TestClipboardSyncToken / TestTTSDrain"
 location: "L58"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch
+  - community/FakeTTS_/_TestClipboardSyncToken_/_TestTTSDrain
 ---
 
 # TestTTSDrain
@@ -26,4 +26,4 @@ tags:
 - [[WebSummarizer]] - `uses` [INFERRED]
 - [[test_voice_and_security.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/FakeTTS_/_ProcessManager_/_TestProcessManagerExactMatch
+#graphify/code #graphify/INFERRED #community/FakeTTS_/_TestClipboardSyncToken_/_TestTTSDrain

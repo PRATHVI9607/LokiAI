@@ -10,7 +10,7 @@ members: 17
 **Members:** 17 nodes
 
 ## Members
-- [[.__init__()_48]] - code - loki/features/semantic_browser_history.py
+- [[.__init__()_50]] - code - loki/features/semantic_browser_history.py
 - [[._find_history_db()]] - code - loki/features/semantic_browser_history.py
 - [[._llm()_6]] - code - loki/features/semantic_browser_history.py
 - [[._read_history()]] - code - loki/features/semantic_browser_history.py

@@ -1,18 +1,16 @@
 ---
 type: community
-cohesion: 0.40
-members: 5
+cohesion: 0.67
+members: 3
 ---
 
 # Web UI Next.js Static Export on Por / REST Endpoints (/health /files /upl / WebSocket API /ws Bidirectional Cha
 
-**Cohesion:** 0.40 - moderately connected
-**Members:** 5 nodes
+**Cohesion:** 0.67 - moderately connected
+**Members:** 3 nodes
 
 ## Members
 - [[REST Endpoints (health files upload brain audit)]] - document - LokiPRD.md
-- [[Requirement fastapi + uvicornstandard (Web server)]] - document - loki/requirements.txt
-- [[Tech Stack Next.js 15 + FastAPI WebSocket]] - document - README.md
 - [[Web UI Next.js Static Export on Port 7777]] - document - LokiPRD.md
 - [[WebSocket API ws Bidirectional Channel]] - document - LokiPRD.md
 

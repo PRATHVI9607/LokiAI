@@ -10,7 +10,7 @@ members: 17
 **Members:** 17 nodes
 
 ## Members
-- [[.__init__()_22]] - code - loki/features/clipboard_sync.py
+- [[.__init__()_25]] - code - loki/features/clipboard_sync.py
 - [[._build_url()]] - code - loki/features/clipboard_sync.py
 - [[.get_clipboard()]] - code - loki/features/clipboard_sync.py
 - [[.get_url()]] - code - loki/features/clipboard_sync.py
@@ -36,16 +36,15 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 5 edges to [[_COMMUNITY_FakeTTS  ConvState  TestClipboardSyncToken]]
-- 1 edge to [[_COMMUNITY_LokiApplication  .__init__()  main.py]]
-- 1 edge to [[_COMMUNITY_._init_all()  DailyBriefing  .generate()]]
+- 5 edges to [[_COMMUNITY_FakeTTS  TestClipboardSyncToken  TestTTSDrain]]
+- 2 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
 - 1 edge to [[_COMMUNITY__Handler  ._check_token()  ._deny()]]
-- 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle()]]
+- 1 edge to [[_COMMUNITY_TestConversationStateMachine  ._make_sm()  .test_end_conversation_goes_to_idle]]
 - 1 edge to [[_COMMUNITY_PendingActionStore  TestPendingActions  .is_expired()]]
 - 1 edge to [[_COMMUNITY_ProcessManager  TestProcessManagerExactMatch  process_manager.py]]
 - 1 edge to [[_COMMUNITY_WebSummarizer  TestSSRFProtection  _is_ssrf_risk()]]
 - 1 edge to [[_COMMUNITY_TestVoicePipeline  ._make()  .test_activate_starts_wakeword()]]
 
 ## Top bridge nodes
-- [[ClipboardSync]] - degree 21, connects to 8 communities
+- [[ClipboardSync]] - degree 21, connects to 7 communities
 - [[clipboard_sync.py]] - degree 4, connects to 1 community

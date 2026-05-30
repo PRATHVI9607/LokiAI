@@ -10,7 +10,7 @@ members: 7
 **Members:** 7 nodes
 
 ## Members
-- [[.__init__()_43]] - code - loki/features/pdf_chat.py
+- [[.__init__()_45]] - code - loki/features/pdf_chat.py
 - [[._extract_text()]] - code - loki/features/pdf_chat.py
 - [[.ask()_1]] - code - loki/features/pdf_chat.py
 - [[Chat with PDF documents using LLM.]] - rationale - loki/features/pdf_chat.py

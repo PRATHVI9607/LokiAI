@@ -12,7 +12,7 @@ tags:
 # FileOps
 
 ## Connections
-- [[.__init__()_1]] - `method` [EXTRACTED]
+- [[.__init__()_3]] - `method` [EXTRACTED]
 - [[._build_tree()]] - `method` [EXTRACTED]
 - [[._deny()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
@@ -21,7 +21,7 @@ tags:
 - [[.create_folder()]] - `method` [EXTRACTED]
 - [[.delete_file()]] - `method` [EXTRACTED]
 - [[.delete_folder()]] - `method` [EXTRACTED]
-- [[.move()]] - `method` [EXTRACTED]
+- [[.move()_1]] - `method` [EXTRACTED]
 - [[.test_confirm_action_executes()]] - `calls` [INFERRED]
 - [[FakeTTS]] - `uses` [INFERRED]
 - [[LokiApplication]] - `uses` [INFERRED]

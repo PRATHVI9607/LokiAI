@@ -10,7 +10,7 @@ members: 19
 **Members:** 19 nodes
 
 ## Members
-- [[.__init__()_52]] - code - loki/features/vault.py
+- [[.__init__()_54]] - code - loki/features/vault.py
 - [[._derive_key()]] - code - loki/features/vault.py
 - [[._save()_1]] - code - loki/features/vault.py
 - [[.delete()_1]] - code - loki/features/vault.py

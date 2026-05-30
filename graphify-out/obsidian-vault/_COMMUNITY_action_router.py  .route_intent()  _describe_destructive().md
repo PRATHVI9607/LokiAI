@@ -24,7 +24,7 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 2 edges to [[_COMMUNITY_ActionRouter  ._handle_agent_cancel()  ._handle_agent_run()]]
-- 1 edge to [[_COMMUNITY__missing()  ._handle_api_mock_generate()  ._handle_backup_list()]]
+- 1 edge to [[_COMMUNITY__missing()  ._handle_api_mock_generate()  ._handle_app_close()]]
 
 ## Top bridge nodes
 - [[action_router.py]] - degree 4, connects to 2 communities

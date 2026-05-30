@@ -2,7 +2,7 @@
 source_file: "main.py"
 type: "rationale"
 community: "LokiApplication / ._init_all() / .__init__()"
-location: "L115"
+location: "L116"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

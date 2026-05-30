@@ -12,7 +12,7 @@ tags:
 # FileOrganizer
 
 ## Connections
-- [[.__init__()_32]] - `method` [EXTRACTED]
+- [[.__init__()_34]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._is_safe_dir()]] - `method` [EXTRACTED]
 - [[._organizer()]] - `calls` [INFERRED]

@@ -12,7 +12,7 @@ tags:
 # WebSummarizer
 
 ## Connections
-- [[.__init__()_53]] - `method` [EXTRACTED]
+- [[.__init__()_55]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.summarize()]] - `method` [EXTRACTED]
 - [[.test_summarizer_blocks_localhost()]] - `calls` [INFERRED]

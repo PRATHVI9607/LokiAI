@@ -12,7 +12,7 @@ tags:
 # FactChecker
 
 ## Connections
-- [[.__init__()_31]] - `method` [EXTRACTED]
+- [[.__init__()_33]] - `method` [EXTRACTED]
 - [[._ask()_6]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._search_web()]] - `method` [EXTRACTED]

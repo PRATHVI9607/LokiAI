@@ -10,7 +10,7 @@ members: 10
 **Members:** 10 nodes
 
 ## Members
-- [[.__init__()_33]] - code - loki/features/file_search.py
+- [[.__init__()_35]] - code - loki/features/file_search.py
 - [[._parse_query()]] - code - loki/features/file_search.py
 - [[._scan()]] - code - loki/features/file_search.py
 - [[._score_file()]] - code - loki/features/file_search.py

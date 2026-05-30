@@ -10,7 +10,7 @@ members: 20
 **Members:** 20 nodes
 
 ## Members
-- [[.__init__()_45]] - code - loki/features/rag_engine.py
+- [[.__init__()_47]] - code - loki/features/rag_engine.py
 - [[._check_embed()]] - code - loki/features/rag_engine.py
 - [[._embed()]] - code - loki/features/rag_engine.py
 - [[._embed_batch()]] - code - loki/features/rag_engine.py

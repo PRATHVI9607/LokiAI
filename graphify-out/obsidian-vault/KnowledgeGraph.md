@@ -12,7 +12,7 @@ tags:
 # KnowledgeGraph
 
 ## Connections
-- [[.__init__()_40]] - `method` [EXTRACTED]
+- [[.__init__()_42]] - `method` [EXTRACTED]
 - [[._extract_entities()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()_2]] - `method` [EXTRACTED]

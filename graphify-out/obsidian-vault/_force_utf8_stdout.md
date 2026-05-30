@@ -1,11 +1,11 @@
 ---
 source_file: "loki/core/log_setup.py"
 type: "code"
-community: "LokiBrain / PlasmaOrb / _call_llm (provider priority)"
+community: "LokiBrain / LokiBrain._fast_intent (determinist / TerminalFormatter (color-coded tags"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority
+  - community/LokiBrain_/_LokiBrain_fast_intent_determinist_/_TerminalFormatter_color-coded_tags
 ---
 
 # _force_utf8_stdout
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[setup_logging]] - `conceptually_related_to` [INFERRED]
 
-#graphify/code #graphify/INFERRED #community/LokiBrain_/_PlasmaOrb_/__call_llm_provider_priority
+#graphify/code #graphify/INFERRED #community/LokiBrain_/_LokiBrain_fast_intent_determinist_/_TerminalFormatter_color-coded_tags

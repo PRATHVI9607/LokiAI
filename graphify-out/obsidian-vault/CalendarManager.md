@@ -12,7 +12,7 @@ tags:
 # CalendarManager
 
 ## Connections
-- [[.__init__()_20]] - `method` [EXTRACTED]
+- [[.__init__()_22]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._llm()]] - `method` [EXTRACTED]
 - [[._load_events()]] - `method` [EXTRACTED]

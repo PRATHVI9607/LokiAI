@@ -12,7 +12,7 @@ tags:
 # MediaConverter
 
 ## Connections
-- [[.__init__()_41]] - `method` [EXTRACTED]
+- [[.__init__()_43]] - `method` [EXTRACTED]
 - [[._check_ffmpeg()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[.convert()_1]] - `method` [EXTRACTED]

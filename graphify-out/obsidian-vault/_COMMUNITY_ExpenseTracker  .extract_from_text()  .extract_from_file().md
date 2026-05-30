@@ -10,7 +10,7 @@ members: 22
 **Members:** 22 nodes
 
 ## Members
-- [[.__init__()_30]] - code - loki/features/expense_tracker.py
+- [[.__init__()_32]] - code - loki/features/expense_tracker.py
 - [[._append_row()]] - code - loki/features/expense_tracker.py
 - [[._ensure_ledger()]] - code - loki/features/expense_tracker.py
 - [[._llm()_1]] - code - loki/features/expense_tracker.py

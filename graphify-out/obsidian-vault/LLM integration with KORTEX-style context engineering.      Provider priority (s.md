@@ -2,7 +2,7 @@
 source_file: "loki/core/brain.py"
 type: "rationale"
 community: "LokiBrain / DailyBriefing / CodeAssistant"
-location: "L267"
+location: "L299"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED

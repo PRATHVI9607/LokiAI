@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "_missing() / ._handle_api_mock_generate() / ._handle_backup_list()"
-location: "L893"
+community: "_missing() / ._handle_api_mock_generate() / ._handle_app_close()"
+location: "L931"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/_missing_/__handle_api_mock_generate_/__handle_backup_list
+  - community/_missing_/__handle_api_mock_generate_/__handle_app_close
 ---
 
 # _missing()
@@ -45,6 +45,13 @@ tags:
 - [[._handle_code_convert()]] - `calls` [EXTRACTED]
 - [[._handle_code_refactor()]] - `calls` [EXTRACTED]
 - [[._handle_commit_message()]] - `calls` [EXTRACTED]
+- [[._handle_computer_action()]] - `calls` [EXTRACTED]
+- [[._handle_computer_click()]] - `calls` [EXTRACTED]
+- [[._handle_computer_click_text()]] - `calls` [EXTRACTED]
+- [[._handle_computer_move()]] - `calls` [EXTRACTED]
+- [[._handle_computer_press()]] - `calls` [EXTRACTED]
+- [[._handle_computer_scroll()]] - `calls` [EXTRACTED]
+- [[._handle_computer_type()]] - `calls` [EXTRACTED]
 - [[._handle_currency_convert()]] - `calls` [EXTRACTED]
 - [[._handle_daily_briefing()]] - `calls` [EXTRACTED]
 - [[._handle_declutter_dups()]] - `calls` [EXTRACTED]
@@ -153,4 +160,4 @@ tags:
 - [[._handle_window_tile_all()]] - `calls` [EXTRACTED]
 - [[action_router.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/_missing_/__handle_api_mock_generate_/__handle_backup_list
+#graphify/code #graphify/EXTRACTED #community/_missing_/__handle_api_mock_generate_/__handle_app_close

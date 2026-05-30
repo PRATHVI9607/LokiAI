@@ -10,7 +10,7 @@ members: 16
 **Members:** 16 nodes
 
 ## Members
-- [[.__init__()_11]] - code - loki/core/memory.py
+- [[.__init__()_13]] - code - loki/core/memory.py
 - [[._load_json()]] - code - loki/core/memory.py
 - [[._next_task_id()]] - code - loki/core/memory.py
 - [[._save_json()]] - code - loki/core/memory.py

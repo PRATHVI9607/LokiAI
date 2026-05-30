@@ -1,12 +1,12 @@
 ---
 source_file: "loki/core/listener.py"
 type: "rationale"
-community: "SpeechListener / ._transcribe_worker() / listener.py"
-location: "L47"
+community: "SpeechListener / WakewordDetector / _whisper_device()"
+location: "L61"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/SpeechListener_/__transcribe_worker_/_listenerpy
+  - community/SpeechListener_/_WakewordDetector_/__whisper_device
 ---
 
 # Listens to microphone, detects speech via VAD, transcribes with Whisper.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[SpeechListener]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/SpeechListener_/__transcribe_worker_/_listenerpy
+#graphify/rationale #graphify/EXTRACTED #community/SpeechListener_/_WakewordDetector_/__whisper_device

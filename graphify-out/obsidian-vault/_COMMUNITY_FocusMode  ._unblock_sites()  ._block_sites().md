@@ -10,7 +10,7 @@ members: 12
 **Members:** 12 nodes
 
 ## Members
-- [[.__init__()_36]] - code - loki/features/focus_mode.py
+- [[.__init__()_38]] - code - loki/features/focus_mode.py
 - [[._auto_disable()]] - code - loki/features/focus_mode.py
 - [[._block_sites()]] - code - loki/features/focus_mode.py
 - [[._flush_dns()]] - code - loki/features/focus_mode.py

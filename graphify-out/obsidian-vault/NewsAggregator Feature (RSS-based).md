@@ -1,11 +1,11 @@
 ---
 source_file: "LokiPRD.md"
 type: "document"
-community: "DailyBriefing Feature (tasks + syst / Clipboard Manager (20-item history  / Persona: Personal Productivity User"
+community: "DailyBriefing Feature (tasks + syst / Persona: Personal Productivity User / Task Manager (persistent priority t"
 tags:
   - graphify/document
   - graphify/EXTRACTED
-  - community/DailyBriefing_Feature_tasks__syst_/_Clipboard_Manager_20-item_history__/_Persona_Personal_Productivity_User
+  - community/DailyBriefing_Feature_tasks__syst_/_Persona_Personal_Productivity_User_/_Task_Manager_persistent_priority_t
 ---
 
 # NewsAggregator Feature (RSS-based)
@@ -13,4 +13,4 @@ tags:
 ## Connections
 - [[DailyBriefing Feature (tasks + system + news)]] - `calls` [EXTRACTED]
 
-#graphify/document #graphify/EXTRACTED #community/DailyBriefing_Feature_tasks__syst_/_Clipboard_Manager_20-item_history__/_Persona_Personal_Productivity_User
+#graphify/document #graphify/EXTRACTED #community/DailyBriefing_Feature_tasks__syst_/_Persona_Personal_Productivity_User_/_Task_Manager_persistent_priority_t

@@ -1,18 +1,20 @@
 ---
 source_file: "loki/core/action_router.py"
 type: "code"
-community: "AutoAgent._execute_task / PendingActionStore / _DESTRUCTIVE_INTENTS Frozenset"
-location: "class ActionRouter"
+community: "ActionRouter / AutoAgent (Multi-Step Automation En / AppCtrl (Open Any App)"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+  - community/ActionRouter_/_AutoAgent_Multi-Step_Automation_En_/_AppCtrl_Open_Any_App
 ---
 
 # ActionRouter
 
 ## Connections
+- [[AppCtrl (Open Any App)]] - `calls` [EXTRACTED]
+- [[AutoAgent (Multi-Step Automation Engine)]] - `calls` [EXTRACTED]
+- [[AutoAgent._execute_task]] - `calls` [EXTRACTED]
+- [[ComputerControl (Desktop Control Engine)]] - `calls` [EXTRACTED]
 - [[INTENT_TIERS Security Classification]] - `rationale_for` [INFERRED]
-- [[PendingActionStore_1]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/AutoAgent_execute_task_/_PendingActionStore_/__DESTRUCTIVE_INTENTS_Frozenset
+#graphify/code #graphify/EXTRACTED #community/ActionRouter_/_AutoAgent_Multi-Step_Automation_En_/_AppCtrl_Open_Any_App

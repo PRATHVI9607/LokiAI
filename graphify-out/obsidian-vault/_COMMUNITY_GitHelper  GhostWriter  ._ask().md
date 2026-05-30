@@ -10,8 +10,8 @@ members: 20
 **Members:** 20 nodes
 
 ## Members
-- [[.__init__()_33]] - code - loki/features/ghostwriter.py
-- [[.__init__()_34]] - code - loki/features/git_helper.py
+- [[.__init__()_39]] - code - loki/features/ghostwriter.py
+- [[.__init__()_40]] - code - loki/features/git_helper.py
 - [[._ask()_7]] - code - loki/features/ghostwriter.py
 - [[._get_repo()]] - code - loki/features/git_helper.py
 - [[.bullets_to_prose()]] - code - loki/features/ghostwriter.py
@@ -39,10 +39,9 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 4 edges to [[_COMMUNITY_LokiApplication  ._init_all()  main.py]]
-- 2 edges to [[_COMMUNITY_ConversationManager  .process_input()  ._speak()]]
-- 2 edges to [[_COMMUNITY_LokiBrain  ApiMocker  FactChecker]]
+- 4 edges to [[_COMMUNITY_LokiApplication  ._init_all()  .__init__()]]
+- 2 edges to [[_COMMUNITY_LokiBrain  DailyBriefing  CodeAssistant]]
 
 ## Top bridge nodes
-- [[GitHelper]] - degree 11, connects to 3 communities
-- [[GhostWriter]] - degree 10, connects to 3 communities
+- [[GitHelper]] - degree 10, connects to 2 communities
+- [[GhostWriter]] - degree 9, connects to 2 communities

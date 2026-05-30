@@ -12,7 +12,7 @@ tags:
 # RagEngine
 
 ## Connections
-- [[.__init__()_45]] - `method` [EXTRACTED]
+- [[.__init__()_47]] - `method` [EXTRACTED]
 - [[._check_embed()]] - `method` [EXTRACTED]
 - [[._embed()]] - `method` [EXTRACTED]
 - [[._embed_batch()]] - `method` [EXTRACTED]

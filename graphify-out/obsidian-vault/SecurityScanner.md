@@ -12,7 +12,7 @@ tags:
 # SecurityScanner
 
 ## Connections
-- [[.__init__()_47]] - `method` [EXTRACTED]
+- [[.__init__()_49]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._iter_files()]] - `method` [EXTRACTED]
 - [[._os_walk()]] - `method` [EXTRACTED]

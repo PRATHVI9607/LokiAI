@@ -12,7 +12,7 @@ tags:
 # TerminalFormatter
 
 ## Connections
-- [[.__init__()_10]] - `method` [EXTRACTED]
+- [[.__init__()_12]] - `method` [EXTRACTED]
 - [[.format()]] - `method` [EXTRACTED]
 - [[Compact, aligned, color-coded one-line format for the terminal.]] - `rationale_for` [EXTRACTED]
 - [[log_setup.py]] - `contains` [EXTRACTED]

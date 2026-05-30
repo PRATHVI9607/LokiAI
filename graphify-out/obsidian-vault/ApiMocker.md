@@ -12,7 +12,7 @@ tags:
 # ApiMocker
 
 ## Connections
-- [[.__init__()_17]] - `method` [EXTRACTED]
+- [[.__init__()_19]] - `method` [EXTRACTED]
 - [[._ask()]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._strip_fences()]] - `method` [EXTRACTED]

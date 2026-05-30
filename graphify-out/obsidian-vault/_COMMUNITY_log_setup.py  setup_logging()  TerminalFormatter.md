@@ -10,7 +10,7 @@ members: 16
 **Members:** 16 nodes
 
 ## Members
-- [[.__init__()_10]] - code - loki/core/log_setup.py
+- [[.__init__()_12]] - code - loki/core/log_setup.py
 - [[.format()]] - code - loki/core/log_setup.py
 - [[C]] - code - loki/core/log_setup.py
 - [[Compact, aligned, color-coded one-line format for the terminal.]] - rationale - loki/core/log_setup.py

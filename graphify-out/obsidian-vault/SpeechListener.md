@@ -1,18 +1,18 @@
 ---
 source_file: "loki/core/listener.py"
 type: "code"
-community: "SpeechListener / ._transcribe_worker() / listener.py"
-location: "L46"
+community: "SpeechListener / WakewordDetector / _whisper_device()"
+location: "L60"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SpeechListener_/__transcribe_worker_/_listenerpy
+  - community/SpeechListener_/_WakewordDetector_/__whisper_device
 ---
 
 # SpeechListener
 
 ## Connections
-- [[.__init__()_9]] - `method` [EXTRACTED]
+- [[.__init__()_11]] - `method` [EXTRACTED]
 - [[._init_all()]] - `calls` [INFERRED]
 - [[._listen_loop()]] - `method` [EXTRACTED]
 - [[._transcribe()]] - `method` [EXTRACTED]
@@ -24,4 +24,4 @@ tags:
 - [[VoicePipeline]] - `uses` [INFERRED]
 - [[listener.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SpeechListener_/__transcribe_worker_/_listenerpy
+#graphify/code #graphify/EXTRACTED #community/SpeechListener_/_WakewordDetector_/__whisper_device

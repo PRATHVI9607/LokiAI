@@ -2,7 +2,7 @@
 source_file: "loki/core/action_router.py"
 type: "rationale"
 community: "Human-readable description of a des"
-location: "L898"
+location: "L936"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
