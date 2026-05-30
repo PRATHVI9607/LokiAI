@@ -64,8 +64,12 @@ htmlcov/
 # Whisper model cache
 .cache/whisper/
 
-# Graphify runtime cache (graph outputs kept, cache is regenerated)
+# Graphify — keep the 3 primary outputs (graph.json, graph.html, GRAPH_REPORT.md);
+# the cache, manifest, and the bulky per-node Obsidian vault are derived/regenerable.
 graphify-out/cache/
+graphify-out/manifest.json
+graphify-out/obsidian-vault/
+loki/graphify-out/
 
 # Distribution
 *.whl
