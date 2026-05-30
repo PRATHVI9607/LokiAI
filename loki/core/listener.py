@@ -251,19 +251,56 @@ class SpeechListener:
 
             text = result.get("text", "").strip()
 
-            if text and len(text) > 2 and text.lower() not in {
-                "you", ".", "thank you.", "thanks.", "bye.", "okay.",
-                "hmm.", "uh.", "um.", "ah.", "oh.", "huh.",
-            }:
-                # Double-check: only fire if still listening at point of callback
-                # (stop_listening may have been called while Whisper was running)
-                if self._listening and self.on_transcript:
-                    logger.info(f"📝 you said: \"{text}\"")
-                    self.on_transcript(text)
-                elif not self._listening:
-                    logger.debug(f"discarded (mic closed): {text!r}")
-            else:
-                logger.debug(f"Transcript filtered out: {text!r}")
+            # Reject obvious garbage + Whisper hallucinations (repetitive loops on
+            # silence/noise, e.g. "a little bit of a little bit of…")
+            reason = self._reject_reason(text, result)
+            if reason:
+                logger.debug(f"Transcript rejected ({reason}): {text[:60]!r}")
+                return
+
+            # Only fire if still listening at point of callback
+            if self._listening and self.on_transcript:
+                logger.info(f"📝 you said: \"{text}\"")
+                self.on_transcript(text)
+            elif not self._listening:
+                logger.debug(f"discarded (mic closed): {text!r}")
 
         except Exception as e:
             logger.error(f"Transcription error: {e}")
+
+    @staticmethod
+    def _reject_reason(text: str, result: dict) -> Optional[str]:
+        """Return a reason string if the transcript should be dropped, else None."""
+        if not text or len(text) <= 2:
+            return "too short"
+        low = text.lower().strip(" .!?")
+        if low in {"you", "thank you", "thanks", "bye", "okay", "ok",
+                   "hmm", "uh", "um", "ah", "oh", "huh", "the", "."}:
+            return "filler"
+
+        words = low.split()
+        # repetition: low unique-word ratio over a long string = looped hallucination
+        if len(words) >= 8 and len(set(words)) / len(words) < 0.45:
+            return "repetition"
+        # repeated short n-gram (e.g. "a little bit of" x10)
+        if len(words) >= 10:
+            for n in (3, 4, 5):
+                grams = [" ".join(words[i:i+n]) for i in range(len(words) - n + 1)]
+                if grams and max(grams.count(g) for g in set(grams)) >= 3:
+                    return "repeated phrase"
+        # repeated whole sentence (e.g. "...look at the video." x3)
+        import re as _re
+        sents = [s.strip() for s in _re.split(r"[.!?]+", low) if len(s.split()) >= 4]
+        if len(sents) >= 2 and len(set(sents)) < len(sents):
+            return "repeated sentence"
+
+        # Whisper's own confidence signals (averaged across segments)
+        segs = result.get("segments") or []
+        if segs:
+            crs = [s.get("compression_ratio", 0) for s in segs]
+            nsp = [s.get("no_speech_prob", 0) for s in segs]
+            if crs and (sum(crs) / len(crs)) > 2.6:      # high compression = repetitive
+                return "high compression"
+            if nsp and (sum(nsp) / len(nsp)) > 0.7:      # likely silence/noise
+                return "no speech"
+        return None
