@@ -9,10 +9,11 @@
 
 html, body, #__next {
   height: 100%;
-  /* Neon cyber: deep indigo void with a faint radial glow */
+  /* Loki semi-dark: lifted indigo slate (not pitch black), brighter toward the
+     centre where the green globe glows, settling to Loki #111128 at the edges */
   background:
-    radial-gradient(ellipse 90% 70% at 50% 40%, #14082e 0%, #0a0a1f 55%, #06060f 100%);
-  color: #EAF2FF;
+    radial-gradient(ellipse 85% 75% at 50% 42%, #232342 0%, #1a1a30 45%, #111128 80%, #0d0d1a 100%);
+  color: #cdd6f4;
   font-family: "Inter", system-ui, sans-serif;
   overflow: hidden;
 }
@@ -1117,3 +1118,119 @@ html, body, #__next {
 .thinking-dot:nth-child(1){ background:#16F58A; }
 .thinking-dot:nth-child(2){ background:#9DFFC6; }
 .thinking-dot:nth-child(3){ background:#00E5FF; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v4 — LOKI GREEN · semi-dark theme (final, overrides all earlier neon)
+   palette: green #50FA7B · bright #7CFFB0 · gold #C4A45A · blue #8BE9FD
+            text #CDD6F4 · text-dim #6B6BA8 · indigo bg #1A1A30/#111128
+══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --lk-green:  #50FA7B;
+  --lk-green2: #7CFFB0;
+  --lk-gold:   #C4A45A;
+  --lk-blue:   #8BE9FD;
+  --lk-text:   #CDD6F4;
+  --lk-dim:    #6B6BA8;
+}
+
+::-webkit-scrollbar-thumb { background: rgba(80,250,123,0.32); }
+::-webkit-scrollbar-thumb:hover { background: rgba(80,250,123,0.55); }
+::selection { background: rgba(80,250,123,0.28); color: #fff; }
+
+/* Vignette: green-tinted glow top, soft indigo settle */
+.app-vignette {
+  background:
+    radial-gradient(ellipse 58% 48% at 50% 42%, transparent 0%, transparent 40%, rgba(13,13,26,0.45) 100%),
+    radial-gradient(ellipse 80% 60% at 50% 0%,  rgba(80,250,123,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(139,233,253,0.05) 0%, transparent 55%);
+}
+
+/* Header — lifted glass, green hairline */
+.app-header {
+  background: linear-gradient(180deg, rgba(20,20,42,0.55), rgba(20,20,42,0.12));
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+  border-bottom: 1px solid rgba(80,250,123,0.10);
+}
+.loki-logo {
+  background: linear-gradient(110deg, #50FA7B 0%, #7CFFB0 35%, #8BE9FD 75%, #50FA7B 100%);
+  background-size: 300% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 8px rgba(80,250,123,0.4));
+}
+.header-divider { background: linear-gradient(180deg, transparent, rgba(80,250,123,0.4), transparent); }
+
+/* Conversation column over the globe */
+.chat-body { background: transparent; }
+
+/* Message cards — green-glass with flowing green→blue border */
+.msg-bubble-loki {
+  background: linear-gradient(155deg, rgba(26,28,52,0.66), rgba(17,17,40,0.58));
+  border: 1px solid transparent;
+  color: var(--lk-text);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 22px rgba(80,250,123,0.05);
+}
+.msg-bubble-loki::before {
+  background: linear-gradient(130deg, #50FA7B, #8BE9FD 50%, #50FA7B 90%);
+  background-size: 200% 200%;
+  opacity: 0.5;
+}
+.msg-bubble-user {
+  background: linear-gradient(135deg, rgba(80,250,123,0.14), rgba(139,233,253,0.10));
+  border: 1px solid rgba(80,250,123,0.30);
+  color: #EAFBF0;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.35), 0 0 18px rgba(80,250,123,0.07);
+}
+
+/* Avatar — green plasma */
+.msg-avatar {
+  background: radial-gradient(circle at 35% 30%, #C8FFD8 0%, #7CFFB0 35%, #50FA7B 70%, #8BE9FD 100%);
+  box-shadow: 0 0 16px rgba(80,250,123,0.55), 0 0 8px rgba(139,233,253,0.3);
+}
+
+/* System chip + markdown */
+.msg-system { color: var(--lk-dim); background: rgba(80,250,123,0.05); border: 1px solid rgba(80,250,123,0.16); }
+.msg-inline-code { background: rgba(80,250,123,0.12); border-color: rgba(80,250,123,0.28); color: #9DFFC0; }
+.msg-code-block { background: rgba(13,13,26,0.85); border-color: rgba(80,250,123,0.16); border-left: 3px solid var(--lk-green); }
+.msg-code-lang { color: rgba(80,250,123,0.6); }
+.msg-link { color: var(--lk-blue); } .msg-link:hover { color: #B5F2FF; }
+
+/* Thinking dots */
+.thinking-dot:nth-child(1){ background:#50FA7B; }
+.thinking-dot:nth-child(2){ background:#7CFFB0; }
+.thinking-dot:nth-child(3){ background:#8BE9FD; }
+
+/* Input capsule — green focus, lifted glass */
+.input-row { border-color: rgba(80,250,123,0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 26px rgba(80,250,123,0.05); }
+.input-field { color: var(--lk-text); }
+.input-field::placeholder { color: var(--lk-dim); }
+.send-btn {
+  background: linear-gradient(135deg, #50FA7B, #8BE9FD 60%, #50FA7B);
+  background-size: 180% auto; color: #0d0d1a; font-weight: 800;
+  box-shadow: 0 4px 20px rgba(80,250,123,0.32);
+}
+.send-btn:hover:not(:disabled) { box-shadow: 0 6px 28px rgba(80,250,123,0.45); }
+
+/* Action buttons + chips */
+.action-btn { background: rgba(26,26,48,0.5); border-color: rgba(80,250,123,0.18); color: #8aa0c6; }
+.action-btn:hover { border-color: rgba(80,250,123,0.4); color: var(--lk-green); box-shadow: 0 0 12px rgba(80,250,123,0.14); }
+.action-btn-gold { border-color: rgba(196,164,90,0.4); background: rgba(196,164,90,0.1); color: var(--lk-gold); }
+.action-btn-red:hover { border-color: rgba(255,85,85,0.45); color: #ff7a7a; }
+.personality-btn { background: rgba(80,250,123,0.06); border-color: rgba(80,250,123,0.22); }
+.personality-btn-dot { background: #50FA7B; box-shadow: 0 0 6px #50FA7B; }
+.status-pill { background: rgba(26,26,48,0.55); }
+
+.rag-pill { border-color: rgba(80,250,123,0.3); background: rgba(80,250,123,0.1); color: #9DFFC0; box-shadow: 0 0 10px rgba(80,250,123,0.12); }
+
+/* File sidebar */
+.file-sidebar { background: rgba(17,17,40,0.78); border-right: 1px solid rgba(80,250,123,0.12); }
+.dropzone { border-color: rgba(80,250,123,0.26); }
+.dropzone:hover, .dropzone-active { border-color: rgba(80,250,123,0.6); background: rgba(80,250,123,0.05); }
+
+.transcript-strip { background: rgba(80,250,123,0.05); border: 1px dashed rgba(80,250,123,0.28); color: var(--lk-dim); }
+
+.rune-glow { text-shadow: 0 0 14px rgba(80,250,123,0.35), 0 0 36px rgba(139,233,253,0.12); color: rgba(80,250,123,0.16); }
+.dormant-rune { color: rgba(80,250,123,0.3); }
+.dormant-label { color: rgba(80,250,123,0.4); }

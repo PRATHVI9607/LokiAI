@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * PlasmaOrb — a half-destroyed planet (React Three Fiber).
+ * PlasmaOrb — holographic network globe (React Three Fiber).
  *
- * A dark solid planet core with a fractured neon-green particle shell — chunks
- * of the surface are "destroyed" (noise-gated gaps) and debris drifts outward.
- * The centre stays DARK; the glow radiates from the broken green crust.
- * Controlled bloom (no white blowout).
+ * Nodes distributed on a sphere (fibonacci), each wired to its nearest
+ * neighbours with thin glowing lines → a crisp "data sphere" / JARVIS-globe.
+ * Bright energy core + animated data pulses travelling the network.
+ * TIGHT bloom (small radius, high threshold) so it reads sharp, not blurry.
  *
- * Reacts to Loki's voice state via glow intensity + rotation speed.
+ * Reacts to Loki's voice state: rotation speed, node brightness, pulse rate.
  */
 
 import { useMemo, useRef } from "react";
@@ -17,173 +17,139 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { type Status } from "@/hooks/useLoki";
 
-interface OrbParams { spin: number; glow: number; }
+interface OrbParams { spin: number; bright: number; }
 const STATE_PARAMS: Record<Status, OrbParams> = {
-  idle:      { spin: 0.06, glow: 1.0 },
-  listening: { spin: 0.12, glow: 1.3 },
-  thinking:  { spin: 0.30, glow: 1.55 },
-  speaking:  { spin: 0.18, glow: 1.7 },
-  offline:   { spin: 0.02, glow: 0.35 },
+  idle:      { spin: 0.05, bright: 1.0 },
+  listening: { spin: 0.10, bright: 1.35 },
+  thinking:  { spin: 0.28, bright: 1.6 },
+  speaking:  { spin: 0.16, bright: 1.8 },
+  offline:   { spin: 0.02, bright: 0.4 },
 };
 
-const SHELL_COUNT  = 2600;   // crust particles (fewer, as requested)
-const DEBRIS_COUNT = 700;    // floating destroyed fragments
-const R = 1.25;              // planet radius
+const NODES = 150;          // network vertices
+const NEIGHBORS = 3;        // edges per node → ~clean mesh
+const R = 1.5;              // globe radius
+const PULSES = 40;          // travelling data sparks
 
-// neon green palette (dark inner → bright neon → cyan spark)
-const C_DEEP = new THREE.Color("#063b2a");  // dark emerald (crust base)
-const C_MID  = new THREE.Color("#16f58a");  // neon green
-const C_HOT  = new THREE.Color("#9dffc6");  // bright green-white spark
-const C_RIM  = new THREE.Color("#00E5FF");  // cyan accent
+// Loki-green holographic palette (JARVIS globe, recoloured to Loki green #50fa7b)
+const COL_NODE = new THREE.Color("#7CFFB0");  // bright node
+const COL_LINE = new THREE.Color("#2FE38A");  // green network lines
+const COL_CORE = new THREE.Color("#C8FFD8");  // pale green-white core
+const COL_PULSE = new THREE.Color("#E8FFEF");  // bright travelling spark
 
-// hash-based pseudo-noise for "destroyed" gaps (deterministic per direction)
-function craterMask(x: number, y: number, z: number): number {
-  // sum of a few sine bands → continents/craters; >thresh = solid crust
-  const n =
-    Math.sin(x * 3.1 + y * 1.7) * 0.5 +
-    Math.sin(y * 2.3 - z * 2.9) * 0.5 +
-    Math.sin(z * 3.7 + x * 1.3) * 0.5;
-  return n; // ~[-1.5, 1.5]
-}
-
-const VERT = `
-uniform float uTime; uniform float uGlow;
-attribute float aScale; attribute vec3 aColor; attribute float aSeed;
-varying vec3 vColor; varying float vA;
-void main(){
-  vColor = aColor;
-  vec3 p = position;
-  // tiny shimmer/drift per particle
-  p += normalize(p) * sin(uTime * 1.2 + aSeed * 6.2831) * 0.012;
-  vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  vA = uGlow;
-  gl_PointSize = aScale * (260.0 / -mv.z);
-  gl_Position = projectionMatrix * mv;
-}
-`;
-
-const FRAG = `
-precision highp float;
-varying vec3 vColor; varying float vA;
-void main(){
-  vec2 uv = gl_PointCoord - 0.5;
-  float d = length(uv);
-  if (d > 0.5) discard;
-  float glow = smoothstep(0.5, 0.05, d);
-  gl_FragColor = vec4(vColor, glow * vA);
-}
-`;
-
-function buildShell() {
-  const pos: number[] = [], col: number[] = [], scl: number[] = [], sd: number[] = [];
-  const tmp = new THREE.Color();
-  let made = 0, attempts = 0;
-  while (made < SHELL_COUNT && attempts < SHELL_COUNT * 4) {
-    attempts++;
-    // random point on sphere
-    const u = Math.random(), v = Math.random();
-    const theta = u * Math.PI * 2;
-    const phi = Math.acos(2 * v - 1);
-    const nx = Math.sin(phi) * Math.cos(theta);
-    const ny = Math.cos(phi);
-    const nz = Math.sin(phi) * Math.sin(theta);
-    // DESTROYED gaps: skip where crust is "blown away"
-    if (craterMask(nx * 2, ny * 2, nz * 2) < -0.15) continue;
-    const rr = R + (Math.random() - 0.5) * 0.06; // thin crust thickness
-    pos.push(nx * rr, ny * rr, nz * rr);
-    // brighter on jagged high points, neon green base, rare cyan spark
-    const t = Math.random();
-    if (t < 0.78)      tmp.copy(C_DEEP).lerp(C_MID, Math.random());
-    else if (t < 0.96) tmp.copy(C_MID).lerp(C_HOT, Math.random() * 0.7);
-    else               tmp.copy(C_RIM);
-    col.push(tmp.r, tmp.g, tmp.b);
-    scl.push(0.7 + Math.random() * 1.6);
-    sd.push(Math.random());
-    made++;
+// even point distribution on a sphere
+function fibonacciSphere(n: number, r: number): THREE.Vector3[] {
+  const pts: THREE.Vector3[] = [];
+  const phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (i / (n - 1)) * 2;
+    const rad = Math.sqrt(1 - y * y);
+    const th = phi * i;
+    pts.push(new THREE.Vector3(Math.cos(th) * rad * r, y * r, Math.sin(th) * rad * r));
   }
-  return {
-    positions: new Float32Array(pos),
-    colors: new Float32Array(col),
-    scales: new Float32Array(scl),
-    seeds: new Float32Array(sd),
-    count: made,
-  };
+  return pts;
 }
 
-function buildDebris() {
-  const pos = new Float32Array(DEBRIS_COUNT * 3);
-  const col = new Float32Array(DEBRIS_COUNT * 3);
-  const scl = new Float32Array(DEBRIS_COUNT);
-  const sd  = new Float32Array(DEBRIS_COUNT);
-  const tmp = new THREE.Color();
-  for (let i = 0; i < DEBRIS_COUNT; i++) {
-    const rr = R * (1.15 + Math.random() * 1.4); // floating outward
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    pos[i*3]   = rr * Math.sin(phi) * Math.cos(theta);
-    pos[i*3+1] = rr * Math.cos(phi);
-    pos[i*3+2] = rr * Math.sin(phi) * Math.sin(theta);
-    tmp.copy(C_MID).lerp(C_DEEP, Math.random() * 0.6);
-    col[i*3] = tmp.r; col[i*3+1] = tmp.g; col[i*3+2] = tmp.b;
-    scl[i] = 0.4 + Math.random() * 0.9;
-    sd[i]  = Math.random();
-  }
-  return { positions: pos, colors: col, scales: scl, seeds: sd };
-}
-
-function Planet({ status }: { status: Status }) {
+function NetworkGlobe({ status }: { status: Status }) {
   const grp = useRef<THREE.Group>(null);
-  const shellMat = useRef<THREE.ShaderMaterial>(null);
-  const debrisMat = useRef<THREE.ShaderMaterial>(null);
+  const nodeMat = useRef<THREE.PointsMaterial>(null);
+  const lineMat = useRef<THREE.LineBasicMaterial>(null);
+  const coreMat = useRef<THREE.MeshBasicMaterial>(null);
+  const pulseRef = useRef<THREE.Points>(null);
   const cur = useRef<OrbParams>({ ...STATE_PARAMS.idle });
 
-  const shell  = useMemo(buildShell, []);
-  const debris = useMemo(buildDebris, []);
+  // Build nodes + nearest-neighbour edges + pulse paths once
+  const { nodePos, linePos, edges } = useMemo(() => {
+    const verts = fibonacciSphere(NODES, R);
+    const nodeArr = new Float32Array(NODES * 3);
+    verts.forEach((v, i) => { nodeArr[i*3] = v.x; nodeArr[i*3+1] = v.y; nodeArr[i*3+2] = v.z; });
 
-  const shellU = useMemo(() => ({ uTime: { value: 0 }, uGlow: { value: 1 } }), []);
-  const debrisU = useMemo(() => ({ uTime: { value: 0 }, uGlow: { value: 1 } }), []);
+    const edgeList: [number, number][] = [];
+    const seen = new Set<string>();
+    for (let i = 0; i < NODES; i++) {
+      const dists = verts.map((v, j) => ({ j, d: verts[i].distanceToSquared(v) }))
+        .filter(o => o.j !== i).sort((a, b) => a.d - b.d).slice(0, NEIGHBORS);
+      for (const { j } of dists) {
+        const key = i < j ? `${i}-${j}` : `${j}-${i}`;
+        if (!seen.has(key)) { seen.add(key); edgeList.push([i, j]); }
+      }
+    }
+    const lineArr = new Float32Array(edgeList.length * 6);
+    edgeList.forEach(([a, b], k) => {
+      lineArr.set([verts[a].x, verts[a].y, verts[a].z, verts[b].x, verts[b].y, verts[b].z], k * 6);
+    });
+    return { nodePos: nodeArr, linePos: lineArr, edges: edgeList, verts };
+  }, []);
+
+  // Travelling data pulses — each rides a random edge, t∈[0,1]
+  const pulses = useMemo(() => Array.from({ length: PULSES }, () => ({
+    edge: Math.floor(Math.random() * edges.length),
+    t: Math.random(),
+    speed: 0.3 + Math.random() * 0.7,
+  })), [edges.length]);
+  const pulsePos = useMemo(() => new Float32Array(PULSES * 3), []);
 
   useFrame((_, delta) => {
     const target = STATE_PARAMS[status] ?? STATE_PARAMS.idle;
     const k = Math.min(delta * 2.0, 1);
     cur.current.spin += (target.spin - cur.current.spin) * k;
-    cur.current.glow += (target.glow - cur.current.glow) * k;
-    const pulse = status === "speaking" ? 1 + Math.sin(performance.now() * 0.005) * 0.12 : 1;
-    if (shellMat.current)  { shellMat.current.uniforms.uTime.value += delta; shellMat.current.uniforms.uGlow.value = cur.current.glow * pulse; }
-    if (debrisMat.current) { debrisMat.current.uniforms.uTime.value += delta; debrisMat.current.uniforms.uGlow.value = cur.current.glow * 0.7; }
-    if (grp.current) { grp.current.rotation.y += delta * cur.current.spin; grp.current.rotation.x = 0.35; }
+    cur.current.bright += (target.bright - cur.current.bright) * k;
+    const pulse = status === "speaking" ? 1 + Math.sin(performance.now() * 0.005) * 0.18 : 1;
+    const b = cur.current.bright * pulse;
+
+    if (nodeMat.current) nodeMat.current.opacity = Math.min(1, 0.85 * b);
+    if (lineMat.current) lineMat.current.opacity = Math.min(1, 0.28 * b);
+    if (coreMat.current) coreMat.current.opacity = Math.min(1, 0.9 * b);
+    if (grp.current) { grp.current.rotation.y += delta * cur.current.spin; grp.current.rotation.x = 0.28; }
+
+    // advance pulses along their edges
+    const geo = pulseRef.current?.geometry as THREE.BufferGeometry | undefined;
+    if (geo) {
+      for (let i = 0; i < PULSES; i++) {
+        const p = pulses[i];
+        p.t += delta * p.speed * (0.5 + cur.current.spin * 2);
+        if (p.t > 1) { p.t = 0; p.edge = Math.floor(Math.random() * edges.length); }
+        pulsePos[i*3]   = linePos[p.edge*6]   + (linePos[p.edge*6+3] - linePos[p.edge*6])   * p.t;
+        pulsePos[i*3+1] = linePos[p.edge*6+1] + (linePos[p.edge*6+4] - linePos[p.edge*6+1]) * p.t;
+        pulsePos[i*3+2] = linePos[p.edge*6+2] + (linePos[p.edge*6+5] - linePos[p.edge*6+2]) * p.t;
+      }
+      (geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+    }
   });
 
   return (
     <group ref={grp}>
-      {/* dark solid planet body — keeps the centre dark + occludes back-side particles */}
+      {/* bright energy core */}
       <mesh>
-        <sphereGeometry args={[R * 0.94, 48, 48]} />
-        <meshStandardMaterial color="#02120b" roughness={1} metalness={0} emissive="#031f14" emissiveIntensity={0.25} />
+        <sphereGeometry args={[0.18, 32, 32]} />
+        <meshBasicMaterial ref={coreMat} color={COL_CORE} transparent toneMapped={false} />
       </mesh>
 
-      {/* fractured neon-green crust */}
+      {/* network lines — thin, crisp, additive */}
+      <lineSegments>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[linePos, 3]} count={linePos.length / 3} />
+        </bufferGeometry>
+        <lineBasicMaterial ref={lineMat} color={COL_LINE} transparent opacity={0.28}
+          blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </lineSegments>
+
+      {/* nodes — sharp bright points */}
       <points>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[shell.positions, 3]} count={shell.count} />
-          <bufferAttribute attach="attributes-aColor"   args={[shell.colors, 3]} count={shell.count} />
-          <bufferAttribute attach="attributes-aScale"   args={[shell.scales, 1]} count={shell.count} />
-          <bufferAttribute attach="attributes-aSeed"    args={[shell.seeds, 1]} count={shell.count} />
+          <bufferAttribute attach="attributes-position" args={[nodePos, 3]} count={NODES} />
         </bufferGeometry>
-        <shaderMaterial ref={shellMat} vertexShader={VERT} fragmentShader={FRAG} uniforms={shellU}
-          transparent depthWrite={false} depthTest blending={THREE.AdditiveBlending} />
+        <pointsMaterial ref={nodeMat} color={COL_NODE} size={0.05} transparent opacity={0.85}
+          sizeAttenuation blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
       </points>
 
-      {/* drifting destroyed debris */}
-      <points>
+      {/* travelling data pulses — bright sparks riding the lines */}
+      <points ref={pulseRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[debris.positions, 3]} count={DEBRIS_COUNT} />
-          <bufferAttribute attach="attributes-aColor"   args={[debris.colors, 3]} count={DEBRIS_COUNT} />
-          <bufferAttribute attach="attributes-aScale"   args={[debris.scales, 1]} count={DEBRIS_COUNT} />
-          <bufferAttribute attach="attributes-aSeed"    args={[debris.seeds, 1]} count={DEBRIS_COUNT} />
+          <bufferAttribute attach="attributes-position" args={[pulsePos, 3]} count={PULSES} />
         </bufferGeometry>
-        <shaderMaterial ref={debrisMat} vertexShader={VERT} fragmentShader={FRAG} uniforms={debrisU}
-          transparent depthWrite={false} depthTest blending={THREE.AdditiveBlending} />
+        <pointsMaterial color={COL_PULSE} size={0.07} transparent opacity={0.95}
+          sizeAttenuation blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
       </points>
     </group>
   );
@@ -192,17 +158,15 @@ function Planet({ status }: { status: Status }) {
 export default function PlasmaOrb({ status }: { status: Status }) {
   return (
     <Canvas
-      camera={{ position: [0, 0, 6.5], fov: 40 }}
-      dpr={[1, 1.75]}
+      camera={{ position: [0, 0, 5.5], fov: 42 }}
+      dpr={[1, 2]}
       gl={{ antialias: true, alpha: true }}
       style={{ width: "100%", height: "100%" }}
     >
-      <ambientLight intensity={0.3} />
-      <pointLight position={[3, 2, 4]} intensity={1.2} color="#16f58a" />
-      <Planet status={status} />
-      {/* controlled bloom — only the brightest green sparks glow, no white blowout */}
+      <NetworkGlobe status={status} />
+      {/* TIGHT bloom: only the hot nodes/core/pulses bloom → crisp, not blurry */}
       <EffectComposer>
-        <Bloom intensity={0.55} luminanceThreshold={0.4} luminanceSmoothing={0.5} mipmapBlur radius={0.6} />
+        <Bloom intensity={0.9} luminanceThreshold={0.5} luminanceSmoothing={0.3} mipmapBlur radius={0.35} />
       </EffectComposer>
     </Canvas>
   );
