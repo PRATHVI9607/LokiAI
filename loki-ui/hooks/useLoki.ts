@@ -9,6 +9,8 @@ export interface ChatMessage {
   type: MessageType;
   text: string;
   ts: number;
+  outcomeId?: string;          // backend outcome-log id — enables 👍/👎 on this turn
+  feedback?: "up" | "down";    // local optimistic state once rated
 }
 
 export type Status = "idle" | "listening" | "thinking" | "speaking" | "offline";
@@ -29,6 +31,7 @@ interface UseLokiReturn {
   indexedFiles: FileEntry[];
   ragAvailable: boolean;
   sendMessage: (text: string) => void;
+  sendFeedback: (messageId: string, outcomeId: string, rating: "up" | "down") => void;
   toggleMute: () => void;
   requestUndo: () => void;
   clearMessages: () => void;
@@ -74,12 +77,13 @@ export function useLoki(): UseLokiReturn {
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const msgIdRef = useRef(0);
 
-  const addMessage = useCallback((type: MessageType, text: string) => {
+  const addMessage = useCallback((type: MessageType, text: string, outcomeId?: string) => {
     const msg: ChatMessage = {
       id: `${++msgIdRef.current}`,
       type,
       text,
       ts: Date.now(),
+      outcomeId,
     };
     setMessages((prev) => [...prev.slice(-200), msg]);
   }, []);
@@ -121,7 +125,7 @@ export function useLoki(): UseLokiReturn {
       try {
         const msg = JSON.parse(event.data);
         switch (msg.type) {
-          case "loki_message":      addMessage("loki_message", msg.text); break;
+          case "loki_message":      addMessage("loki_message", msg.text, msg.outcome_id); break;
           case "user_message":      addMessage("user_message", msg.text); break;
           case "system_message":    addMessage("system_message", msg.text); break;
           case "status":            setStatus(msg.status as Status); break;
@@ -161,6 +165,14 @@ export function useLoki(): UseLokiReturn {
 
   const sendMessage = useCallback((text: string) => {
     send({ type: "user_message", text });
+  }, [send]);
+
+  const sendFeedback = useCallback((messageId: string, outcomeId: string, rating: "up" | "down") => {
+    send({ type: "feedback", id: outcomeId, rating });
+    // optimistic local state so the button reflects the choice immediately
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, feedback: rating } : m))
+    );
   }, [send]);
 
   const toggleMute = useCallback(() => {
@@ -239,7 +251,7 @@ export function useLoki(): UseLokiReturn {
   return {
     messages, status, transcript, isVisible, isMuted,
     personality, indexedFiles, ragAvailable,
-    sendMessage, toggleMute, requestUndo, clearMessages,
+    sendMessage, sendFeedback, toggleMute, requestUndo, clearMessages,
     uploadFile, deleteFile, setPersonality,
   };
 }

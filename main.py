@@ -336,6 +336,7 @@ class LokiApplication:
         self.server.on_user_message = self._on_browser_message
         self.server.on_mute_toggle  = lambda m: self.voice.set_muted(m)
         self.server.on_undo         = self._on_undo
+        self.server.on_feedback     = self._on_feedback
 
         # AutoAgent progress → chat feed
         self.auto_agent._on_progress = self.server.add_loki_message
@@ -361,6 +362,12 @@ class LokiApplication:
             return
         success = self.undo_stack.pop_and_undo()
         self.server.add_loki_message("Done. Reversed." if success else "Undo failed. Some things are permanent.")
+
+    def _on_feedback(self, interaction_id: str, rating: str, correction: str = "") -> None:
+        """User gave 👍/👎 (and maybe a correction) on a past response — feeds the learning loop."""
+        ok = self.outcome_log.record_feedback(interaction_id, rating, correction)
+        if ok:
+            logger.info(f"📊 feedback recorded: {rating} on {interaction_id}")
 
     def _on_proactive_alert(self, text: str, speak: bool) -> None:
         """Loki noticed something and is speaking up unprompted."""

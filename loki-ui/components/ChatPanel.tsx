@@ -30,6 +30,7 @@ interface ChatPanelProps {
   personality: Personality;
   indexedFiles: FileEntry[];
   onSend: (text: string) => void;
+  onFeedback: (messageId: string, outcomeId: string, rating: "up" | "down") => void;
   onToggleMute: () => void;
   onUndo: () => void;
   onClear: () => void;
@@ -40,7 +41,7 @@ interface ChatPanelProps {
 export default function ChatPanel({
   messages, status, transcript, isMuted, personality,
   indexedFiles,
-  onSend, onToggleMute, onUndo, onClear, onFilePanel, onPersonalityChange,
+  onSend, onFeedback, onToggleMute, onUndo, onClear, onFilePanel, onPersonalityChange,
 }: ChatPanelProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -207,7 +208,7 @@ export default function ChatPanel({
         <div ref={scrollRef} className="messages-area">
           <AnimatePresence initial={false}>
             {messages.map((msg) => (
-              <MessageBubble key={msg.id} msg={msg} />
+              <MessageBubble key={msg.id} msg={msg} onFeedback={onFeedback} />
             ))}
           </AnimatePresence>
 

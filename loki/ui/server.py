@@ -92,6 +92,7 @@ class LokiServer:
         self.on_user_message: Optional[Callable[[str], None]] = None
         self.on_mute_toggle: Optional[Callable[[bool], None]] = None
         self.on_undo: Optional[Callable] = None
+        self.on_feedback: Optional[Callable[[str, str, str], None]] = None
 
         self._setup_routes()
 
@@ -241,6 +242,12 @@ class LokiServer:
         elif kind == "undo":
             if self.on_undo:
                 self.on_undo()
+        elif kind == "feedback":
+            # 👍/👎 (and optional correction) on a past Loki response → learning loop
+            fid = str(msg.get("id", "")).strip()
+            rating = str(msg.get("rating", "")).strip()
+            if fid and rating and self.on_feedback:
+                self.on_feedback(fid, rating, str(msg.get("correction", "")).strip())
 
     # ─── Outbound helpers ─────────────────────────────────────────────────────
 
@@ -256,8 +263,11 @@ class LokiServer:
     def add_user_message(self, text: str) -> None:
         self._broadcast_sync({"type": "user_message", "text": text})
 
-    def add_loki_message(self, text: str) -> None:
-        self._broadcast_sync({"type": "loki_message", "text": text})
+    def add_loki_message(self, text: str, outcome_id: Optional[str] = None) -> None:
+        payload = {"type": "loki_message", "text": text}
+        if outcome_id:
+            payload["outcome_id"] = outcome_id  # lets the UI attach 👍/👎 to this turn
+        self._broadcast_sync(payload)
 
     def set_status(self, status: str) -> None:
         self._broadcast_sync({"type": "status", "status": status})

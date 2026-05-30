@@ -1289,9 +1289,55 @@ html, body, #__next {
 .msg-content .msg-list li { margin: 3px 0; }
 .msg-content .msg-code-block { margin: 8px 0; }
 
+/* ── Feedback thumbs (learning loop) ─────────────────────────────────────
+   Quiet by default, revealed on hover; locks in once rated. */
+.msg-feedback {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  padding-left: 31px;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.msg-block-loki:hover .msg-feedback { opacity: 1; }
+.msg-fb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.03);
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.msg-fb-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07);
+  color: #cdd6f4;
+}
+.msg-fb-btn:disabled { cursor: default; }
+.msg-fb-btn.is-active-up {
+  opacity: 1;
+  color: #10D97E;
+  border-color: rgba(16, 217, 126, 0.4);
+  background: rgba(16, 217, 126, 0.12);
+}
+.msg-fb-btn.is-active-down {
+  opacity: 1;
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.12);
+}
+/* keep the rated thumb visible even when the row isn't hovered */
+.msg-feedback:has(.is-active-up),
+.msg-feedback:has(.is-active-down) { opacity: 1; }
+
 /* tighten the hover hit area on mobile */
 @media (max-width: 760px) {
   .msg-content { padding-left: 0; }
+  .msg-feedback { padding-left: 0; opacity: 1; }  /* no hover on touch — always show */
   .messages-area { padding: 22px 14px 12px; }
 }
 

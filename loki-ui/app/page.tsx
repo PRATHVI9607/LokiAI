@@ -13,7 +13,7 @@ export default function Home() {
   const {
     messages, status, transcript, isMuted, isVisible,
     personality, indexedFiles, ragAvailable,
-    sendMessage, toggleMute, requestUndo, clearMessages,
+    sendMessage, sendFeedback, toggleMute, requestUndo, clearMessages,
     uploadFile, deleteFile, setPersonality,
   } = useLoki();
 
@@ -86,6 +86,7 @@ export default function Home() {
           personality={personality}
           indexedFiles={indexedFiles}
           onSend={sendMessage}
+          onFeedback={sendFeedback}
           onToggleMute={toggleMute}
           onUndo={requestUndo}
           onClear={clearMessages}

@@ -195,6 +195,7 @@ class ConversationStateMachine:
     def _process_worker(self, text: str) -> None:
         import time as _time
         _start = _time.time()
+        self._last_outcome_id = None  # fresh per turn — avoids stale feedback attribution
         try:
             response = ""
             for chunk in self._brain.ask(text):
@@ -218,7 +219,7 @@ class ConversationStateMachine:
                 self._handle_intent(intent)
             else:
                 self._record_outcome(intent="chat", params={}, success=True, response=response)
-                self._emit_response(response)
+                self._emit_response(response, outcome_id=self._last_outcome_id)
 
         except Exception as e:
             logger.error("Process worker error: %s", e, exc_info=True)
@@ -290,16 +291,20 @@ class ConversationStateMachine:
             return
 
         if result.get("success"):
-            # Speak the conversational ack (if any), then the concrete result
+            # Speak the conversational ack (if any), then the concrete result.
+            # The thumbs 👍/👎 attaches to the final/concrete message of the turn.
+            has_result = bool(result_msg and result_msg != loki_msg)
             if loki_msg:
-                self._emit_response(loki_msg, speak=True)
-            if result_msg and result_msg != loki_msg:
-                self._emit_response(result_msg, speak=True)
+                self._emit_response(loki_msg, speak=True,
+                                    outcome_id=None if has_result else self._last_outcome_id)
+            if has_result:
+                self._emit_response(result_msg, speak=True, outcome_id=self._last_outcome_id)
         else:
-            self._emit_response(result_msg or "That operation failed.", speak=True)
+            self._emit_response(result_msg or "That operation failed.", speak=True,
+                                outcome_id=self._last_outcome_id)
 
-    def _emit_response(self, text: str, speak: bool = True) -> None:
-        self._server.add_loki_message(text)
+    def _emit_response(self, text: str, speak: bool = True, outcome_id: Optional[str] = None) -> None:
+        self._server.add_loki_message(text, outcome_id=outcome_id)
         if speak and text:
             with self._lock:
                 self._state = ConvState.SPEAKING

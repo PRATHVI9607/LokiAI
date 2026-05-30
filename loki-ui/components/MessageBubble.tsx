@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { type ChatMessage } from "@/hooks/useLoki";
 
 // Lightweight inline markdown renderer — bold, italic, inline code, links
@@ -96,11 +97,17 @@ function renderMarkdown(text: string): React.ReactNode {
   return <>{nodes}</>;
 }
 
-export default function MessageBubble({ msg }: { msg: ChatMessage }) {
+interface MessageBubbleProps {
+  msg: ChatMessage;
+  onFeedback?: (messageId: string, outcomeId: string, rating: "up" | "down") => void;
+}
+
+export default function MessageBubble({ msg, onFeedback }: MessageBubbleProps) {
   // Hooks must run unconditionally on every render — keep this ABOVE any early
   // return, or React crashes with a hook-count mismatch (client-side exception).
   const isUser = msg.type === "user_message";
   const rendered = useMemo(() => renderMarkdown(msg.text), [msg.text]);
+  const canRate = !isUser && msg.type === "loki_message" && !!msg.outcomeId && !!onFeedback;
 
   if (msg.type === "system_message") {
     return (
@@ -130,6 +137,29 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
       <div className="msg-content">
         {isUser ? <p className="msg-para">{msg.text}</p> : rendered}
       </div>
+
+      {canRate && (
+        <div className="msg-feedback" aria-label="Rate this response">
+          <button
+            type="button"
+            className={`msg-fb-btn ${msg.feedback === "up" ? "is-active-up" : ""}`}
+            aria-label="Good response"
+            disabled={!!msg.feedback}
+            onClick={() => onFeedback!(msg.id, msg.outcomeId!, "up")}
+          >
+            <ThumbsUp size={13} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={`msg-fb-btn ${msg.feedback === "down" ? "is-active-down" : ""}`}
+            aria-label="Bad response"
+            disabled={!!msg.feedback}
+            onClick={() => onFeedback!(msg.id, msg.outcomeId!, "down")}
+          >
+            <ThumbsDown size={13} aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }
