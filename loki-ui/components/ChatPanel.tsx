@@ -141,7 +141,7 @@ export default function ChatPanel({
   const isOffline = status === "offline";
 
   return (
-    <div ref={rootRef} className="flex-1 flex flex-col min-w-0 min-h-0">
+    <div ref={rootRef} className="chat-dock flex flex-col min-w-0 min-h-0">
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <header className="app-header">

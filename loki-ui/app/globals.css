@@ -1294,3 +1294,53 @@ html, body, #__next {
   .msg-content { padding-left: 0; }
   .messages-area { padding: 22px 14px 12px; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v6 — SIDE-DOCKED CHAT: globe fills the view, chat is a right glass rail
+══════════════════════════════════════════════════════════════════════════ */
+
+.chat-dock {
+  width: min(440px, 100%);
+  margin-left: auto;          /* push to the right edge */
+  height: 100%;
+  background: linear-gradient(180deg, rgba(13,13,26,0.62), rgba(13,13,26,0.5));
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  backdrop-filter: blur(26px) saturate(140%);
+  border-left: 1px solid rgba(80,250,123,0.12);
+  box-shadow: -16px 0 50px rgba(0,0,0,0.4);
+}
+
+/* header sits atop the dock, not full width */
+.chat-dock .app-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(80,250,123,0.08);
+  box-shadow: none;
+  padding: 0 18px;
+}
+
+/* messages fill the dock width (drop the centered-column overrides) */
+.chat-dock .messages-area {
+  max-width: 100%;
+  padding: 22px 16px 12px;
+}
+.chat-dock .msg-content { max-width: 100%; }
+
+/* input fills the dock width */
+.chat-dock .input-bar {
+  max-width: 100%;
+  margin: 0;
+  padding: 12px 16px 18px;
+}
+
+/* mobile: dock becomes full width, globe sits behind (still visible at top) */
+@media (max-width: 760px) {
+  .chat-dock {
+    width: 100%;
+    height: 62%;
+    margin-top: auto;          /* dock to the bottom, globe shows on top */
+    border-left: none;
+    border-top: 1px solid rgba(80,250,123,0.12);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -16px 50px rgba(0,0,0,0.45);
+  }
+}

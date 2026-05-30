@@ -361,7 +361,7 @@ class LokiBrain:
             except Exception as e:
                 logger.warning(f"Kimi K2 init failed: {e}")
         else:
-            logger.info("KIMI_API_KEY not set — Kimi Moonshot disabled")
+            logger.info("Moonshot direct API not set (optional — Kimi K2.6 already served via NVIDIA NIM)")
 
         # ─── Provider 3: Ollama (local) ────────────────────────────────────────
         self._ollama_infer_client: Optional[Any] = None
