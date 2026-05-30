@@ -383,8 +383,18 @@ class LokiApplication:
             self.server.set_status("idle")
 
         async def on_startup():
+            loop = asyncio.get_event_loop()
+            # Swallow the benign Windows "connection forcibly closed" noise that
+            # fires whenever a browser tab refreshes/closes a WebSocket (WinError
+            # 10054). It's harmless — just stops it spamming the terminal.
+            def _quiet_conn_reset(loop, context):
+                exc = context.get("exception")
+                if isinstance(exc, (ConnectionResetError, ConnectionAbortedError)):
+                    return
+                loop.default_exception_handler(context)
+            loop.set_exception_handler(_quiet_conn_reset)
             asyncio.create_task(_startup())
-            self.server.set_loop(asyncio.get_event_loop())
+            self.server.set_loop(loop)
 
         self.server.add_startup_handler(on_startup)
         app = self.server.get_app()

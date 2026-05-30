@@ -1647,3 +1647,84 @@ html, body, #__next {
 .transcript-strip { background: rgba(217,182,92,0.05); border: 1px solid rgba(217,182,92,0.15); color: #B8AC8E; }
 .file-sidebar { background: rgba(16,13,9,0.8); border-right: 1px solid rgba(217,182,92,0.1); }
 .dropzone:hover, .dropzone-active { border-color: rgba(217,182,92,0.6); background: rgba(217,182,92,0.05); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v9 — CENTERED CONVERSATION  (undock the rail; orb is the hero)
+   Full-screen gold orb behind; chat is a calm centered column floating over it.
+══════════════════════════════════════════════════════════════════════════ */
+
+/* orb sits centred now (chat no longer covers the right side) */
+.video-orb { object-position: 50% 40%; }
+.video-scrim {
+  background:
+    linear-gradient(0deg, rgba(13,11,7,0.72) 0%, rgba(13,11,7,0.28) 26%, transparent 50%),
+    radial-gradient(ellipse 75% 60% at 50% 40%, transparent 40%, rgba(13,11,7,0.45) 100%),
+    linear-gradient(180deg, rgba(13,11,7,0.5) 0%, transparent 16%);
+}
+
+/* undock: full width, transparent, centred content */
+.chat-dock {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-left: none;
+  box-shadow: none;
+}
+
+/* header → minimal transparent floating top bar */
+.chat-dock .app-header {
+  height: 60px;
+  padding: 0 28px;
+  background: transparent;
+  border-bottom: none;
+}
+
+/* messages → centred 720px column, anchored toward the bottom so they
+   rise from just above the composer while the orb fills the space above */
+.chat-dock .messages-area {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 24px 10px;
+  justify-content: flex-end;   /* recent messages hug the input */
+  gap: 12px;
+}
+.chat-dock .msg-content { max-width: 100%; }
+
+/* composer → centred floating island */
+.chat-dock .input-bar {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 24px 22px;
+}
+
+/* a touch more presence on the composer since it floats over video */
+.composer-shell {
+  background: rgba(20,16,10,0.55);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+}
+
+/* messages over video → give every bubble a readable glass back, incl. user */
+.msg-block-loki .msg-content {
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+}
+.msg-block-user .msg-content {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* system line → centred subtle */
+.msg-row-system { justify-content: center; }
+
+/* mobile: same centred column, tighter padding */
+@media (max-width: 760px) {
+  .chat-dock .messages-area,
+  .chat-dock .input-bar { max-width: 100%; padding-left: 14px; padding-right: 14px; }
+}
