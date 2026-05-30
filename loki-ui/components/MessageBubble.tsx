@@ -115,16 +115,20 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
     );
   }
 
+  // Professional stacked layout: sender row (avatar + name) then content below.
   return (
     <motion.div
-      className={`msg-row ${isUser ? "msg-row-user" : "msg-row-loki"}`}
-      initial={{ opacity: 0, x: isUser ? 16 : -16, y: 6 }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      transition={{ duration: 0.28, ease: "easeOut" }}
+      className={`msg-block ${isUser ? "msg-block-user" : "msg-block-loki"}`}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
     >
-      {!isUser && <div className="msg-avatar" aria-hidden="true" />}
-      <div className={`msg-bubble ${isUser ? "msg-bubble-user" : "msg-bubble-loki"}`}>
-        {isUser ? msg.text : rendered}
+      <div className="msg-head">
+        <span className={`msg-dot ${isUser ? "is-user" : "is-loki"}`} aria-hidden="true" />
+        <span className="msg-sender">{isUser ? "You" : "Loki"}</span>
+      </div>
+      <div className="msg-content">
+        {isUser ? <p className="msg-para">{msg.text}</p> : rendered}
       </div>
     </motion.div>
   );
