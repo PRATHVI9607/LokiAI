@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, type KeyboardEvent } from "react";
-import { Send, Mic, MicOff, RotateCcw, Trash2, Paperclip } from "lucide-react";
+import { ArrowUp, Mic, MicOff, RotateCcw, Trash2, Paperclip } from "lucide-react";
 import { type Status } from "@/hooks/useLoki";
 
 interface InputBarProps {
@@ -14,6 +14,9 @@ interface InputBarProps {
   status: Status;
   filesCount: number;
 }
+
+// thin precise lines (skill: no thick lucide)
+const ICON = { strokeWidth: 1.5 };
 
 export default function InputBar({
   onSend, onToggleMute, onUndo, onClear, onFileClick,
@@ -38,71 +41,55 @@ export default function InputBar({
 
   return (
     <div className="input-bar">
-      {/* Main input row */}
-      <div className="input-row">
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={onKey}
-          placeholder={isOffline ? "Connecting to Loki…" : isListening ? "Listening… or type here" : "Speak or type…"}
-          disabled={isOffline}
-          aria-label="Message input"
-          className="input-field"
-        />
-        <button
-          type="button"
-          onClick={submit}
-          disabled={!value.trim() || isOffline}
-          aria-label="Send message"
-          className="send-btn"
-        >
-          <Send size={15} />
-          Send
-        </button>
+      {/* Double-Bezel island: outer shell + inner core */}
+      <div className="composer-shell">
+        <div className="composer-core">
+          <input
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={onKey}
+            placeholder={isOffline ? "Connecting to Loki…" : isListening ? "Listening…" : "Message Loki…"}
+            disabled={isOffline}
+            aria-label="Message input"
+            className="composer-input"
+          />
+          <button
+            type="button"
+            onClick={submit}
+            disabled={!value.trim() || isOffline}
+            aria-label="Send message"
+            className="composer-send group"
+          >
+            <ArrowUp size={17} {...ICON} className="transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-[2px]" />
+          </button>
+        </div>
       </div>
 
-      {/* Action row */}
+      {/* Action rail — thin ghost pills */}
       <div className="action-row">
-        <button
-          type="button"
-          onClick={onFileClick}
-          aria-label="Toggle file panel"
-          className={`action-btn ${filesCount > 0 ? "action-btn-gold" : ""}`}
-        >
-          <Paperclip size={12} />
-          Files{filesCount > 0 ? ` · ${filesCount}` : ""}
+        <button type="button" onClick={onFileClick} aria-label="Toggle file panel"
+          className={`pill ${filesCount > 0 ? "pill-active" : ""}`}>
+          <Paperclip size={13} {...ICON} />
+          <span>Files{filesCount > 0 ? ` · ${filesCount}` : ""}</span>
         </button>
 
-        <button
-          type="button"
-          onClick={onToggleMute}
+        <button type="button" onClick={onToggleMute}
           aria-label={isMuted ? "Unmute microphone" : "Mute microphone"}
-          className={`action-btn ${isListening ? "action-btn-mic-live" : isMuted ? "action-btn-red" : ""}`}
-        >
-          {isMuted ? <MicOff size={12} /> : <Mic size={12} />}
-          {isListening ? "Listening…" : isMuted ? "Muted" : "Mic"}
+          className={`pill ${isListening ? "pill-live" : isMuted ? "pill-danger" : ""}`}>
+          {isMuted ? <MicOff size={13} {...ICON} /> : <Mic size={13} {...ICON} />}
+          <span>{isListening ? "Listening" : isMuted ? "Muted" : "Voice"}</span>
         </button>
 
-        <button
-          type="button"
-          onClick={onUndo}
-          aria-label="Undo last action"
-          className="action-btn"
-        >
-          <RotateCcw size={12} />
-          Undo
+        <button type="button" onClick={onUndo} aria-label="Undo last action" className="pill">
+          <RotateCcw size={13} {...ICON} />
+          <span>Undo</span>
         </button>
 
-        <button
-          type="button"
-          onClick={onClear}
-          aria-label="Clear chat"
-          className="action-btn action-btn-red ml-auto"
-        >
-          <Trash2 size={12} />
-          Clear
+        <button type="button" onClick={onClear} aria-label="Clear chat" className="pill pill-danger ml-auto">
+          <Trash2 size={13} {...ICON} />
+          <span>Clear</span>
         </button>
       </div>
     </div>

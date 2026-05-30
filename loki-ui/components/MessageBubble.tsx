@@ -115,13 +115,13 @@ export default function MessageBubble({ msg }: { msg: ChatMessage }) {
     );
   }
 
-  // Professional stacked layout: sender row (avatar + name) then content below.
+  // Premium stacked layout — Double-Bezel card for Loki, ghost block for user.
   return (
     <motion.div
       className={`msg-block ${isUser ? "msg-block-user" : "msg-block-loki"}`}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
     >
       <div className="msg-head">
         <span className={`msg-dot ${isUser ? "is-user" : "is-loki"}`} aria-hidden="true" />
