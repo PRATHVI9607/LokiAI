@@ -2,9 +2,18 @@
 
 > *"The god of mischief, at your service."*
 
+[![CI](https://github.com/PRATHVI9607/LokiAI/actions/workflows/ci.yml/badge.svg)](https://github.com/PRATHVI9607/LokiAI/actions/workflows/ci.yml)
+
 Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, and deeply integrated with your system — with the wit and competence of a Norse trickster god.
 
-**50+ features** covering OS control, coding, writing, research, security, and productivity.
+**50+ features** covering OS control, coding, writing, research, security, and productivity — and it **learns from how you use it**.
+
+<!--
+  DEMO: record a 15-30s clip (wake word → a command → a spoken reply), save it as
+  docs/demo.gif, then replace this comment with:  ![Loki demo](docs/demo.gif)
+  Quick capture on Windows: ScreenToGif (free) → export GIF, keep it under ~8 MB.
+-->
+<p align="center"><em>▶︎ Demo GIF coming soon — see docs/DEMO.md for how it's captured.</em></p>
 
 ---
 
@@ -107,6 +116,19 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 | **Code Security Scanner** | Detect secrets and vulnerabilities in source files |
 | **Encrypted Vault** | PBKDF2 (310 000 iterations) + AES-256-GCM secret storage |
 
+### 🧠 Intelligence & Learning
+
+| Feature | Description |
+|---------|-------------|
+| **Proactive Intelligence** | Speaks up unprompted — high CPU/RAM, low battery/disk, long work sessions, late-night nudges (cooldowns, only when idle) |
+| **Vision** | *"What's on my screen?"*, *"what's this error?"* — a real vision model reads your screen, with OCR + text-LLM fallback |
+| **Streaming Voice** | Splits replies into sentences so the first words start almost instantly; **barge-in** — interrupt mid-sentence |
+| **Learning Loop** | Every interaction is logged with outcome + latency + 👍/👎; a **contextual bandit** learns which LLM provider is fastest/most reliable on *your* machine and reorders them |
+| **Insights Dashboard** | Live success rate, feedback tally, per-provider reward bars, and a recent-action log with one-click undo |
+| **Second Brain** | *"Remember that…"* / *"What did I say about…"* — personal long-term memory with semantic recall (nomic-embed) and keyword fallback |
+| **Google (Gmail + Calendar)** | Read inbox/calendar, send email, create events — your real account via OAuth |
+| **Spotify** | *"What's playing?"*, *"play …"*, pause/skip — via the Spotify Web API |
+
 ---
 
 ## Quick Start (Windows)
@@ -172,7 +194,32 @@ nothing else breaks. To activate:
 5. Ask Loki *"what's on my calendar today?"* — a browser opens once for consent; the token
    is cached at `loki/credentials/google_token.json` so you only authorize once.
 
-Both files are gitignored (read-only `calendar.readonly` + `gmail.readonly` scopes).
+Both files are gitignored. Scopes: `calendar.events` (read + create events),
+`gmail.readonly` (read inbox), `gmail.send` (send mail). If you authorized an
+earlier read-only build, delete `loki/credentials/google_token.json` and
+re-consent so the new scopes take effect.
+
+### Spotify — optional
+
+*"What's playing?"*, *"play bohemian rhapsody"*, *"pause"*, *"skip"*.
+
+1. [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) → create an app.
+2. Add redirect URI `http://localhost:8888/callback`.
+3. Put the credentials in `loki/.env`:
+   ```env
+   SPOTIFY_CLIENT_ID=...
+   SPOTIFY_CLIENT_SECRET=...
+   ```
+4. First use opens a browser to authorize once. Playback control needs Spotify
+   Premium; *"what's playing"* works on free too.
+
+### Learning loop (bandit)
+
+Loki logs every interaction to `memory/outcomes.jsonl` (gitignored) and a
+contextual bandit reorders cloud LLM providers by the reward it learns from your
+own usage. Tune it under `llm.bandit` in `config.yaml` (`enabled`, `epsilon`).
+Your local model stays pinned first when `prefer_local` — only the cloud
+fallbacks are reordered. Rate replies with 👍/👎 to sharpen it faster.
 
 Edit `loki/config.yaml` to customise:
 
