@@ -82,10 +82,32 @@ class LokiTTS:
             logger.error(f"pyttsx3 init failed: {e}")
 
     def speak(self, text: str) -> None:
-        """Enqueue text for speaking. Never drops messages."""
+        """Enqueue text for speaking. Long text is split into sentences so the
+        first words start playing almost immediately (streaming feel) instead of
+        waiting for the whole paragraph's audio to render. Never drops messages."""
         if not text or not text.strip():
             return
-        self._queue.put(text)
+        for chunk in self._sentences(text.strip()):
+            self._queue.put(chunk)
+
+    @staticmethod
+    def _sentences(text: str) -> list:
+        """Split into speakable chunks at sentence boundaries; merge very short
+        fragments so we don't over-chop (e.g. 'Mr.' or 'Done.')."""
+        import re as _re
+        # keep code blocks / very short text as one piece
+        if len(text) < 90 or "```" in text:
+            return [text]
+        parts = _re.split(r"(?<=[.!?])\s+", text)
+        out, buf = [], ""
+        for p in parts:
+            buf = (buf + " " + p).strip() if buf else p
+            if len(buf) >= 60:        # don't speak tiny fragments alone
+                out.append(buf)
+                buf = ""
+        if buf:
+            out.append(buf)
+        return out or [text]
 
     def _queue_worker(self) -> None:
         """Single background thread — serializes all speech, signals when queue drains.
