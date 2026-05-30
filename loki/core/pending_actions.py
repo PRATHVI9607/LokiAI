@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Optional
 
 _TTL_SECONDS = 60  # pending actions expire after 60s
+_MAX_PENDING = 50  # hard cap so a misbehaving caller can't grow the store unbounded
 
 
 @dataclass
@@ -43,6 +44,10 @@ class PendingActionStore:
             expired = [k for k, v in self._store.items() if v.is_expired()]
             for k in expired:
                 del self._store[k]
+            # Hard cap — drop the oldest if still over the limit after expiry
+            while len(self._store) >= _MAX_PENDING:
+                oldest = min(self._store, key=lambda k: self._store[k].expires_at)
+                del self._store[oldest]
             self._store[token] = action
             self._last_token = token
         return action

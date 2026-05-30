@@ -10,6 +10,7 @@ Replaces the flat JSON/numpy store with ChromaDB for:
 
 import hashlib
 import logging
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -38,6 +39,8 @@ class RagEngine:
     File RAG with ChromaDB (HNSW) + Ollama nomic-embed-text embeddings.
     One persistent collection: loki_rag.
     """
+
+    _EMBED_RETRIES = 3  # embedding attempts before giving up (cold Ollama can miss once)
 
     def __init__(self, memory_dir: Path, ollama_url: str = "http://localhost:11434"):
         self._dir = Path(memory_dir)
@@ -95,24 +98,32 @@ class RagEngine:
         batching turns N round-trips into 1, hugely speeding up file indexing."""
         if not texts:
             return []
-        try:
-            resp = requests.post(
-                f"{self._ollama_url}/api/embed",
-                json={"model": "nomic-embed-text", "input": texts},
-                timeout=60,
-            )
-            resp.raise_for_status()
-            embeds = resp.json().get("embeddings")
-            if not isinstance(embeds, list) or len(embeds) != len(texts):
+        # Retry with exponential backoff — a cold Ollama (first pull / model load
+        # into VRAM) often misses one timeout but succeeds on the next try.
+        last_err: Optional[Exception] = None
+        for attempt in range(1, self._EMBED_RETRIES + 1):
+            try:
+                resp = requests.post(
+                    f"{self._ollama_url}/api/embed",
+                    json={"model": "nomic-embed-text", "input": texts},
+                    timeout=90,
+                )
+                resp.raise_for_status()
+                embeds = resp.json().get("embeddings")
+                if isinstance(embeds, list) and len(embeds) == len(texts):
+                    return embeds
                 logger.warning(
                     f"Embedding API returned {len(embeds) if isinstance(embeds, list) else 0} "
-                    f"vectors for {len(texts)} inputs"
+                    f"vectors for {len(texts)} inputs (attempt {attempt})"
                 )
-                return None
-            return embeds
-        except Exception as e:
-            logger.error(f"Batch embedding error: {e}")
-            return None
+            except Exception as e:
+                last_err = e
+                if attempt < self._EMBED_RETRIES:
+                    time.sleep(2 ** attempt)  # 2s, 4s
+                    continue
+        if last_err:
+            logger.error(f"Batch embedding failed after {self._EMBED_RETRIES} attempts: {last_err}")
+        return None
 
     # ─── Chunking ─────────────────────────────────────────────────────────────
 

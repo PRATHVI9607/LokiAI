@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { X, Activity, RotateCcw, Brain, ThumbsUp, ThumbsDown } from "lucide-react";
 import { type LokiStats, type AuditEntry } from "@/hooks/useLoki";
+import { rewardToPct } from "@/lib/format";
 
 interface InsightsPanelProps {
   fetchStats: () => Promise<LokiStats | null>;
@@ -105,7 +106,7 @@ export default function InsightsPanel({ fetchStats, fetchAudit, onUndo, onClose 
               ) : (
                 <div className="space-y-1.5">
                   {banditRows.map(([name, s]) => {
-                    const pct = Math.max(2, Math.min(100, ((s.avg_reward + 0.5) / 2) * 100));
+                    const pct = rewardToPct(s.avg_reward);
                     return (
                       <div key={name} className="insights-bar-row">
                         <span className="insights-bar-label">{name}</span>

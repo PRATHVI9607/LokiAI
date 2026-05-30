@@ -8,7 +8,7 @@ Tier 3: destructive/external ops (logged with full payload).
 import json
 import logging
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -58,7 +58,7 @@ class AuditLog:
             return
 
         entry = {
-            "ts": datetime.now().isoformat(),
+            "ts": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
             "intent": intent,
             "tier": tier,
             "tier_label": TIER_LABELS[tier],

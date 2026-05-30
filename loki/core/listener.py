@@ -77,6 +77,7 @@ class SpeechListener:
         self._listening = False
         self._thread: Optional[threading.Thread] = None
         self._model = None
+        self._stream = None  # active InputStream, tracked for explicit cleanup
 
         # Worker queue: callback puts completed frame-lists here; worker runs Whisper
         self._work_queue: queue.Queue = queue.Queue(maxsize=8)
@@ -120,6 +121,16 @@ class SpeechListener:
         self._listening = False
         if self._thread and threading.current_thread() is not self._thread:
             self._thread.join(timeout=3)
+        # Defense-in-depth: the `with InputStream` in _listen_loop normally closes
+        # the device, but if the loop thread is wedged, force the stream shut so the
+        # mic and its callback (which captures self) are released for GC.
+        if self._stream is not None:
+            try:
+                self._stream.stop()
+                self._stream.close()
+            except Exception:
+                pass
+            self._stream = None
         if self.on_listening_stopped:
             self.on_listening_stopped()
         if was_listening:
@@ -198,11 +209,14 @@ class SpeechListener:
                 dtype="float32",
                 blocksize=self.FRAME_SAMPLES,
                 callback=callback,
-            ):
+            ) as stream:
+                self._stream = stream
                 while self._listening:
                     time.sleep(0.1)
         except Exception as e:
             logger.error(f"Audio stream error: {e}")
+        finally:
+            self._stream = None
 
     # ── Transcription worker (runs on its own daemon thread) ────────────
 

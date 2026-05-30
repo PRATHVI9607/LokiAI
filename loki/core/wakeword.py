@@ -64,6 +64,7 @@ class WakewordDetector:
         self._running       = False
         self._thread: Optional[threading.Thread] = None
         self._model         = None
+        self._available     = False  # True only once a usable detector is loaded
 
         self.on_wakeword:    Optional[Callable]           = None
         self.on_transcript:  Optional[Callable[[str], None]] = None
@@ -73,15 +74,26 @@ class WakewordDetector:
                 from loki.core.listener import _whisper_device
                 device = _whisper_device(self._config.get("device", "auto"))
                 self._model = whisper.load_model("tiny.en", device=device)
+                self._available = True
                 logger.info(f"Wakeword Whisper model loaded (tiny.en, {device})")
             except Exception as e:
                 logger.error(f"Wakeword Whisper load failed: {e}")
+                logger.warning("Wakeword detection disabled — voice activation won't work. "
+                               "Check your Whisper install / device.")
 
     @property
     def is_running(self) -> bool:
         return self._running
 
+    @property
+    def is_available(self) -> bool:
+        return self._available
+
     def start(self) -> None:
+        if not self._available:
+            logger.error("Wakeword detector unavailable (model failed to load) — not starting. "
+                         "Use the on-screen composer to talk to Loki instead.")
+            return
         if self._running:
             return
         self._running = True

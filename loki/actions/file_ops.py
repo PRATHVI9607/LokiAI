@@ -11,6 +11,12 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+# Undo safety limits — deleting a file/folder snapshots its bytes into the in-memory
+# undo stack. Without caps, deleting a few large files could exhaust RAM, and a deeply
+# nested / symlink-looped tree could blow the Python recursion limit.
+MAX_UNDO_FILE_BYTES = 50_000_000   # 50 MB — files above this delete WITHOUT undo
+MAX_UNDO_TREE_DEPTH = 25           # folder snapshot recursion cap
+
 
 class FileOps:
     """Secure file/folder operations with undo support."""
@@ -75,11 +81,18 @@ class FileOps:
         if not resolved.is_file():
             return {"success": False, "message": f"'{resolved.name}' is not a file or doesn't exist."}
         try:
-            content = resolved.read_bytes()
-            self._undo.push("file_delete", {"path": str(resolved), "content": content},
-                            f"Deleted {resolved.name}")
+            # Only snapshot for undo when the file is small enough to hold in RAM.
+            # Large files are still deleted — but without undo (we say so plainly).
+            size = resolved.stat().st_size
+            undo_note = ""
+            if size <= MAX_UNDO_FILE_BYTES:
+                content = resolved.read_bytes()
+                self._undo.push("file_delete", {"path": str(resolved), "content": content},
+                                f"Deleted {resolved.name}")
+            else:
+                undo_note = f" (too large at {size / 1_000_000:.0f}MB to undo)"
             resolved.unlink()
-            return {"success": True, "message": f"Done. '{resolved.name}' deleted."}
+            return {"success": True, "message": f"Done. '{resolved.name}' deleted{undo_note}."}
         except PermissionError:
             return self._deny("Permission denied deleting that file.")
         except Exception as e:
@@ -123,14 +136,27 @@ class FileOps:
             logger.error(f"move error: {e}")
             return {"success": False, "message": "Move operation failed."}
 
-    def _build_tree(self, path: Path) -> Dict:
+    def _build_tree(self, path: Path, depth: int = 0) -> Dict:
+        # Depth cap guards against symlink loops / pathological nesting blowing the
+        # recursion limit; size cap keeps the in-memory undo snapshot bounded.
+        if depth > MAX_UNDO_TREE_DEPTH:
+            logger.warning(f"Folder nesting exceeds {MAX_UNDO_TREE_DEPTH} levels — undo truncated below {path}")
+            return {}
         tree = {}
-        for item in path.iterdir():
-            if item.is_file():
-                try:
-                    tree[item.name] = item.read_bytes()
-                except Exception:
-                    tree[item.name] = b""
-            elif item.is_dir():
-                tree[item.name] = self._build_tree(item)
+        try:
+            for item in path.iterdir():
+                if item.is_symlink():
+                    continue  # never follow symlinks when snapshotting
+                if item.is_file():
+                    try:
+                        if item.stat().st_size <= MAX_UNDO_FILE_BYTES:
+                            tree[item.name] = item.read_bytes()
+                        else:
+                            tree[item.name] = b""  # too large to snapshot; restored empty
+                    except Exception:
+                        tree[item.name] = b""
+                elif item.is_dir():
+                    tree[item.name] = self._build_tree(item, depth + 1)
+        except (OSError, PermissionError) as e:
+            logger.warning(f"_build_tree error at {path}: {e}")
         return tree

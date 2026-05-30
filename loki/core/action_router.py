@@ -29,9 +29,13 @@ class ActionRouter:
         self._pending = PendingActionStore()
 
     def register_feature(self, name: str, handler: Any) -> None:
+        if name in self._features:
+            logger.warning(f"Feature '{name}' already registered — replacing (likely a reload).")
         self._features[name] = handler
 
     def register_action(self, name: str, handler: Any) -> None:
+        if name in self._actions:
+            logger.warning(f"Action '{name}' already registered — replacing (likely a reload).")
         self._actions[name] = handler
 
     def route_intent(self, intent: Dict[str, Any]) -> Dict[str, Any]:

@@ -6,6 +6,7 @@ Master password set on first use.
 import json
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Dict, Any, Optional
 
@@ -28,11 +29,15 @@ class Vault:
     PBKDF2_ITERATIONS = 310000
     SALT_SIZE = 32
     NONCE_SIZE = 12
+    MAX_UNLOCK_ATTEMPTS = 5      # consecutive wrong passwords before lockout
+    UNLOCK_COOLDOWN_SEC = 30     # lockout duration after the limit is hit
 
     def __init__(self, vault_path: Path):
         self._path = vault_path
         self._key: Optional[bytes] = None
         self._data: Dict[str, str] = {}
+        self._failed_attempts = 0
+        self._locked_until = 0.0    # epoch time; >now means temporarily locked out
 
     def _derive_key(self, password: str, salt: bytes) -> bytes:
         kdf = PBKDF2HMAC(
@@ -47,6 +52,14 @@ class Vault:
         if not CRYPTO_AVAILABLE:
             return {"success": False, "message": "cryptography library not installed."}
 
+        # Throttle brute-force: after MAX_UNLOCK_ATTEMPTS wrong passwords, lock out
+        # for a cooldown. AES-GCM + 310k-iter PBKDF2 already makes offline attacks
+        # slow; this adds in-process defense for a running session.
+        now = time.time()
+        if now < self._locked_until:
+            wait = int(self._locked_until - now)
+            return {"success": False, "message": f"Too many failed attempts. Try again in {wait}s."}
+
         if self._path.exists():
             try:
                 raw = self._path.read_bytes()
@@ -59,8 +72,15 @@ class Vault:
                 plaintext = aesgcm.decrypt(nonce, ciphertext, None)
                 self._data = json.loads(plaintext.decode("utf-8"))
                 self._key = key
+                self._failed_attempts = 0  # reset on success
                 return {"success": True, "message": f"Vault unlocked. {len(self._data)} entries."}
             except Exception:
+                self._failed_attempts += 1
+                if self._failed_attempts >= self.MAX_UNLOCK_ATTEMPTS:
+                    self._locked_until = now + self.UNLOCK_COOLDOWN_SEC
+                    self._failed_attempts = 0
+                    return {"success": False,
+                            "message": f"Too many failed attempts. Locked for {self.UNLOCK_COOLDOWN_SEC}s."}
                 return {"success": False, "message": "Wrong password or corrupted vault."}
         else:
             salt = os.urandom(self.SALT_SIZE)
