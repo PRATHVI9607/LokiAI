@@ -92,6 +92,68 @@ class GitHelper:
 
         return {"success": False, "message": "LLM not available for commit message generation."}
 
+    @staticmethod
+    def _remote_kind(url: str) -> str:
+        """Classify a remote URL. Both SSH and HTTPS are fully supported — the
+        underlying git binary uses the user's SSH keys / credential helper."""
+        u = (url or "").strip()
+        if u.startswith("git@") or u.startswith("ssh://") or (":" in u and "//" not in u and "@" in u):
+            return "ssh"
+        if u.startswith(("http://", "https://")):
+            return "https"
+        return "other"
+
+    def remote_info(self, repo_path: Optional[str] = None) -> Dict[str, Any]:
+        if not GIT_AVAILABLE:
+            return {"success": False, "message": "gitpython not installed."}
+        repo = self._get_repo(repo_path)
+        if not repo:
+            return {"success": False, "message": "Not in a git repository."}
+        try:
+            remotes = list(repo.remotes)
+            if not remotes:
+                return {"success": True, "message": "No remotes configured.", "data": {"remotes": []}}
+            lines, data = ["Remotes:"], []
+            for r in remotes:
+                url = next(iter(r.urls), "")
+                kind = self._remote_kind(url)
+                lines.append(f"  {r.name} → {url} [{kind}]")
+                data.append({"name": r.name, "url": url, "kind": kind})
+            return {"success": True, "message": "\n".join(lines), "data": {"remotes": data}}
+        except Exception as e:
+            return {"success": False, "message": f"Couldn't read remotes: {e}"}
+
+    def pull(self, repo_path: Optional[str] = None) -> Dict[str, Any]:
+        if not GIT_AVAILABLE:
+            return {"success": False, "message": "gitpython not installed."}
+        repo = self._get_repo(repo_path)
+        if not repo:
+            return {"success": False, "message": "Not in a git repository."}
+        if not repo.remotes:
+            return {"success": False, "message": "No remote to pull from."}
+        try:
+            # repo.git.pull delegates to the git binary → SSH keys / credential
+            # helpers work exactly as they do on the command line.
+            out = repo.git.pull()
+            return {"success": True, "message": f"Pulled.\n{out[:300]}" if out else "Already up to date."}
+        except Exception as e:
+            return {"success": False, "message": f"Pull failed: {e}"}
+
+    def push(self, repo_path: Optional[str] = None) -> Dict[str, Any]:
+        if not GIT_AVAILABLE:
+            return {"success": False, "message": "gitpython not installed."}
+        repo = self._get_repo(repo_path)
+        if not repo:
+            return {"success": False, "message": "Not in a git repository."}
+        if not repo.remotes:
+            return {"success": False, "message": "No remote to push to."}
+        try:
+            branch = repo.active_branch.name
+            out = repo.git.push("origin", branch)  # SSH or HTTPS — git handles auth
+            return {"success": True, "message": f"Pushed {branch} to origin.\n{out[:300]}".strip()}
+        except Exception as e:
+            return {"success": False, "message": f"Push failed: {e}"}
+
     def commit(self, message: str, repo_path: Optional[str] = None) -> Dict[str, Any]:
         if not GIT_AVAILABLE:
             return {"success": False, "message": "gitpython not installed."}

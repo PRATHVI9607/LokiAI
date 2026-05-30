@@ -9,6 +9,8 @@ import logging
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 
+from loki.core.paths import resolve_within_roots
+
 logger = logging.getLogger(__name__)
 
 # Undo safety limits — deleting a file/folder snapshots its bytes into the in-memory
@@ -29,14 +31,9 @@ class FileOps:
             self._trusted_roots.extend(Path(r).resolve() for r in extra_roots)
 
     def _safe(self, path: str) -> tuple[bool, Path]:
-        """Returns (is_safe, resolved_path). Prevents path traversal outside trusted roots."""
-        if not path or not path.strip():
-            return False, Path()
-        try:
-            resolved = Path(path).expanduser().resolve()
-            return any(resolved.is_relative_to(root) for root in self._trusted_roots), resolved
-        except Exception:
-            return False, Path()
+        """Returns (is_safe, resolved_path). Prevents path traversal outside trusted roots.
+        Delegates to the shared `resolve_within_roots` helper (single source of truth)."""
+        return resolve_within_roots(path, self._trusted_roots)
 
     def _deny(self, reason: str = "Access denied. Path is outside allowed directories.") -> Dict:
         return {"success": False, "message": reason}

@@ -9,6 +9,8 @@ import webbrowser
 from typing import Dict, Any
 from urllib.parse import quote_plus, urlparse
 
+from loki.core.log_utils import redact
+
 logger = logging.getLogger(__name__)
 
 
@@ -59,7 +61,7 @@ class BrowserCtrl:
             return {"success": False, "message": "That URL scheme is not permitted."}
 
         if _open_with_timeout(url):
-            logger.info(f"Opened URL: {url[:80]}")
+            logger.info(f"Opened URL: {redact(url)[:80]}")
             return {"success": True, "message": f"Opening {url[:50]}..."}
         return {"success": False, "message": "The browser didn't respond in time."}
 

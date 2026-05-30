@@ -30,6 +30,7 @@ from loki.core.memory import MemoryManager
 from loki.core.audit import AuditLog
 from loki.core.outcome_log import OutcomeLog
 from loki.core.bandit import ProviderBandit
+from loki.core.config_check import validate_config
 from loki.core.voice_pipeline import VoicePipeline
 from loki.core.conversation_sm import ConversationStateMachine
 from loki.core.log_setup import setup_logging, banner as log_banner, flow as log_flow
@@ -141,6 +142,10 @@ class LokiApplication:
 
         setup_logging(self.config, LOKI_LOG)
         log_banner("  LOKI AI DESKTOP ASSISTANT — Starting up")
+
+        # Surface obvious config mistakes (bad types / out-of-range) as clear
+        # warnings at startup rather than confusing runtime behaviour.
+        validate_config(self.config)
 
         self._init_all()
         self._wire_callbacks()

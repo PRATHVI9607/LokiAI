@@ -101,6 +101,9 @@ INTENTS (intelligence):
 - sql_build: params={description, schema?}
 - git_status: params={repo_path?}
 - git_commit: params={message, repo_path?}
+- git_push: params={repo_path?}   (push to origin — works with SSH or HTTPS remotes; needs confirmation)
+- git_pull: params={repo_path?}   ("pull latest", "git pull")
+- git_remote: params={repo_path?} ("what's my remote", "show git remotes")
 - security_scan: params={path}
 
 INTENTS (productivity):

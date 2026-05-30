@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Intents that require explicit user confirmation before executing
 _DESTRUCTIVE_INTENTS = frozenset({
     "file_delete", "folder_delete", "process_kill", "shell",
-    "git_commit", "update_all", "update_package", "install_package",
+    "git_commit", "git_push", "update_all", "update_package", "install_package",
     "focus_mode_enable",  # edits hosts file
 })
 
@@ -109,6 +109,9 @@ class ActionRouter:
             "sql_build": self._handle_sql_build,
             "git_status": self._handle_git_status,
             "git_commit": self._handle_git_commit,
+            "git_push": self._handle_git_push,
+            "git_pull": self._handle_git_pull,
+            "git_remote": self._handle_git_remote,
             "security_scan": self._handle_security_scan,
             # Productivity
             "focus_mode_enable": self._handle_focus_enable,
@@ -446,6 +449,18 @@ class ActionRouter:
     def _handle_git_commit(self, p):
         feat = self._features.get("git_helper")
         return feat.commit(p.get("message", ""), p.get("repo_path")) if feat else self._missing("git_helper")
+
+    def _handle_git_push(self, p):
+        feat = self._features.get("git_helper")
+        return feat.push(p.get("repo_path")) if feat else self._missing("git_helper")
+
+    def _handle_git_pull(self, p):
+        feat = self._features.get("git_helper")
+        return feat.pull(p.get("repo_path")) if feat else self._missing("git_helper")
+
+    def _handle_git_remote(self, p):
+        feat = self._features.get("git_helper")
+        return feat.remote_info(p.get("repo_path")) if feat else self._missing("git_helper")
 
     def _handle_security_scan(self, p):
         feat = self._features.get("security_scanner")
