@@ -1,18 +1,23 @@
 """
-AutoAgent — autonomous multi-step task executor (harness agent).
+AutoAgent — autonomous multi-step task executor (the "use the computer like a
+person" engine).
 
-The user describes a goal; AutoAgent asks the LLM to plan it as a sequence of
-Loki intents, then executes each intent through the action router, streaming
-progress back via the server's add_loki_message callback.
+The user describes a goal; AutoAgent plans it as a sequence of Loki intents
+(opening apps, typing, hotkeys, clicking on-screen text, file ops, web, system
+queries…) and executes them through the action router with sensible delays
+between steps, streaming progress back to the chat.
 
-Usage examples (voice or text):
-  "Agent: rename all .jpeg files in Downloads to .jpg"
-  "Agent: check system health, backup my notes, then give me a briefing"
-  "Cancel agent" — abort any running task
+Examples:
+  "open notepad, type my address, and save it as address.txt"
+  "open chrome, go to youtube, and search for lofi music"
+  "check my system health then back up my notes folder"
+  "cancel agent" — abort any running task
 """
 
+import json
 import logging
 import threading
+import time
 from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -21,29 +26,67 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-_MAX_STEPS = 10
-_PLAN_PROMPT = """You are a task planner for Loki AI assistant.
+_MAX_STEPS = 12
+
+# Delay AFTER a step completes, before the next — gives apps/windows time to be
+# ready (you can't type into Notepad the instant you launch it).
+_STEP_DELAY: Dict[str, float] = {
+    "app_open": 2.0, "browser_open": 2.2, "browser_search": 2.2,
+    "computer_action": 0.7, "computer_press": 0.4, "computer_click": 0.4,
+    "computer_click_text": 0.6, "computer_type": 0.3,
+}
+_DEFAULT_DELAY = 0.3
+
+_PLAN_PROMPT = """You are the task planner for Loki, an AI that directly controls a Windows PC.
+Break the user's request into a sequence of concrete steps it can execute.
+
 The user wants: {goal}
 
-Break this into at most {max_steps} sequential Loki intents.
-Return a JSON array of intent objects — each with "intent" (string) and "params" (object).
-Only use intents from this list: {intent_list}
+Return ONLY a JSON array (no prose, no markdown) of step objects, each:
+{{"intent": "<name>", "params": {{...}}}}
 
-Rules:
-- Use only safe, reversible intents where possible.
-- Never use shell, file_delete, folder_delete, or process_kill unless the user explicitly asked.
-- Return [] if the goal cannot be safely automated.
+Available intents:
+- app_open {{name}}            open an application
+- app_close {{name}}           close an application
+- browser_open {{url}}         open a website
+- browser_search {{query, engine?}}   web/youtube search (engine: "youtube" or "google")
+- computer_type {{text}}       type text into the focused window
+- computer_press {{key}}       a key or hotkey ("enter", "ctrl+s", "alt+tab")
+- computer_click_text {{target}}   find on-screen text and click it
+- computer_action {{action}}   minimize, maximize, show desktop, save, copy, paste, select all, new tab, screenshot
+- computer_scroll {{amount}}   negative=down, positive=up
+- screen_read {{}}             read what's on screen
+- file_create {{path, content}}   create a file
+- system_monitor {{}}, process_list {{}}, volume_get {{}}, brightness_get {{}}
+- task_add {{title}}, news_briefing {{}}, daily_briefing {{}}, backup_directory {{path}}
 
-Return ONLY valid JSON array, no explanation:
-[{{"intent": "...", "params": {{...}}}}, ...]"""
+EXAMPLE — "open notepad, type my address and save it as address.txt":
+[{{"intent":"app_open","params":{{"name":"notepad"}}}},
+ {{"intent":"computer_type","params":{{"text":"221B Baker Street, London"}}}},
+ {{"intent":"computer_press","params":{{"key":"ctrl+s"}}}},
+ {{"intent":"computer_type","params":{{"text":"address.txt"}}}},
+ {{"intent":"computer_press","params":{{"key":"enter"}}}}]
+
+EXAMPLE — "open youtube and search for lofi music":
+[{{"intent":"browser_search","params":{{"query":"lofi music","engine":"youtube"}}}}]
+
+Keep it to {max_steps} steps max. Return [] if it can't be done. JSON array only:"""
 
 
 class AutoAgent:
-    """Runs multi-step plans autonomously using Loki's action router."""
+    """Plans and runs multi-step desktop automations via the action router."""
 
+    # Intents the agent may run without per-step confirmation
     SAFE_INTENTS = {
-        "file_search", "file_create", "file_read", "file_move",
-        "folder_create", "system_monitor", "process_list", "volume_get", "brightness_get",
+        # apps + web
+        "app_open", "app_close", "browser_open", "browser_search",
+        # computer control (act like a person)
+        "computer_type", "computer_press", "computer_click", "computer_click_text",
+        "computer_action", "computer_scroll", "screen_read",
+        # files / info / productivity (read-mostly)
+        "file_search", "file_create", "file_read", "file_move", "folder_create",
+        "system_monitor", "process_list", "volume_get", "volume_set",
+        "brightness_get", "brightness_set",
         "task_add", "task_list", "task_complete", "task_prioritize_ai",
         "web_summarize", "pdf_chat", "fact_check", "daily_briefing",
         "news_headlines", "news_briefing", "git_status", "commit_message",
@@ -51,8 +94,9 @@ class AutoAgent:
         "backup_list", "declutter_suggest", "clipboard_show", "clipboard_sync_url",
         "kg_query", "kg_stats", "history_recent", "history_stats",
         "calendar_list", "calendar_conflicts", "expense_list", "expense_summary",
-        "window_layouts", "process_analyze", "process_triage",
+        "window_layouts", "window_snap", "process_analyze", "process_triage",
         "currency_convert", "unit_convert", "media_info", "update_check",
+        "ui_theme_time", "ui_theme_mood",
     }
 
     def __init__(
@@ -69,24 +113,16 @@ class AutoAgent:
         self._abort = threading.Event()
 
     def run(self, goal: str) -> Dict[str, Any]:
-        """Start an agentic task. Returns immediately; progress via on_progress callback."""
         if self._running:
             return {"success": False, "message": "Agent is already running a task. Say 'cancel agent' to stop."}
         if not self._brain or not self._router:
             return {"success": False, "message": "Agent requires LLM and router — not fully initialized."}
-
         self._abort.clear()
-        self._thread = threading.Thread(
-            target=self._execute_task,
-            args=(goal,),
-            daemon=True,
-            name="loki-auto-agent",
-        )
+        self._thread = threading.Thread(target=self._execute_task, args=(goal,), daemon=True, name="loki-auto-agent")
         self._thread.start()
-        return {"success": True, "message": f"Agent started. Working on: {goal}"}
+        return {"success": True, "message": f"On it — working on: {goal}"}
 
     def cancel(self) -> Dict[str, Any]:
-        """Abort any running task."""
         if not self._running:
             return {"success": False, "message": "No agent task is running."}
         self._abort.set()
@@ -97,68 +133,74 @@ class AutoAgent:
 
     def _execute_task(self, goal: str) -> None:
         self._running = True
-        self._on_progress(f"Agent planning: {goal}")
-
+        self._on_progress(f"🧩 Planning: {goal}")
         try:
             plan = self._plan(goal)
         except Exception as e:
-            self._on_progress(f"Agent planning failed: {e}")
+            self._on_progress(f"Planning failed: {e}")
             self._running = False
             return
 
         if not plan:
-            self._on_progress("Agent: could not build a safe plan for that goal.")
+            self._on_progress("I couldn't break that into steps I can run. Try rephrasing.")
             self._running = False
             return
 
-        self._on_progress(f"Agent: {len(plan)} step plan ready. Executing...")
-
+        self._on_progress(f"📋 {len(plan)}-step plan ready. Executing…")
         completed = 0
         for i, step in enumerate(plan[:_MAX_STEPS], 1):
             if self._abort.is_set():
-                self._on_progress(f"Agent aborted after {completed} step(s).")
+                self._on_progress(f"⏹ Aborted after {completed} step(s).")
                 self._running = False
                 return
 
             intent_name = step.get("intent", "")
             if intent_name not in self.SAFE_INTENTS:
-                self._on_progress(f"Agent: step {i} skipped — '{intent_name}' requires manual confirmation.")
+                self._on_progress(f"⊘ Step {i} skipped — '{intent_name}' needs manual confirmation.")
                 continue
 
-            self._on_progress(f"Agent step {i}/{len(plan)}: {intent_name}...")
-
+            self._on_progress(f"▸ Step {i}/{len(plan)}: {intent_name}…")
             try:
                 result = self._router.route_intent(step)
-                msg = result.get("message", "")
-                status = "✓" if result.get("success") else "✗"
-                self._on_progress(f"Agent {status} {intent_name}: {msg[:200]}")
+                ok = result.get("success")
+                self._on_progress(f"{'✓' if ok else '✗'} {result.get('message', '')[:180]}")
                 completed += 1
-
-                if not result.get("success"):
-                    self._on_progress(f"Agent stopping — step {i} failed.")
+                if not ok:
+                    self._on_progress(f"Stopped — step {i} failed.")
                     break
             except Exception as e:
                 logger.error("AutoAgent step error (%s): %s", intent_name, e, exc_info=True)
-                self._on_progress(f"Agent error on step {i}: {e}")
+                self._on_progress(f"Error on step {i}: {e}")
                 break
 
-        self._on_progress(f"Agent done. Completed {completed}/{len(plan)} steps.")
+            # give the UI/app time to settle before the next step
+            time.sleep(_STEP_DELAY.get(intent_name, _DEFAULT_DELAY))
+
+        self._on_progress(f"✅ Done — {completed}/{len(plan)} steps.")
         self._running = False
 
     def _plan(self, goal: str) -> List[Dict[str, Any]]:
-        """Ask the LLM to produce a JSON intent plan for the goal."""
-        import json
-        intent_list = ", ".join(sorted(self.SAFE_INTENTS))
-        prompt = _PLAN_PROMPT.format(goal=goal, max_steps=_MAX_STEPS, intent_list=intent_list)
-        raw = "".join(self._brain.ask(prompt)).strip()
+        """Ask the LLM for a JSON step plan. Uses _call_llm directly (not the
+        conversational ask pipeline) so there's no fast-path/RAG interference."""
+        prompt = _PLAN_PROMPT.format(goal=goal, max_steps=_MAX_STEPS)
+        messages = [
+            {"role": "system", "content": "You output only valid JSON arrays. No prose."},
+            {"role": "user", "content": prompt},
+        ]
+        raw = self._brain._call_llm(messages, max_tokens=700).strip()
 
-        # Strip markdown fences if present
+        # strip code fences
         if raw.startswith("```"):
             raw = raw.split("```")[1]
-            if raw.startswith("json"):
+            if raw.lower().startswith("json"):
                 raw = raw[4:]
-
-        plan = json.loads(raw)
-        if not isinstance(plan, list):
+        # extract the first [...] block if there's stray text
+        if not raw.startswith("["):
+            s, e = raw.find("["), raw.rfind("]")
+            if s != -1 and e != -1:
+                raw = raw[s:e + 1]
+        try:
+            plan = json.loads(raw)
+        except json.JSONDecodeError:
             return []
-        return plan
+        return plan if isinstance(plan, list) else []

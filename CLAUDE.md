@@ -10,7 +10,7 @@
 loki/                 ← Main package
 ├── core/             ← Brain, TTS, STT, wakeword, router, undo, memory
 ├── features/         ← 15 feature modules (file_search, monitor, vault, etc.)
-├── actions/          ← Direct system actions (file_ops, shell, app, browser, system)
+├── actions/          ← Direct system actions (file_ops, shell, app, browser, system, computer_control)
 ├── ui/               ← PyQt6 UI (main_window + dark Norse theme)
 ├── memory/           ← Persistent JSON storage (conversation, profile, tasks)
 ├── data/             ← Static data (command allowlist)
@@ -27,11 +27,18 @@ pip install -r loki/requirements.txt
 
 # Set up .env
 cp loki/.env.example loki/.env
-# Edit loki/.env with your OPENROUTER_API_KEY
+# Edit loki/.env with OPENROUTER_API_KEY and/or NVIDIA_API_KEY
 
-# Run
+# Run (CPU)
 python main.py
+
+# Run (GPU — Python 3.12 + CUDA via uv venv .venv-gpu)
+run-gpu.bat
 ```
+
+**GPU note:** PyTorch CUDA wheels need Python 3.11/3.12 (not 3.14). The `.venv-gpu`
+(created with `uv venv --python 3.12`) holds `torch+cu121`; `whisper.device: auto`
+resolves to CUDA when available, else CPU. Both `python main.py` and `run-gpu.bat` work.
 
 ## Key Conventions
 

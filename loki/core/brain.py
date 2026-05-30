@@ -690,6 +690,14 @@ class LokiBrain:
         t = text.lower().strip().rstrip("?.!")
         m = None
 
+        # ── MULTI-STEP automation → hand to the agent ───────────────────────
+        # genuine sequences: "X then Y", or "open … and type/write/save …"
+        if (" then " in t
+                or re.search(r"\b(?:open|launch|start)\b.{0,40}\b(?:type|write|save|fill in|enter)\b", t)
+                or re.search(r"\b(?:type|write)\b.{0,40}\b(?:and|then)\b.{0,20}\b(?:save|press|enter)\b", t)):
+            return json.dumps({"intent": "agent_run", "params": {"goal": text.strip()},
+                               "message": "On it — running that as a sequence."})
+
         def topic_after(keyword: str) -> str:
             """Pull the meaningful search topic out of a messy command."""
             tail = t.split(keyword, 1)[-1]

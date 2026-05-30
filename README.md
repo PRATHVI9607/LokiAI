@@ -19,7 +19,9 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 | **Process Manager** | List, kill, or suspend background processes |
 | **Process Triage** | Auto-close non-essential apps to free resources before gaming/rendering |
 | **File Organizer** | Auto-sort Downloads/Desktop by file type |
-| **App Launcher** | Open any app by name via voice or text |
+| **App Launcher** | Open **any** installed app by name (alias → PATH → Start-Menu shortcut search) |
+| **Computer Control** | Operate the PC like a person: click, type, hotkeys, scroll, read the screen (OCR), click on-screen text by name |
+| **Multi-step Automation** | Chains actions: *"open notepad, type my address, save it as address.txt"* — plans and runs the whole sequence |
 | **Volume Control** | Set / query system volume (pycaw, Windows API) |
 | **Brightness Control** | Set / query screen brightness |
 | **Wi-Fi / Bluetooth** | Toggle adapters with one command |
@@ -108,52 +110,53 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 
 ## Quick Start (Windows)
 
-### Option A — One-click installer (recommended)
-
-```bat
-git clone https://github.com/PRATHVI9607/LokiAI.git
-cd LokiAI
-install.bat
-```
-
-Then edit `loki\.env` with your API key and run:
-
-```bat
-run.bat
-```
-
-### Option B — Manual setup
+### CPU — works anywhere (Python 3.10+)
 
 ```bash
-# Python 3.10+ required
-python -m venv venv
-venv\Scripts\activate
-
-# Install PyTorch (CPU build)
+# Install deps (CPU PyTorch)
 pip install torch --index-url https://download.pytorch.org/whl/cpu
-
-# Install Loki dependencies
 pip install -r loki/requirements.txt
 
-# Configure
+# Configure keys
 copy loki\.env.example loki\.env
-# Edit loki\.env — add your OPENROUTER_API_KEY
+# Edit loki\.env — add OPENROUTER_API_KEY and/or NVIDIA_API_KEY
 
 # Run
 python main.py
 ```
 
+### GPU — faster voice (NVIDIA + uv + Python 3.12)
+
+PyTorch's CUDA wheels need Python 3.11/3.12 (not 3.14). Use [`uv`](https://github.com/astral-sh/uv):
+
+```bash
+uv venv --python 3.12 .venv-gpu
+uv pip install --python .venv-gpu/Scripts/python.exe torch --index-url https://download.pytorch.org/whl/cu121
+uv pip install --python .venv-gpu/Scripts/python.exe -r loki/requirements.txt
+
+# Run on the GPU
+run-gpu.bat
+```
+
+Then open **http://localhost:7777**. Whisper auto-detects the GPU (`whisper.device: auto`); the terminal shows `(cuda)` when the GPU is active, `(cpu)` otherwise — **either way it runs**.
+
 ---
 
 ## Configuration
 
-Get a **free** OpenRouter API key at [openrouter.ai/keys](https://openrouter.ai/keys) and put it in `loki/.env`:
+Loki tries providers **fast-first**: local Ollama → NVIDIA NIM (Kimi K2.6) → OpenRouter → Ollama fallback model. Put keys in `loki/.env`:
 
 ```env
-OPENROUTER_API_KEY=sk-or-...
+OPENROUTER_API_KEY=sk-or-...      # free at openrouter.ai/keys
+NVIDIA_API_KEY=nvapi-...          # free at build.nvidia.com — serves Kimi K2.6
 ```
 
-Loki uses **Ollama locally first** (if running) and falls back to OpenRouter cloud. No GPU required — Whisper runs on CPU.
+**Local models (recommended — no quota, no network):** run `ollama serve`, then
+`ollama pull qwen2.5-coder:7b` (primary) and `ollama pull phi3:mini` (GPU-fast fallback).
+For file search/RAG also `ollama pull nomic-embed-text`.
+
+`config.yaml` lets you tune the model chain, `prefer_local`, `ollama_fallback_model`,
+`ollama_timeout`, and `whisper.device` (auto/cuda/cpu).
 
 Edit `loki/config.yaml` to customise:
 
@@ -201,7 +204,11 @@ loki/
 │   ├── Security           vault, phishing_detector, footprint_auditor
 │   ├── Meetings           meeting_transcriber
 │   └── Productivity       task_manager, focus_mode, clipboard_manager
-├── actions/               5 system action modules (file_ops, shell_exec, system_ctrl, app_ctrl, browser_ctrl)
+├── actions/               6 system action modules (file_ops, shell_exec, system_ctrl,
+│                          app_ctrl, browser_ctrl, computer_control)
+├── features/auto_agent    multi-step automation planner (chains actions)
+├── core/voice_pipeline    exclusive-mic wakeword↔listener handoff
+├── core/conversation_sm   conversation state machine (idle/listening/thinking/speaking)
 └── ui/                    FastAPI server + Next.js frontend (Norse dark theme)
 ```
 
