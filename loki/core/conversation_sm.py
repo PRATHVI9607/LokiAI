@@ -107,14 +107,31 @@ class ConversationStateMachine:
         self._arm_timeout()
         logger.info("● conversation started [LISTENING]")
 
+    def barge_in(self) -> None:
+        """Interrupt Loki mid-sentence — cut TTS and return to listening.
+        Triggered by the UI stop button or by a new message arriving while speaking."""
+        self._tts.stop()
+        with self._lock:
+            if self._state == ConvState.SPEAKING:
+                self._state = ConvState.LISTENING
+        self._server.set_status("listening")
+        logger.info("✋ barge-in — speech interrupted [LISTENING]")
+
     def process_input(self, text: str) -> None:
         if not text or not text.strip():
             return
         with self._lock:
-            if self._state not in (ConvState.LISTENING, ConvState.IDLE):
+            # Barge-in: a new message while Loki is speaking interrupts it.
+            if self._state == ConvState.SPEAKING:
+                interrupt = True
+            elif self._state not in (ConvState.LISTENING, ConvState.IDLE):
                 logger.warning("process_input called in state %s — ignoring", self._state)
                 return
+            else:
+                interrupt = False
             self._state = ConvState.THINKING
+        if interrupt:
+            self._tts.stop()  # silence the current/queued speech before answering anew
         self._cancel_timeout()
         self._server.add_user_message(text)
         self._server.set_status("thinking")
@@ -304,7 +321,8 @@ class ConversationStateMachine:
                                 outcome_id=self._last_outcome_id)
 
     def _emit_response(self, text: str, speak: bool = True, outcome_id: Optional[str] = None) -> None:
-        self._server.add_loki_message(text, outcome_id=outcome_id)
+        provider = getattr(self._brain, "last_provider", None)
+        self._server.add_loki_message(text, outcome_id=outcome_id, provider=provider)
         if speak and text:
             with self._lock:
                 self._state = ConvState.SPEAKING

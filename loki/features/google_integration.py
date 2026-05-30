@@ -23,8 +23,9 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 SCOPES = [
-    "https://www.googleapis.com/auth/calendar.readonly",
+    "https://www.googleapis.com/auth/calendar.events",
     "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send",
 ]
 
 _SETUP_MSG = (
@@ -138,6 +139,47 @@ class GoogleIntegration:
                     "data": {"count": len(msgs)}}
         except Exception as e:
             return {"success": False, "message": f"Gmail read failed: {e}"}
+
+    def send_email(self, to: str, subject: str, body: str) -> Dict[str, Any]:
+        if not self._ensure():
+            return {"success": False, "message": _SETUP_MSG}
+        if not to:
+            return {"success": False, "message": "Who should I send it to?"}
+        try:
+            import base64
+            from email.mime.text import MIMEText
+            msg = MIMEText(body or "")
+            msg["to"] = to
+            msg["subject"] = subject or "(no subject)"
+            raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+            self._service_gmail.users().messages().send(
+                userId="me", body={"raw": raw},
+            ).execute()
+            return {"success": True, "message": f"Sent to {to}."}
+        except Exception as e:
+            return {"success": False, "message": f"Send failed: {e}"}
+
+    def create_event(self, title: str, start_iso: str, duration_minutes: int = 60) -> Dict[str, Any]:
+        if not self._ensure():
+            return {"success": False, "message": _SETUP_MSG}
+        if not title or not start_iso:
+            return {"success": False, "message": "I need a title and a start time."}
+        try:
+            start = datetime.fromisoformat(start_iso)
+            end = start + timedelta(minutes=duration_minutes)
+            event = {
+                "summary": title,
+                "start": {"dateTime": start.isoformat()},
+                "end": {"dateTime": end.isoformat()},
+            }
+            created = self._service_cal.events().insert(calendarId="primary", body=event).execute()
+            when = start.strftime("%a %d %b %H:%M")
+            return {"success": True, "message": f"Added '{title}' on {when}.",
+                    "data": {"link": created.get("htmlLink")}}
+        except ValueError:
+            return {"success": False, "message": f"Couldn't parse the start time '{start_iso}' (use ISO like 2026-06-01T15:00)."}
+        except Exception as e:
+            return {"success": False, "message": f"Couldn't create the event: {e}"}
 
     @property
     def is_available(self) -> bool:

@@ -211,6 +211,18 @@ INTENTS (Google — live Gmail + Calendar of the user's real account):
 - calendar_today: params={days?}  ("what's on my calendar", "my schedule today", "what do I have on")
 - calendar_next: params={}        ("what's my next meeting", "when's my next event")
 - email_unread: params={count?}   ("any new email", "unread mail", "check my inbox")
+- email_send: params={to, subject, body}   ("email alice@x.com saying I'll be late")
+- calendar_create: params={title, start, duration_minutes?}   start MUST be ISO 8601 like 2026-06-01T15:00 ("add a meeting tomorrow 3pm called Standup")
+
+INTENTS (Spotify — playback):
+- spotify_now: params={}          ("what's playing")
+- spotify_play: params={query?}   (query → search & play that; empty → resume)
+- spotify_pause: params={}        | spotify_next: params={} | spotify_previous: params={}
+
+INTENTS (second brain — the user's personal long-term memory):
+- remember: params={text}         ("remember that my flight is at 6am")
+- recall: params={query}          ("what did I say about my flight")
+- forget: params={query}          | notes_list: params={}
 
 INTENTS (expenses):
 - expense_extract: params={text}
@@ -438,6 +450,8 @@ class LokiBrain:
         self._maint_running = False            # prevents overlapping maintenance runs
         self.last_provider = "none"            # which provider answered the last query
                                                # (for the outcome logger / future bandit)
+        self._bandit = None                    # ProviderBandit, injected by main.py —
+                                               # reorders cloud providers by learned reward
 
         self._load_history()
         self._log_provider_status()
@@ -594,93 +608,113 @@ class LokiBrain:
                 logger.warning(f"Ollama {model}: {e}")
         return ""
 
-    def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
-        mt = max_tokens or self._max_tokens
+    # ── individual provider calls (each returns text or "") ──────────────────
 
-        # ── 0. Local Ollama FIRST when prefer_local — no quota, no network ────
-        if self._prefer_local:
-            local = self._call_ollama(messages, mt)
-            if local:
-                self.last_provider = "ollama"
-                return local
-            # local failed/empty — fall through to cloud providers
+    def _try_nvidia(self, messages: List[Dict], mt: int) -> str:
+        if not self._nvidia_client:
+            return ""
+        try:
+            extra: dict = {}
+            timeout_override = 60.0
+            if self._nvidia_thinking:
+                extra = {"chat_template_kwargs": {"thinking": True}}
+                timeout_override = 180.0
+                self._nvidia_client.timeout = timeout_override
 
-        # ── 1. NVIDIA NIM — Kimi K2.6 (PRIMARY — your key is set) ──────────────
-        if self._nvidia_client:
+            stream = self._nvidia_client.chat.completions.create(
+                model=self.NVIDIA_MODEL,
+                messages=messages,
+                max_tokens=max(mt, 1024),
+                temperature=self._temperature,
+                top_p=1.0,
+                stream=True,
+                **({"extra_body": extra} if extra else {}),
+            )
+            chunks = []
+            for chunk in stream:
+                delta = chunk.choices[0].delta.content or "" if chunk.choices else ""
+                chunks.append(delta)
+            text = "".join(chunks)
+            # Remove <think>…</think> reasoning traces
+            text = re.sub(r"<think>[\s\S]*?</think>", "", text, flags=re.DOTALL).strip()
+            if text:
+                mode = "thinking" if self._nvidia_thinking else "fast"
+                logger.debug(f"Response from NVIDIA NIM ({mode})")
+                self.last_provider = "nvidia"
+                return text
+        except Exception as e:
+            logger.warning(f"NVIDIA NIM: {e}")
+        return ""
+
+    def _try_openrouter(self, messages: List[Dict], mt: int) -> str:
+        if not self._openrouter_client:
+            return ""
+        for model in self._fast_models:
             try:
-                extra: dict = {}
-                timeout_override = 60.0
-                if self._nvidia_thinking:
-                    extra = {"chat_template_kwargs": {"thinking": True}}
-                    timeout_override = 180.0
-                    self._nvidia_client.timeout = timeout_override
-
-                stream = self._nvidia_client.chat.completions.create(
-                    model=self.NVIDIA_MODEL,
-                    messages=messages,
-                    max_tokens=max(mt, 1024),
-                    temperature=self._temperature,
-                    top_p=1.0,
-                    stream=True,
-                    **({"extra_body": extra} if extra else {}),
-                )
-                chunks = []
-                for chunk in stream:
-                    delta = chunk.choices[0].delta.content or "" if chunk.choices else ""
-                    chunks.append(delta)
-                text = "".join(chunks)
-                # Remove <think>…</think> reasoning traces
-                text = re.sub(r"<think>[\s\S]*?</think>", "", text, flags=re.DOTALL).strip()
-                if text:
-                    mode = "thinking" if self._nvidia_thinking else "fast"
-                    logger.debug(f"Response from NVIDIA NIM ({mode})")
-                    self.last_provider = "nvidia"
-                    return text
-            except Exception as e:
-                logger.warning(f"NVIDIA NIM: {e}")
-
-        # ── 2. OpenRouter (fallback — free models) ────────────────────────────
-        if self._openrouter_client:
-            for model in self._fast_models:
-                try:
-                    resp = self._openrouter_client.chat.completions.create(
-                        model=model,
-                        messages=messages,
-                        max_tokens=mt,
-                        temperature=self._temperature,
-                        extra_headers={"HTTP-Referer": "loki-desktop-assistant", "X-Title": "Loki"},
-                    )
-                    text = resp.choices[0].message.content or ""
-                    if text.strip():
-                        logger.debug(f"Response from OpenRouter ({model})")
-                        self.last_provider = f"openrouter:{model}"
-                        return text
-                except Exception as e:
-                    logger.warning(f"OpenRouter {model}: {e}")
-
-        # ── 3. Kimi Moonshot direct API ───────────────────────────────────────
-        if self._kimi_client:
-            try:
-                resp = self._kimi_client.chat.completions.create(
-                    model=self._kimi_model,
+                resp = self._openrouter_client.chat.completions.create(
+                    model=model,
                     messages=messages,
                     max_tokens=mt,
                     temperature=self._temperature,
+                    extra_headers={"HTTP-Referer": "loki-desktop-assistant", "X-Title": "Loki"},
                 )
                 text = resp.choices[0].message.content or ""
                 if text.strip():
-                    logger.debug("Response from Kimi Moonshot")
-                    self.last_provider = "kimi"
+                    logger.debug(f"Response from OpenRouter ({model})")
+                    self.last_provider = f"openrouter:{model}"
                     return text
             except Exception as e:
-                logger.warning(f"Kimi Moonshot: {e}")
+                logger.warning(f"OpenRouter {model}: {e}")
+        return ""
 
-        # ── 4. Ollama local (skip if prefer_local already tried it above) ─────
-        if not self._prefer_local:
-            local = self._call_ollama(messages, mt)
-            if local:
-                self.last_provider = "ollama"
-                return local
+    def _try_kimi(self, messages: List[Dict], mt: int) -> str:
+        if not self._kimi_client:
+            return ""
+        try:
+            resp = self._kimi_client.chat.completions.create(
+                model=self._kimi_model,
+                messages=messages,
+                max_tokens=mt,
+                temperature=self._temperature,
+            )
+            text = resp.choices[0].message.content or ""
+            if text.strip():
+                logger.debug("Response from Kimi Moonshot")
+                self.last_provider = "kimi"
+                return text
+        except Exception as e:
+            logger.warning(f"Kimi Moonshot: {e}")
+        return ""
+
+    def _try_ollama(self, messages: List[Dict], mt: int) -> str:
+        local = self._call_ollama(messages, mt)
+        if local:
+            self.last_provider = "ollama"
+            return local
+        return ""
+
+    def _call_llm(self, messages: List[Dict], max_tokens: int = None) -> str:
+        mt = max_tokens or self._max_tokens
+        calls = {
+            "ollama": self._try_ollama,
+            "nvidia": self._try_nvidia,
+            "openrouter": self._try_openrouter,
+            "kimi": self._try_kimi,
+        }
+
+        # Default priority. When prefer_local, the local model stays pinned first
+        # (you asked to keep qwen primary); the bandit only reorders the cloud
+        # fallbacks. Otherwise the bandit ranks the whole set.
+        cloud = ["nvidia", "openrouter", "kimi"]
+        if self._bandit:
+            cloud = self._bandit.rank(cloud)
+
+        order = (["ollama"] + cloud) if self._prefer_local else (cloud + ["ollama"])
+
+        for name in order:
+            text = calls[name](messages, mt)
+            if text:
+                return text
 
         self.last_provider = "none"
         return ""
@@ -803,6 +837,31 @@ class LokiBrain:
             return json.dumps({"intent": "calendar_next", "params": {}, "message": "Checking."})
         if re.search(r"\b(?:any )?(?:new |unread )?(?:e?mail|inbox|messages)\b", t) and "search" not in t:
             return json.dumps({"intent": "email_unread", "params": {}, "message": "Checking your inbox."})
+
+        # ── SPOTIFY — playback control ──────────────────────────────────────
+        m = re.match(r"^(?:hey )?(?:loki[,\s]+)?(?:play|put on) (.+?)(?: on spotify)?$", t)
+        if m and "youtube" not in t:
+            return json.dumps({"intent": "spotify_play", "params": {"query": m.group(1).strip()}, "message": "Playing."})
+        if re.search(r"what.?s (?:playing|this song)|current(?:ly)? (?:playing|song|track)|now playing", t):
+            return json.dumps({"intent": "spotify_now", "params": {}, "message": "Checking."})
+        if re.fullmatch(r"(?:hey loki[,\s]+)?(?:pause|pause (?:the )?(?:music|song|spotify))\.?", t):
+            return json.dumps({"intent": "spotify_pause", "params": {}, "message": "Paused."})
+        if re.fullmatch(r"(?:hey loki[,\s]+)?(?:resume|play|unpause)\.?", t):
+            return json.dumps({"intent": "spotify_play", "params": {}, "message": "Playing."})
+        if re.search(r"\b(?:skip|next (?:song|track))\b", t):
+            return json.dumps({"intent": "spotify_next", "params": {}, "message": "Skipped."})
+        if re.search(r"\b(?:previous|last) (?:song|track)\b|\bgo back a (?:song|track)\b", t):
+            return json.dumps({"intent": "spotify_previous", "params": {}, "message": "Back a track."})
+
+        # ── SECOND BRAIN — personal memory ──────────────────────────────────
+        m = re.match(r"^(?:hey )?(?:loki[,\s]+)?remember (?:that |this[:,]? )?(.+)$", t)
+        if m:
+            return json.dumps({"intent": "remember", "params": {"text": m.group(1).strip()}, "message": "Noted."})
+        m = re.match(r"^(?:what (?:did i|do you) (?:say|know|remember)|what.?s|recall|do you remember)\b.*?\babout (.+?)\??$", t)
+        if m:
+            return json.dumps({"intent": "recall", "params": {"query": m.group(1).strip()}, "message": "Let me think."})
+        if re.fullmatch(r"(?:list|show) (?:my )?notes\.?", t):
+            return json.dumps({"intent": "notes_list", "params": {}, "message": "Your notes."})
 
         # ── VISION — look at the screen and answer ─────────────────────────
         # "what's on my screen", "what's this error", "look at my screen", "what am I looking at"

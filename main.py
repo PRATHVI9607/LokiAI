@@ -29,6 +29,7 @@ from loki.core.undo_stack import UndoStack
 from loki.core.memory import MemoryManager
 from loki.core.audit import AuditLog
 from loki.core.outcome_log import OutcomeLog
+from loki.core.bandit import ProviderBandit
 from loki.core.voice_pipeline import VoicePipeline
 from loki.core.conversation_sm import ConversationStateMachine
 from loki.core.log_setup import setup_logging, banner as log_banner, flow as log_flow
@@ -91,6 +92,8 @@ from loki.features.file_watcher import FileWatcher
 from loki.features.clipboard_sync import ClipboardSync
 from loki.features.proactive_monitor import ProactiveMonitor
 from loki.features.google_integration import GoogleIntegration
+from loki.features.spotify_integration import SpotifyIntegration
+from loki.features.second_brain import SecondBrain
 from loki.features.auto_agent import AutoAgent
 
 from loki.ui.server import create_loki_server
@@ -161,6 +164,15 @@ class LokiApplication:
             brain_memory=self.brain_memory,
             rag_engine=self.rag_engine,
         )
+        # Learning loop: the bandit reorders cloud providers by learned reward,
+        # using the outcome log as its training data. Cold-start = default order.
+        _bcfg = self.config.get("llm", {}).get("bandit", {})
+        self.bandit = ProviderBandit(
+            self.outcome_log,
+            epsilon=_bcfg.get("epsilon", 0.15),
+            enabled=_bcfg.get("enabled", True),
+        )
+        self.brain._bandit = self.bandit
         self.tts = create_tts_engine(self.config)
         self.server = create_loki_server(self.config)
         self.server.set_components(
@@ -168,6 +180,9 @@ class LokiApplication:
             brain_memory=self.brain_memory,
             audit_log=self.audit_log,
             uploads_dir=memory_dir / "uploads",
+            outcome_log=self.outcome_log,
+            bandit=self.bandit,
+            brain=self.brain,
         )
 
         actions_cfg = self.config.get("actions", {})
@@ -247,6 +262,8 @@ class LokiApplication:
             is_busy=lambda: self.conversation.is_active,
         )
         self.google = GoogleIntegration(memory_dir)
+        self.spotify = SpotifyIntegration(memory_dir)
+        self.second_brain = SecondBrain(memory_dir, rag_engine=self.rag_engine)
 
         self.router = ActionRouter(self.undo_stack)
         self.router.register_action("file_ops", self.file_ops)
@@ -293,6 +310,8 @@ class LokiApplication:
         self.router.register_feature("footprint_auditor", self.footprint_auditor)
         self.router.register_feature("browser_history", self.browser_history)
         self.router.register_feature("google", self.google)
+        self.router.register_feature("spotify", self.spotify)
+        self.router.register_feature("second_brain", self.second_brain)
         # Remaining / enhancement features
         self.router.register_feature("screenshot_search", self.screenshot_search)
         self.router.register_feature("calendar_manager", self.calendar_manager)
@@ -337,6 +356,7 @@ class LokiApplication:
         self.server.on_mute_toggle  = lambda m: self.voice.set_muted(m)
         self.server.on_undo         = self._on_undo
         self.server.on_feedback     = self._on_feedback
+        self.server.on_stop_speaking = self.conversation.barge_in
 
         # AutoAgent progress → chat feed
         self.auto_agent._on_progress = self.server.add_loki_message

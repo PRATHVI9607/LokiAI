@@ -247,6 +247,19 @@ class ActionRouter:
             "calendar_today":  self._handle_calendar_today,
             "calendar_next":   self._handle_calendar_next,
             "email_unread":    self._handle_email_unread,
+            "email_send":      self._handle_email_send,
+            "calendar_create": self._handle_calendar_create,
+            # Spotify
+            "spotify_now":      self._handle_spotify_now,
+            "spotify_play":     self._handle_spotify_play,
+            "spotify_pause":    self._handle_spotify_pause,
+            "spotify_next":     self._handle_spotify_next,
+            "spotify_previous": self._handle_spotify_previous,
+            # Second brain (personal memory)
+            "remember":   self._handle_remember,
+            "recall":     self._handle_recall,
+            "forget":     self._handle_forget,
+            "notes_list": self._handle_notes_list,
             # Meta
             "undo": self._handle_undo,
             "chat": lambda p: {"success": True, "message": intent.get("message", "")},
@@ -747,6 +760,58 @@ class ActionRouter:
     def _handle_email_unread(self, p):
         g = self._features.get("google")
         return g.unread_summary(int(p.get("count", 5))) if g else self._missing("google")
+
+    def _handle_email_send(self, p):
+        g = self._features.get("google")
+        return g.send_email(p.get("to", ""), p.get("subject", ""), p.get("body", "")) if g else self._missing("google")
+
+    def _handle_calendar_create(self, p):
+        g = self._features.get("google")
+        return g.create_event(p.get("title", ""), p.get("start", ""), int(p.get("duration_minutes", 60))) if g else self._missing("google")
+
+    # --- Spotify ---
+    def _handle_spotify_now(self, p):
+        s = self._features.get("spotify")
+        if not s:
+            return self._missing("spotify")
+        q = p.get("query", "")
+        return s.search_play(q) if q else s.now_playing()
+
+    def _handle_spotify_play(self, p):
+        s = self._features.get("spotify")
+        if not s:
+            return self._missing("spotify")
+        q = p.get("query", "")
+        return s.search_play(q) if q else s.play()
+
+    def _handle_spotify_pause(self, p):
+        s = self._features.get("spotify")
+        return s.pause() if s else self._missing("spotify")
+
+    def _handle_spotify_next(self, p):
+        s = self._features.get("spotify")
+        return s.next() if s else self._missing("spotify")
+
+    def _handle_spotify_previous(self, p):
+        s = self._features.get("spotify")
+        return s.previous() if s else self._missing("spotify")
+
+    # --- Second brain ---
+    def _handle_remember(self, p):
+        sb = self._features.get("second_brain")
+        return sb.remember(p.get("text", "")) if sb else self._missing("second_brain")
+
+    def _handle_recall(self, p):
+        sb = self._features.get("second_brain")
+        return sb.recall(p.get("query", "")) if sb else self._missing("second_brain")
+
+    def _handle_forget(self, p):
+        sb = self._features.get("second_brain")
+        return sb.forget(p.get("query", "")) if sb else self._missing("second_brain")
+
+    def _handle_notes_list(self, p):
+        sb = self._features.get("second_brain")
+        return sb.list_notes() if sb else self._missing("second_brain")
 
     def _handle_screen_translate(self, p):
         f = self._features.get("screenshot_search")

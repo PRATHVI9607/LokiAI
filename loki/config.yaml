@@ -35,6 +35,13 @@ llm:
   max_tokens: 600
   temperature: 0.70
 
+  # Learning loop — bandit reorders cloud providers by reward learned from your
+  # own usage (memory/outcomes.jsonl). Local model stays pinned first when
+  # prefer_local; only the cloud fallbacks (nvidia/openrouter/kimi) are reordered.
+  bandit:
+    enabled: true
+    epsilon: 0.15   # exploration rate (0 = always exploit best, 1 = always random)
+
 whisper:
   model: base.en
   device: auto       # auto = GPU (CUDA) if available, else CPU
