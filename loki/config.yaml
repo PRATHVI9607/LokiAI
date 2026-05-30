@@ -43,7 +43,9 @@ wakeword:
   chunk_duration: 2.0
   check_interval: 0.5
   porcupine_sensitivity: 0.5
-  rms_threshold: 0.006   # min audio energy — below this is silence (was 0.01, missed soft speech)
+  rms_threshold: 0.0025  # min audio energy to trigger wakeword. Lower = more sensitive
+                         # (you shouldn't have to raise your voice). The hallucination
+                         # filter in the listener now guards against noise getting through.
 
 tts:
   engine: edge         # "edge" | "pyttsx3" | "luxtts"
@@ -66,7 +68,8 @@ memory:
 audio:
   sample_rate: 16000
   channels: 1
-  vad_aggressiveness: 1      # 0-3; 1 catches more speech without false positives
+  vad_aggressiveness: 0      # 0-3; 0 = most sensitive (catches quiet speech). The
+                             # listener's hallucination filter handles any noise that slips in.
   silence_duration: 1.0      # seconds of silence before flushing to Whisper (was 2.0, felt laggy)
   min_audio_seconds: 0.35    # minimum clip length sent to Whisper — shorter clips hallucinate
   max_record_seconds: 15     # safety flush if speech never stops

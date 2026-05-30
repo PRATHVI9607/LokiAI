@@ -691,10 +691,13 @@ class LokiBrain:
         m = None
 
         # ── MULTI-STEP automation → hand to the agent ───────────────────────
-        # genuine sequences: "X then Y", or "open … and type/write/save …"
-        if (" then " in t
-                or re.search(r"\b(?:open|launch|start)\b.{0,40}\b(?:type|write|save|fill in|enter)\b", t)
-                or re.search(r"\b(?:type|write)\b.{0,40}\b(?:and|then)\b.{0,20}\b(?:save|press|enter)\b", t)):
+        # genuine sequences: "X then Y", or "open … and <do something> …"
+        _act2 = r"(?:type|write|save|create|make|generate|fill|enter|draft|compose|then)"
+        # (youtube "open … and search" is one action — handled by the youtube block below)
+        if "youtube" not in t and (
+                " then " in t
+                or re.search(rf"\b(?:open|launch|start)\b.{{0,50}}\band\b.{{0,30}}\b{_act2}\b", t)
+                or re.search(rf"\b{_act2}\b.{{0,40}}\b(?:and|then)\b.{{0,25}}\b(?:save|press|enter|it|that)\b", t)):
             return json.dumps({"intent": "agent_run", "params": {"goal": text.strip()},
                                "message": "On it — running that as a sequence."})
 
@@ -716,22 +719,30 @@ class LokiBrain:
                                    "message": f"Searching YouTube for {topic}."})
             return json.dumps({"intent": "browser_open", "params": {"url": "youtube.com"}, "message": "Opening YouTube."})
 
-        # ── search the web (explicit) ───────────────────────────────────────
+        # ── search the web (explicit) — but NOT "open google chrome" etc. ────
         m = re.search(r"\b(?:google|search(?:\s+the\s+web)?|look up)\s+(?:for\s+)?(.+)", t)
-        if m and "youtube" not in t:
+        if m and "youtube" not in t and not re.match(r"^\s*(?:open|launch|go to|visit|start)\b", t):
             return json.dumps({"intent": "browser_search", "params": {"query": m.group(1).strip()}, "message": "Searching."})
 
         # ── open a known site or a URL ──────────────────────────────────────
         m = re.search(r"\b(?:open|go to|visit|launch)\s+(?:the\s+|my\s+|app\s+|website\s+)?(.+)", t)
         if m:
             tgt = m.group(1).strip()
+            # clip at the first conjunction — an app/site name is short, not a sentence
+            # ("open notepad and write a poem" → name = "notepad", the rest is multi-step)
+            tgt = re.split(r"\b(?:and|then|to|with|for|so that)\b|,", tgt, 1)[0].strip()
+            # cap to 4 words max (covers "visual studio code", "microsoft edge")
+            tgt = " ".join(tgt.split()[:4])
+            if not tgt:
+                return None
             # explicit url
             if re.search(r"\.(com|org|net|io|ai|dev|co|gov|edu|uk)\b", tgt) or tgt.startswith("http"):
                 return json.dumps({"intent": "browser_open", "params": {"url": tgt}, "message": "Opening it."})
-            # known website word (e.g. "open reddit")
-            first = tgt.split()[0] if tgt.split() else tgt
-            if first in cls._SITES:
-                return json.dumps({"intent": "browser_open", "params": {"url": cls._SITES[first]}, "message": f"Opening {first}."})
+            # known website word — only when it's a SINGLE word ("open reddit"),
+            # so "open google chrome" still opens the Chrome app, not google.com
+            words = tgt.split()
+            if len(words) == 1 and words[0] in cls._SITES:
+                return json.dumps({"intent": "browser_open", "params": {"url": cls._SITES[words[0]]}, "message": f"Opening {words[0]}."})
             # otherwise it's an app
             return json.dumps({"intent": "app_open", "params": {"name": tgt}, "message": f"Opening {tgt}."})
 
