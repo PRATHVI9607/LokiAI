@@ -187,6 +187,7 @@ class ActionRouter:
             "screen_read": self._handle_screen_read,
             "screen_search": self._handle_screen_search,
             "screen_describe": self._handle_screen_describe,
+            "screen_ask": self._handle_screen_ask,
             "screen_translate": self._handle_screen_translate,
             "screenshot_save": self._handle_screenshot_save,
             # Calendar
@@ -725,6 +726,10 @@ class ActionRouter:
     def _handle_screen_describe(self, p):
         f = self._features.get("screenshot_search")
         return f.describe_screen() if f else self._missing("screenshot_search")
+
+    def _handle_screen_ask(self, p):
+        f = self._features.get("screenshot_search")
+        return f.ask_screen(p.get("question", "")) if f else self._missing("screenshot_search")
 
     def _handle_screen_translate(self, p):
         f = self._features.get("screenshot_search")

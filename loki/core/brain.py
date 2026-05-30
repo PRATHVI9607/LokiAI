@@ -194,6 +194,7 @@ INTENTS (meetings):
 
 INTENTS (screen & visual):
 - screen_capture: params={region?}
+- screen_ask: params={question}  (LOOK at the screen and answer — "what's this error", "what's on my screen", "summarize this page")
 - screen_read: params={region?}
 - screen_search: params={query}
 - screen_describe: params={}
@@ -356,6 +357,11 @@ class LokiBrain:
             config.get("fast_model",        "openai/gpt-oss-120b:free"),
             config.get("fallback_model",     "google/gemma-4-31b-it:free"),
             config.get("second_fallback_model", "liquid/lfm-2.5-1.2b-instruct:free"),
+        ]
+        # vision model for "look at my screen" (multimodal, via OpenRouter)
+        self._vision_models = [
+            config.get("vision_model", "meta-llama/llama-3.2-11b-vision-instruct:free"),
+            "google/gemma-3-27b-it:free",
         ]
 
         # ─── Provider 2 (DEEP REASONING): NVIDIA NIM — Kimi K2.6 ────────────
@@ -777,10 +783,13 @@ class LokiBrain:
         if re.search(r"\b(?:list|show|what).*(?:process|running app|task)", t):
             return json.dumps({"intent": "process_list", "params": {}, "message": "Listing processes."})
 
-        # ── COMPUTER CONTROL — act like a person at the keyboard ────────────
-        # read the screen
-        if re.search(r"\b(?:read|what.?s on|whats on|describe).*(?:screen|display)\b", t):
-            return json.dumps({"intent": "screen_read", "params": {}, "message": "Reading the screen."})
+        # ── VISION — look at the screen and answer ─────────────────────────
+        # "what's on my screen", "what's this error", "look at my screen", "what am I looking at"
+        if (re.search(r"\b(?:what'?s|what is|whats|describe|explain|summari[sz]e|read|look at|check)\b.{0,30}\b(?:screen|display|this|page|error|here|window)\b", t)
+                or re.search(r"\bwhat am i (?:looking at|seeing|on)\b", t)
+                or t in ("what's this", "whats this", "look at this", "what is this")):
+            return json.dumps({"intent": "screen_ask", "params": {"question": text.strip()},
+                               "message": "Let me take a look."})
         # type text  →  type "hello"  /  type hello world
         m = re.search(r'\btype\s+(?:out\s+)?["\']?(.+?)["\']?$', t)
         if m:
@@ -810,6 +819,33 @@ class LokiBrain:
                 return json.dumps({"intent": "computer_action", "params": {"action": act}, "message": f"{act.title()}."})
 
         return None
+
+    def ask_vision(self, question: str, image_b64: str) -> str:
+        """Answer a question about an image (a screenshot) using a vision model.
+        Returns '' if no vision-capable provider is reachable."""
+        if not self._openrouter_client:
+            return ""
+        content = [
+            {"type": "text", "text": question},
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_b64}"}},
+        ]
+        messages = [
+            {"role": "system", "content": self._build_system_prompt()},
+            {"role": "user", "content": content},
+        ]
+        for model in self._vision_models:
+            try:
+                resp = self._openrouter_client.chat.completions.create(
+                    model=model, messages=messages, max_tokens=500, temperature=0.4,
+                    extra_headers={"HTTP-Referer": "loki-desktop-assistant", "X-Title": "Loki"},
+                )
+                text = (resp.choices[0].message.content or "").strip()
+                if text:
+                    logger.debug(f"Vision answer from {model}")
+                    return text
+            except Exception as e:
+                logger.warning(f"Vision model {model}: {e}")
+        return ""
 
     def ask(self, user_message: str, is_wakeword: bool = False) -> Generator[str, None, None]:
         if is_wakeword:

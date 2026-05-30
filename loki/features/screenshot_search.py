@@ -264,6 +264,46 @@ class ScreenshotSearch:
             "data": {"matches": matches},
         }
 
+    def ask_screen(self, question: str = "") -> dict:
+        """Look at the screen and answer a question about it. Uses a real vision
+        model (sends the actual image); falls back to OCR + text LLM if no vision
+        model is reachable. Powers 'what's on my screen / what's this error'."""
+        png = _capture_screen()
+        if not png:
+            return {"success": False, "message": "Couldn't capture the screen."}
+
+        q = question.strip() or "Describe what's on the screen and what the user is doing. Be concise."
+
+        # 1. real vision — resize first so it fits token/VRAM limits
+        if self._brain and hasattr(self._brain, "ask_vision"):
+            try:
+                import io as _io
+                from PIL import Image
+                img = Image.open(_io.BytesIO(png)).convert("RGB")
+                if img.width > 1280:
+                    h = int(img.height * 1280 / img.width)
+                    img = img.resize((1280, h))
+                buf = _io.BytesIO(); img.save(buf, format="JPEG", quality=70)
+                b64 = base64.b64encode(buf.getvalue()).decode()
+                answer = self._brain.ask_vision(q, b64)
+                if answer:
+                    return {"success": True, "message": answer, "data": {"mode": "vision"}}
+            except Exception as e:
+                logger.debug(f"vision path failed: {e}")
+
+        # 2. fallback — OCR the screen, let the text LLM reason about it
+        text = self._ocr(png)
+        if not text:
+            return {"success": True,
+                    "message": "I captured the screen but couldn't read any text, and no vision model is reachable."}
+        if self._brain:
+            prompt = (f"This text was read off the user's screen via OCR. Answer their question.\n\n"
+                      f"Question: {q}\n\nScreen text:\n{text[:2500]}")
+            ans = self._llm(prompt)
+            if ans:
+                return {"success": True, "message": ans, "data": {"mode": "ocr", "text": text}}
+        return {"success": True, "message": f"On screen:\n{text[:600]}", "data": {"mode": "ocr", "text": text}}
+
     def describe_screen(self) -> dict:
         """Capture the screen and ask LLM to describe what's on it (vision model)."""
         png = _capture_screen()

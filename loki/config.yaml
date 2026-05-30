@@ -17,6 +17,9 @@ llm:
   # NVIDIA NIM — Kimi K2.6 (set NVIDIA_API_KEY in .env to enable)
   nvidia_thinking: false  # true = deep reasoning but slow (30-90s); false = fast mode
 
+  # Vision model for "look at my screen" (multimodal, via OpenRouter)
+  vision_model: meta-llama/llama-3.2-11b-vision-instruct:free
+
   # Kimi Moonshot direct (set KIMI_API_KEY in .env to enable)
   kimi_model: kimi-k2
 
