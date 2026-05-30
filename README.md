@@ -51,7 +51,7 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 | **SQL Builder** | Natural language to SQL query |
 | **Code Converter** | Python → Go → TypeScript, any pair |
 | **Security Scanner** | Detect API keys, passwords, secrets in code |
-| **Git Helper** | Status, commit, diff summaries |
+| **Git Helper** | Status, commit, diff summaries, **push/pull/remote** (SSH + HTTPS) — push is confirmation-gated |
 | **Dockerfile Generator** | Production-ready multi-stage Dockerfile for any project |
 | **Venv Setup Script** | PowerShell setup script for Python virtual environments |
 | **Docker Compose Gen** | Multi-service docker-compose.yml with healthchecks |
@@ -86,7 +86,7 @@ Loki is an elite AI desktop assistant for Windows. Voice-activated, always-on, a
 
 | Feature | Description |
 |---------|-------------|
-| **Task Manager** | Add, list, complete tasks; AI-ranked priority order via LLM scoring |
+| **Task Manager** | Add, list, complete tasks; **recurring tasks** (daily/weekly/monthly); validated due dates; AI-ranked priority via LLM scoring |
 | **Calendar Manager** | Parse `.ics` files, detect scheduling conflicts, suggest free meeting slots |
 | **Expense Tracker** | Extract billing info from email text / `.eml` files; CSV ledger + monthly summary |
 | **Focus Mode** | Block distracting sites (YouTube, Reddit, etc.) via hosts file |
@@ -244,27 +244,35 @@ Or type directly in the chat panel.
 main.py                    Entry point — wires everything
 loki/
 ├── core/
-│   ├── brain.py           LLM + KORTEX context engineering (Ollama/OpenRouter)
-│   ├── brain_memory.py    Persistent facts, personality, session summaries
-│   ├── listener.py        Whisper STT
-│   ├── wakeword.py        "Hey Loki" detection
-│   ├── tts.py             edge-tts (Microsoft Neural voices)
-│   ├── action_router.py   Intent dispatch — 100+ handlers covering all 50 features
+│   ├── brain.py           LLM + KORTEX context engineering (Ollama/OpenRouter); _llm_lock
+│   ├── bandit.py          Contextual bandit — learns the best provider from outcomes
+│   ├── outcome_log.py     Per-interaction training data (transcript→provider→👍/👎)
+│   ├── brain_memory.py    Persistent facts, personality, session summaries (bounded)
+│   ├── listener.py        Whisper STT (worker watchdog + explicit stream cleanup)
+│   ├── wakeword.py        "Hey Loki" detection (availability-gated)
+│   ├── tts.py             edge-tts (Microsoft Neural voices); sentence streaming + barge-in
+│   ├── action_router.py   Intent dispatch — 120+ handlers; destructive-op confirmation gate
 │   ├── undo_stack.py      Reversible actions (25-deep)
-│   ├── memory.py          Persistent conversation + task storage
-│   └── audit.py           Structured audit log for all actions
-├── features/              41 feature modules
+│   ├── memory.py          Persistent conversation + tasks (recurrence, validated dates)
+│   ├── audit.py           Structured audit log (UTC-ms) for all actions
+│   ├── prompt_utils.py    wrap_untrusted() — prompt-injection defense
+│   ├── paths.py           Shared path-traversal validation
+│   ├── log_utils.py       Secret redaction for logs
+│   ├── config_check.py    Startup config validation
+│   └── proactive_monitor  Unprompted "alive" alerts (CPU/RAM/battery/breaks)
+├── features/              44 feature modules
 │   ├── OS & System        file_search, system_monitor, process_manager, process_triage,
 │   │                      file_organizer, window_tiler, dynamic_ui, file_watcher, clipboard_sync
-│   ├── Intelligence       web_summarizer, pdf_chat, rag_engine, screenshot_search,
-│   │                      semantic_browser_history, knowledge_graph, fact_checker
-│   ├── Coding             code_assistant, git_helper, security_scanner, api_mocker, env_setup
+│   ├── Intelligence       web_summarizer, pdf_chat, rag_engine, screenshot_search (vision),
+│   │                      semantic_browser_history, knowledge_graph (pruned), fact_checker, second_brain
+│   ├── Coding             code_assistant, git_helper (SSH/HTTPS), security_scanner, api_mocker, env_setup
 │   ├── Writing            ghostwriter, grammar_polisher, citation_generator,
 │   │                      email_drafter, daily_briefing
-│   ├── Data               currency_converter, news_aggregator, media_converter,
+│   ├── Data               currency_converter, news_aggregator (cached), media_converter,
 │   │                      calendar_manager, expense_tracker
+│   ├── Integrations       google_integration (Gmail+Calendar), spotify_integration
 │   ├── Files              backup_manager, digital_declutter, software_updater
-│   ├── Security           vault, phishing_detector, footprint_auditor
+│   ├── Security           vault (throttled), phishing_detector, footprint_auditor
 │   ├── Meetings           meeting_transcriber
 │   └── Productivity       task_manager, focus_mode, clipboard_manager
 ├── actions/               6 system action modules (file_ops, shell_exec, system_ctrl,
@@ -274,6 +282,23 @@ loki/
 ├── core/conversation_sm   conversation state machine (idle/listening/thinking/speaking)
 └── ui/                    FastAPI server + Next.js frontend (Norse dark theme)
 ```
+
+---
+
+## Quality, Testing & Security
+
+- **Tests:** `129` pytest + `6` Vitest, all green. Run with `pytest loki/tests/ -q`
+  and (in `loki-ui/`) `npm run typecheck && npm test`.
+- **CI:** GitHub Actions runs pytest on Windows + typecheck/Vitest/build on every push.
+- **Security hardening:**
+  - Prompt-injection defense — untrusted content (web/PDF/screen/email) is delimited
+    and the model is told to treat it as data (`prompt_utils.wrap_untrusted`).
+  - Path-traversal blocked via a single `paths.resolve_within_roots` check.
+  - Vault brute-force throttling; shell allowlist + metacharacter blocking.
+  - Rate limiting on the WebSocket + uploads; secrets redacted from logs.
+  - Destructive ops (delete, kill, shell, `git push`) require explicit confirmation.
+- **Observability:** opt-in JSON logs (`logging.json: true`), a `/stats` endpoint with
+  per-provider latency/success, and an in-app **Insights** dashboard.
 
 ---
 
